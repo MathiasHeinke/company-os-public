@@ -63,7 +63,6 @@ Sort order is stable:
 node scripts/orchestration/founder-daily-queue.mjs \
   --workspace companyos \
   --project-id <uuid or default COMPA anchor> \
-  --project-identifier <COMPA|ATLAS|...> \
   --output reports/runs/2026-05-13/founder-queue.md \
   --date 2026-05-13 \
   --json
@@ -75,7 +74,6 @@ Flags:
 |---|---|---|
 | `--workspace` | yes | Plane workspace slug. |
 | `--project-id` | no | Plane project UUID. Defaults to the COMPA anchor. Override with `PLANE_PROJECT_ID` env. |
-| `--project-identifier` | no | Rendered work item prefix. Defaults to `COMPA`; pass `ATLAS` when targeting the Atlas Bio.OS project. |
 | `--output` | yes | Absolute path to write the Markdown artifact. The directory is created if missing. |
 | `--date` | no | Override the artifact date header (defaults to today UTC). |
 | `--auth` | no | `app-token` (default) or `api-key`. Mirrors `scripts/plane/plane-auth.mjs`. |

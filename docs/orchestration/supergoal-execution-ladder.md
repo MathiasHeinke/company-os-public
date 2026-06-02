@@ -109,21 +109,6 @@ gate evidence. This is the artifact Codex/CEO reviews to move an item from "buil
 HG-2.5 release authority. It keeps integration a deliberate, evidenced act rather than an implicit
 side effect of a green worker run.
 
-## Pattern 4 — Post-Worker Quality Follow-Up
-
-When a supergoal worker needs quality, security, regression, deep-audit or
-bounded hotfix follow-up, the controller does not spawn that follow-up worker.
-It writes scheduler-visible `controller.audit-followup` or
-`controller.hotfix-request` markers. The scheduler then translates eligible
-markers into `scheduler.lower-worker-candidate` comments and normal lower-worker
-contracts. A lower-worker candidate is still only a queueable artifact; it is
-not a lock, spawn, state transition, integration proof, production proof or
-Plane `Done` authority.
-
-[WORK_ITEM_ID] is the reference proof path: `quality-auditor` and then
-`security-auditor` ran through marker-to-scheduler handoff, while the controller
-kept direct spawn authority at zero.
-
 ## Implementation hooks (v0)
 
 - `scripts/orchestration/supergoal-execution-ladder-core.mjs` — stage enum, `STAGE_AUTHORITY`,

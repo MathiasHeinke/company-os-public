@@ -12,7 +12,8 @@ Decide:
 - initial autonomy profile and maximum autonomy ceiling
 - GitHub org/user
 - primary product repo name
-- Company.OS repo visibility: private first, public later
+- Company.OS source: public clone or sanitized public mirror first; private
+  overlay later
 - execution ledger: Plane workspace/project; Linear only if importing legacy work
 - memory split: personal, company architecture, user/product memory
 - cloud providers: Vercel, Supabase, Google Cloud, Stripe as needed
@@ -69,7 +70,7 @@ Create:
 Clone locally under one developer root:
 
 ```text
-~/Developer/Company.OS
+~/Developer/company-os
 ~/Developer/product-repo
 ~/Developer/website-repo
 ~/Developer/agent-repo
@@ -77,26 +78,26 @@ Clone locally under one developer root:
 
 ## Phase 4 - Install Company.OS Kit
 
-From the Company.OS repo root, run a dry-run first:
+From the public Company.OS repo root, run the public-RC installer:
 
 ```bash
-node scripts/install/bootstrap.mjs install \
-  --source ~/Developer/Company.OS \
+node scripts/install/public-rc.mjs install \
   --target ~/Developer/product-repo \
-  --dry-run \
+  --company "Acme Systems" \
+  --website "https://acme.example" \
+  --offer "AI operating-system setup" \
+  --buyer "founder-led service firms" \
+  --founder "Jane Founder" \
+  --approval-owner "Jane Founder" \
+  --first-department marketing \
   --json
 ```
 
-If the dry-run is clean, install:
+The installer runs the bootstrap collision dry-run, installs the kit, writes
+the first intake from signup/report seed, generates EVE's boot packet, writes
+an update dry-run report and writes a public-RC handoff report.
 
-```bash
-node scripts/install/bootstrap.mjs install \
-  --source ~/Developer/Company.OS \
-  --target ~/Developer/product-repo \
-  --json
-```
-
-The installer copies the kit and creates active local setup files:
+It creates active local setup files:
 
 - `.company-os/install-record.md`
 - `.company-os/company-discovery-brief.md`
@@ -104,6 +105,10 @@ The installer copies the kit and creates active local setup files:
 - `.company-os/operations/workspace-registry.json`
 - `.company-os/operations/software-stack.md`
 - `.company-os/operations/human-gates.md`
+- `.company-os/onboarding/company-intake.json`
+- `.company-os/onboarding/intake-record.json`
+- `.company-os/onboarding/eve-boot-packet.json`
+- `reports/company-os-public-rc/YYYY-MM-DD/company-os-public-rc-0.9.0-rc.0.md`
 
 Record the exact Company.OS version and autonomy profile. Do not install
 "latest" without a version.
@@ -213,20 +218,14 @@ functions. If enabled:
 
 ## Phase 6.5 - Company Discovery And Pressure Test
 
-After the technical install, run discovery before creating a large backlog or
-department rollout.
+After the public-RC install, review the generated discovery brief and EVE boot
+packet before creating a large backlog or department rollout.
 
-Start with the generated intake example:
-
-```bash
-cp ~/Developer/product-repo/.company-os/onboarding/company-intake.example.json \
-  ~/Developer/product-repo/.company-os/onboarding/company-intake.json
-```
-
-Edit the intake JSON, then generate the first company packet:
+If the first seed was incomplete, update the intake JSON and regenerate the
+first-company packet:
 
 ```bash
-node ~/Developer/Company.OS/scripts/onboarding/first-company-packet.mjs \
+node ~/Developer/company-os/scripts/onboarding/first-company-packet.mjs \
   --target ~/Developer/product-repo \
   --input ~/Developer/product-repo/.company-os/onboarding/company-intake.json \
   --date YYYY-MM-DD \
@@ -270,57 +269,64 @@ clear and the readiness verdict is `go` or `pilot-only`.
 
 ## Phase 6.6 - Self-Serve Smoke Drill
 
-Before claiming the install path for a new founder, run the combined smoke from
-the Company.OS source checkout:
+Before claiming the install path for a new founder, run the public-RC install
+drill from the public Company.OS source checkout:
 
 ```bash
-node ~/Developer/Company.OS/scripts/install/self-serve-smoke.mjs run \
-  --source ~/Developer/Company.OS \
-  --date YYYY-MM-DD \
-  --json
-```
-
-For an explicit target workspace:
-
-```bash
-node ~/Developer/Company.OS/scripts/install/self-serve-smoke.mjs run \
-  --source ~/Developer/Company.OS \
+node ~/Developer/company-os/scripts/install/public-rc.mjs install \
   --target ~/Developer/product-repo-self-serve-smoke \
+  --company "Acme Systems" \
+  --website "https://acme.example" \
+  --offer "AI operating-system setup" \
+  --buyer "founder-led service firms" \
+  --approval-owner "Jane Founder" \
+  --first-department marketing \
   --date YYYY-MM-DD \
   --json
 ```
 
-The smoke proves the narrow 0.7.1 path end to end:
+The older combined smoke remains useful for regression checks:
+
+```bash
+node ~/Developer/company-os/scripts/install/self-serve-smoke.mjs run \
+  --source ~/Developer/company-os \
+  --date YYYY-MM-DD \
+  --json
+```
+
+The public-RC drill proves the narrow 0.9 path end to end:
 
 - bootstrap dry-run blocks collisions before writes
 - bootstrap apply installs the kit
-- first company packet writes intake, discovery brief, EVE boot packet and
-  first Plane parent draft
+- signup/report seed writes intake, discovery brief, EVE boot packet and first
+  Plane parent draft
 - update check writes an update report
 - update apply dry-run stays non-destructive
+- public-RC handoff report tells EVE what is known and what needs confirmation
 
 This does not replace founder onboarding. It only proves the repo artifacts can
 produce the first install/onboarding/update evidence from a fresh target.
 
 ## Phase 7 - Company.OS Updates
 
-Before a client pilot, prove update visibility without mutating local state:
+Before a private/client overlay updates, prove update visibility from the
+public source without mutating local state:
 
 ```bash
-node ~/Developer/Company.OS/scripts/update/company-os-update.mjs check \
-  --source ~/Developer/Company.OS \
+node ~/Developer/company-os/scripts/update/company-os-update.mjs check \
+  --source ~/Developer/company-os \
   --target ~/Developer/product-repo \
-  --to 0.7.2 \
+  --to 0.9.0-rc.0 \
   --write-report
 ```
 
 Then run the apply dry-run:
 
 ```bash
-node ~/Developer/Company.OS/scripts/update/company-os-update.mjs apply \
-  --source ~/Developer/Company.OS \
+node ~/Developer/company-os/scripts/update/company-os-update.mjs apply \
+  --source ~/Developer/company-os \
   --target ~/Developer/product-repo \
-  --to 0.7.2 \
+  --to 0.9.0-rc.0 \
   --dry-run
 ```
 

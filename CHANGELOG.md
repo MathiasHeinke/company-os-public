@@ -5,6 +5,45 @@ runtime changes.
 
 ## Unreleased
 
+## 0.9.0-rc.0 - 2026-06-02
+
+Status: Public self-serve release candidate. This is the first Company.OS
+release line where the sanitized public clone or public mirror artifact is the
+canonical distribution source for a fresh external install. It is not a stable
+unsupported autonomy release, not scheduler-default-on and not a production
+write/publish/send/spend release.
+
+Added:
+
+- Public-RC install wrapper (`scripts/install/public-rc.mjs`) that turns a
+  signup/report seed into a fresh Company.OS target: bootstrap dry-run,
+  bootstrap apply, `company-intake.json`, EVE boot packet, company discovery
+  brief, first Plane parent draft, update provenance and public-RC handoff
+  report.
+- Public-RC install core and tests proving a naked target can start from generic
+  company seed without any client-specific assumptions.
+- Public mirror coverage for `registries/domain-packs/**`,
+  `registries/plane-templates/**` and `registries/quality/**`, while private
+  capability and inference registries remain stripped or replaced with examples.
+
+Changed:
+
+- `VERSION`, `README.md`, `ROADMAP.md`, `docs/releases/versioning.md`,
+  `docs/bootstrap/fresh-company-setup.md`, `docs/operations/client-productization-readiness.md`
+  and `kits/company-os-kit/README.md` now identify `0.9.0-rc.0` as the current
+  public-RC line.
+- The install path is now public-first: private or client overlays update from
+  the public source after the public mirror/clone proves install and update
+  evidence, not the other way around.
+
+Boundaries:
+
+- `0.9.0-rc.0` does not grant stable unattended self-serve claims, autonomous
+  publish/schedule/send/spend behavior, production writes, Plane `Done`,
+  public tags or release uploads without the relevant HumanGate release.
+- EVE may guide first-run setup and prepare founder/CEO decision packets, but
+  HG-4 remains founder-owned.
+
 ## 0.7.4-rc.0 - 2026-06-02
 
 Status: Supergoal Factory release candidate. This is a reusable Company.OS

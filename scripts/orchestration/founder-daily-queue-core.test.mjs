@@ -299,31 +299,6 @@ test("classifyItemForQueue picks an HG-4 item without a controller.decision", ()
   assert.equal(result.role, "role:coo");
 });
 
-test("classifyItemForQueue uses a caller-provided project identifier for refs", () => {
-  const result = classifyItemForQueue({
-    item: buildItem({ sequence_id: 542, name: "ATLAS HG-4 ask", updated_at: "2026-05-13T00:00:00Z", contractYaml: hg4ContractYaml() }),
-    comments: [],
-    labelNames: ["role:cao"],
-    projectIdentifier: "ATLAS",
-  });
-  assert.equal(result.sequence, "[WORK_ITEM_ID]");
-});
-
-test("classifyItemForQueue skips superseded duplicate items", () => {
-  const result = classifyItemForQueue({
-    item: buildItem({
-      sequence_id: 570,
-      name: "[SUPERSEDED-DUPLICATE] Old iOS gate",
-      updated_at: "2026-05-13T00:00:00Z",
-      contractYaml: hg4ContractYaml(),
-    }),
-    comments: [],
-    labelNames: ["role:cao"],
-    projectIdentifier: "ATLAS",
-  });
-  assert.equal(result, null);
-});
-
 test("classifyItemForQueue treats released HG-4 item with report as review-required", () => {
   const result = classifyItemForQueue({
     item: buildItem({ sequence_id: 228, name: "Claim gate", updated_at: "2026-05-13T00:00:00Z", contractYaml: hg4ContractYaml({ role: "role:cao" }) }),
@@ -512,17 +487,6 @@ test("buildQueueModel sorts HG-4 ahead of HG-3.5 and oldest first within a kind"
   assert.equal(model.primary[0].sequence, "[WORK_ITEM_ID]");
   assert.equal(model.primary[1].sequence, "[WORK_ITEM_ID]");
   assert.equal(model.primary[2].sequence, "[WORK_ITEM_ID]");
-});
-
-test("buildQueueModel carries project identifier into queue refs and JSON", () => {
-  const model = buildQueueModel({
-    records: [pendingHg4Record(577, "2026-05-13T01:00:00Z")],
-    date: "2026-05-13",
-    projectIdentifier: "ATLAS",
-  });
-  assert.equal(model.project_identifier, "ATLAS");
-  assert.equal(model.primary[0].sequence, "[WORK_ITEM_ID]");
-  assert.equal(renderQueueJson(model).project_identifier, "ATLAS");
 });
 
 test("buildQueueModel sorts HG-4 review-required ahead of dispatch-blocked items", () => {

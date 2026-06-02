@@ -7,7 +7,7 @@ import {
 } from "./post-worker-quality-loop-core.mjs";
 import {
   POST_WORKER_QUALITY_SCHEDULER_VERSION,
-  buildLowerWorkerDispatchesFromMarkers,
+  buildLowerWorkerDispatchFromMarker,
 } from "./post-worker-quality-scheduler-core.mjs";
 import {
   canonicalDescriptionText,
@@ -144,9 +144,9 @@ export function buildPlaneQualityProjectScan({
     }));
   }
 
-  const candidates = results.flatMap((result) => result.candidates?.length ? result.candidates : result.status === "LOWER_WORKER_READY" ? [result] : []);
-  const blocked = results.flatMap((result) => result.blocked?.length ? result.blocked : result.status === "BLOCKED" ? [result] : []);
-  const noSpawn = results.flatMap((result) => result.no_spawn?.length ? result.no_spawn : result.status === "NO_SPAWN" ? [result] : []);
+  const candidates = results.filter((result) => result.status === "LOWER_WORKER_READY");
+  const blocked = results.filter((result) => result.status === "BLOCKED");
+  const noSpawn = results.filter((result) => result.status === "NO_SPAWN");
   return {
     ok: true,
     version: POST_WORKER_QUALITY_PLANE_HANDOFF_VERSION,
@@ -197,7 +197,7 @@ export function buildPlaneQualitySchedulerHandoff({
     };
   }
 
-  const schedulerResult = buildLowerWorkerDispatchesFromMarkers({
+  const schedulerResult = buildLowerWorkerDispatchFromMarker({
     registry,
     comments: normalizedComments,
     parentContractFields: parentContract.fields,
@@ -206,10 +206,11 @@ export function buildPlaneQualitySchedulerHandoff({
     now,
   });
 
-  const base = {
+  return {
     ok: schedulerResult.ok,
     version: POST_WORKER_QUALITY_PLANE_HANDOFF_VERSION,
     scheduler_version: POST_WORKER_QUALITY_SCHEDULER_VERSION,
+    status: schedulerResult.status,
     generated_at: now.toISOString(),
     reason_codes: schedulerResult.reason_codes || [],
     work_item: {
@@ -224,50 +225,11 @@ export function buildPlaneQualitySchedulerHandoff({
       field_keys: Object.keys(parentContract.fields || {}).sort(),
       validation: parentContract.validation,
     },
-  };
-
-  if (schedulerResult.status === "CANDIDATES_READY" || schedulerResult.marker_count > 1) {
-    const decorate = (result) => decorateSchedulerResult({
-      result,
-      base,
-      status: result.status,
-    });
-    return {
-      ...base,
-      status: schedulerResult.status,
-      marker_count: schedulerResult.marker_count || 0,
-      candidate_count: schedulerResult.candidate_count || 0,
-      blocked_count: schedulerResult.blocked_count || 0,
-      no_spawn_count: schedulerResult.no_spawn_count || 0,
-      candidates: (schedulerResult.candidates || []).map(decorate),
-      blocked: (schedulerResult.blocked || []).map(decorate),
-      no_spawn: (schedulerResult.no_spawn || []).map(decorate),
-      scheduler: schedulerResult.scheduler || null,
-    };
-  }
-
-  return decorateSchedulerResult({
-    result: schedulerResult,
-    base,
-    status: schedulerResult.status,
-  });
-}
-
-function decorateSchedulerResult({
-  result,
-  base,
-  status,
-}) {
-  return {
-    ...base,
-    ok: result.ok,
-    status,
-    reason_codes: result.reason_codes || [],
-    marker: result.marker || null,
-    worker_class: result.worker_class || null,
-    worker_contract: result.worker_contract || null,
-    worker_contract_markdown: result.worker_contract_markdown || "",
-    scheduler: result.scheduler || null,
+    marker: schedulerResult.marker || null,
+    worker_class: schedulerResult.worker_class || null,
+    worker_contract: schedulerResult.worker_contract || null,
+    worker_contract_markdown: schedulerResult.worker_contract_markdown || "",
+    scheduler: schedulerResult.scheduler || null,
   };
 }
 
@@ -293,21 +255,7 @@ export function renderPlaneCandidateMarkdown(result = {}) {
     "",
   ];
 
-  if (result.status === "CANDIDATES_READY" && result.candidates?.length) {
-    lines.push(
-      "## Generated Lower-Worker Contracts",
-      "",
-    );
-    for (const candidate of result.candidates) {
-      lines.push(
-        `### ${candidate.worker_class || "unknown"}`,
-        "",
-        candidate.worker_contract_markdown || "",
-        "",
-      );
-    }
-    lines.push("This is a candidate set only. Runtime Dispatcher may consume each contract only after normal controller, runtime, capability and HumanGate checks pass.");
-  } else if (result.status === "LOWER_WORKER_READY" && result.worker_contract_markdown) {
+  if (result.status === "LOWER_WORKER_READY" && result.worker_contract_markdown) {
     lines.push(
       "## Generated Lower-Worker Contract",
       "",
@@ -325,14 +273,6 @@ export function renderPlaneCandidateMarkdown(result = {}) {
   }
 
   return lines.join("\n");
-}
-
-export function postableCandidateResults(result = {}) {
-  if (result.status === "CANDIDATES_READY") {
-    return asArray(result.candidates).filter((candidate) => candidate.status === "LOWER_WORKER_READY");
-  }
-  if (result.status === "LOWER_WORKER_READY") return [result];
-  return [];
 }
 
 export function findExistingCandidateComment(comments = [], result = {}) {

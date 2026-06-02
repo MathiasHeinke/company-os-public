@@ -1,0 +1,111 @@
+{
+  "version": "plane-template-registry/v0",
+  "source_of_truth": "docs/operations/plane-native-template-registry.md",
+  "updated_at": "2026-05-17",
+  "templates": [
+    {
+      "id": "work-item.clevel-worker-contract",
+      "plane_surface": "work_item",
+      "name": "C-Level Worker Contract",
+      "description": "Default delegable Company.OS worker item with a parseable Worker Issue Contract.",
+      "default_labels": ["${ROLE_LABEL}"],
+      "default_priority": "high",
+      "variables": {
+        "TITLE": "C-Level Worker Contract",
+        "ROLE_LABEL": "role:cto",
+        "PARENT_SEAT": "role:cto",
+        "AGENT": "claude",
+        "MODE": "implement",
+        "WORKSPACE": "registry:company-os",
+        "DISPATCH": "manual",
+        "SOURCE_OF_TRUTH": "- /absolute/source/path.md",
+        "ACCEPTANCE_CRITERIA": "- One verifiable outcome is complete.",
+        "GATES": "- node --test <focused-test>\n- node scripts/release-gates/productization-readiness.mjs check\n- git diff --check",
+        "HUMAN_GATE": "HG-2",
+        "ALLOWED_WRITE_PATHS": "- docs/\n- reports/runs/\n- docs/page-index.md",
+        "BLOCKED_ACTIONS": "No Plane Done, no push, no merge, no deploy, no production write, no secrets, no Linear writes.",
+        "REPORTING": "Plane worker.reported with changed files, commands/results, blockers, reflection, learning_proposals and artifact paths."
+      },
+      "body_markdown": "## Purpose\n\n${TITLE}\n\n## Worker Issue Contract\n\n```yaml\nrole: ${ROLE_LABEL}\nparent_seat: ${PARENT_SEAT}\nagent: ${AGENT}\nmode: ${MODE}\nworkspace: ${WORKSPACE}\ndispatch: ${DISPATCH}\nsource_of_truth:\n${SOURCE_OF_TRUTH}\nacceptance_criteria:\n${ACCEPTANCE_CRITERIA}\ngates:\n${GATES}\nhuman_gate: ${HUMAN_GATE}\nAllowedWritePaths:\n${ALLOWED_WRITE_PATHS}\nBlockedActions: ${BLOCKED_ACTIONS}\nReflectionPolicy: required\nLearningProposalPolicy: required\nreporting: ${REPORTING}\n```\n\n## Notes\n\nKeep this item narrow. If the scope grows beyond one worker pass, split before dispatch."
+    },
+    {
+      "id": "work-item.cao-audit",
+      "plane_surface": "work_item",
+      "name": "CAO Audit Item",
+      "description": "Separate CAO review seat. CAO verifies, rejects, or parks; CAO does not build.",
+      "default_labels": ["role:cao"],
+      "default_priority": "high",
+      "variables": {
+        "TITLE": "CAO Audit Item",
+        "WORKSPACE": "registry:company-os",
+        "DISPATCH": "manual",
+        "SOURCE_OF_TRUTH": "- /absolute/artifact/or/report.md",
+        "ACCEPTANCE_CRITERIA": "- Audit verdict is PASS, REJECT, or PARK with evidence.",
+        "GATES": "- Read source artifacts\n- Verify contract, report, gates and human-gate boundaries\n- Produce controller-readable verdict",
+        "HUMAN_GATE": "HG-2",
+        "REPORTING": "Plane controller.verdict or CAO audit report with findings, evidence, residual risk and blocked actions."
+      },
+      "body_markdown": "## Purpose\n\n${TITLE}\n\n## Worker Issue Contract\n\n```yaml\nrole: role:cao\nparent_seat: role:cao\nagent: claude\nmode: audit\nworkspace: ${WORKSPACE}\ndispatch: ${DISPATCH}\nsource_of_truth:\n${SOURCE_OF_TRUTH}\nacceptance_criteria:\n${ACCEPTANCE_CRITERIA}\ngates:\n${GATES}\nhuman_gate: ${HUMAN_GATE}\nBlockedActions: CAO does not build, edit production code, mark Done, approve regulated claims, push, merge, deploy or publish.\nReflectionPolicy: required\nLearningProposalPolicy: required\nreporting: ${REPORTING}\n```\n\n## CAO Bar\n\nFindings first, ordered by severity. No summary-only PASS. Every PASS names residual risk."
+    },
+    {
+      "id": "work-item.hg4-founder-review",
+      "plane_surface": "work_item",
+      "name": "HG-4 Founder Review",
+      "description": "Founder decision packet for strategic, non-restorable or true founder-will actions.",
+      "default_labels": ["role:cao"],
+      "default_priority": "urgent",
+      "variables": {
+        "TITLE": "HG-4 Founder Review",
+        "WORKSPACE": "registry:company-os",
+        "SOURCE_OF_TRUTH": "- /absolute/decision-packet.md",
+        "DECISION_OPTIONS": "- APPROVE\n- APPROVE_WITH_CHANGES\n- REJECT",
+        "BLOCKED_ACTIONS": "No worker dispatch beyond the signed boundary, no Plane Done, no claim approval, no deploy, no publish, no production write.",
+        "REPORTING": "Founder signs or rejects in Plane with founder.sign YAML."
+      },
+      "body_markdown": "## Purpose\n\n${TITLE}\n\n## Decision Needed\n\nReview the packet and choose one of:\n\n${DECISION_OPTIONS}\n\n## Worker Issue Contract\n\n```yaml\nrole: role:cao\nparent_seat: role:cao\nagent: human\nmode: review\nworkspace: ${WORKSPACE}\ndispatch: manual\nsource_of_truth:\n${SOURCE_OF_TRUTH}\nacceptance_criteria:\n  - Founder decision is posted as founder.sign YAML.\ngates:\n  - Source packet exists and names blocked actions.\n  - Decision options are explicit.\n  - Rollback or rework path is named.\nhuman_gate: HG-4\nBlockedActions: ${BLOCKED_ACTIONS}\nreporting: ${REPORTING}\n```\n\n## Sign Template\n\n```yaml\nfounder.sign:\n  work_item: <COMPA-###>\n  verdict: APPROVE | APPROVE_WITH_CHANGES | REJECT\n  reason: <required for APPROVE_WITH_CHANGES or REJECT>\n  signed_at: <ISO-8601>\n```"
+    },
+    {
+      "id": "work-item.goal-parent",
+      "plane_surface": "work_item",
+      "name": "Goal Parent",
+      "description": "Parent item for /goal command work. Not directly dispatched.",
+      "default_labels": ["role:coo"],
+      "default_priority": "high",
+      "variables": {
+        "GOAL_TITLE": "Company.OS Goal",
+        "OUTCOME": "One measurable operating-system outcome.",
+        "ROLE_LABEL": "role:coo",
+        "CHILDREN": "- Child 1: define worker contract\n- Child 2: run worker\n- Child 3: synthesize and release-gate",
+        "HUMAN_GATE": "HG-2"
+      },
+      "body_markdown": "## GoalState\n\n```yaml\ngoal_state:\n  title: ${GOAL_TITLE}\n  outcome: ${OUTCOME}\n  owner_role: ${ROLE_LABEL}\n  human_gate: ${HUMAN_GATE}\n```\n\n## Children\n\n${CHILDREN}\n\n## Rule\n\nThis parent is not a worker contract. Children must each contain a parseable fenced Worker Issue Contract before scheduler dispatch."
+    },
+    {
+      "id": "page.founder-daily-queue",
+      "plane_surface": "page",
+      "name": "Founder Daily Queue Page",
+      "description": "Daily Founder decision surface for HG-4 and HG-3.5 pending items.",
+      "default_labels": [],
+      "default_priority": "medium",
+      "variables": {
+        "DATE": "YYYY-MM-DD",
+        "QUEUE_ARTIFACT": "reports/goals/YYYY-MM-DD/founder-daily-queue.md"
+      },
+      "body_markdown": "# Founder Daily Queue — ${DATE}\n\nSource artifact: `${QUEUE_ARTIFACT}`\n\n## Primary Queue\n\nPaste the generated queue contents here.\n\n## Rules\n\n- Sign/reject in the original Plane work item, not on this page.\n- No Done transitions from this page.\n- Keep daily queue to <= 10 primary items.\n- Use this page as a decision cockpit, not as memory."
+    },
+    {
+      "id": "project.company-os-client-install",
+      "plane_surface": "project",
+      "name": "Company.OS Client Install",
+      "description": "Seed project template for a new Company.OS implementation.",
+      "default_labels": [],
+      "default_priority": "high",
+      "variables": {
+        "CLIENT_NAME": "[Client]",
+        "PROJECT_IDENTIFIER": "COPS",
+        "FIRST_GOAL": "Install Company.OS guided alpha substrate."
+      },
+      "body_markdown": "# ${CLIENT_NAME} — Company.OS Install\n\nIdentifier: `${PROJECT_IDENTIFIER}`\n\n## First Goal\n\n${FIRST_GOAL}\n\n## Seed Work Items\n\n1. Company discovery brief\n2. Plane labels/states/views check\n3. Worker contract template install\n4. Capability registry scaffold\n5. First read-only worker pilot\n6. Founder daily queue setup\n7. Release/readiness gate\n\n## Required Pages\n\n- Project Overview\n- Founder Daily Queue\n- Capability Registry\n- Release / Gate Ledger\n\n## Rules\n\n- Plane is execution ledger.\n- Worker and CAO do not mark Done.\n- HumanGate boundaries are explicit before runtime dispatch."
+    }
+  ]
+}

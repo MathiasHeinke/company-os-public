@@ -12,17 +12,13 @@ import {
   normalizeHumanGateLevel,
   resolveControllerInputs,
   decideController,
-  buildPostWorkerQualityPlanForController,
   buildDecisionCardYaml,
   findCaoVerdictComment,
-  findHumanGateReleaseComment,
 } from "./codex-controller-dryrun.mjs";
-import { loadPostWorkerQualityRegistry } from "./post-worker-quality-loop-core.mjs";
 import { stripHtml } from "./plane-html.mjs";
 import { extractContractBlock } from "./worker-ledger-validator.mjs";
 
 const EMPTY_GATES = { green: [], red: [] };
-const QUALITY_REGISTRY = loadPostWorkerQualityRegistry().registry;
 
 test("normalizeHumanGateLevel extracts canonical level from descriptive contracts", () => {
   assert.equal(normalizeHumanGateLevel("HG-2.5 sandbox only; no merge"), "HG-2.5");
@@ -66,18 +62,6 @@ test("resolveControllerInputs prefers CLI confidence over contract confidence", 
   });
   assert.equal(result.ceoConfidence, 0.93);
   assert.equal(result.ceoConfidenceSource, "cli");
-});
-
-test("resolveControllerInputs prefers CLI release authority over contract release authority", () => {
-  const result = resolveControllerInputs({
-    args: { confidence: 0.97, releaseAuthority: "CEO_CRITICAL" },
-    contractFields: {
-      releaseauthority: "CEO_AUTONOMOUS",
-    },
-  });
-  assert.equal(result.ceoConfidence, 0.97);
-  assert.equal(result.ceoConfidenceSource, "cli");
-  assert.equal(result.releaseAuthorityDeclared, "CEO_CRITICAL");
 });
 
 test("resolveControllerInputs derives confidence from HG-2.5 CEO release metadata", () => {
@@ -294,26 +278,6 @@ test("decideController ASK-FOUNDER on HG-4 regardless of confidence", () => {
   assert.equal(d.release_authority, "FOUNDER_REQUIRED");
 });
 
-test("decideController AUTO-GO on HG-4 only when explicit human gate release exists", () => {
-  const d = decideController({
-    caoVerdict: "PASS",
-    humanGateLevel: "HG-4",
-    ceoConfidence: 0,
-    humanGateRelease: {
-      ok: true,
-      comment_id: "release-1",
-      released_by: "Mathias Heinke",
-      level: "HG-4",
-      scope: "ARES-private-only",
-    },
-  });
-  assert.equal(d.decision_mode, DECISION_MODES.AUTO_GO);
-  assert.equal(d.reason, "hg-4-founder-released");
-  assert.equal(d.release_authority, "FOUNDER_REQUIRED");
-  assert.equal(d.next_state_hint, "founder-released");
-  assert.equal(d.human_gate_release.comment_id, "release-1");
-});
-
 test("decideController ASK-FOUNDER when HG-2.5 contract declares founder-required release", () => {
   const d = decideController({
     caoVerdict: "PASS",
@@ -447,75 +411,6 @@ test("buildDecisionCardYaml emits expected keys for SELF-FIX", () => {
   assert.match(yaml, /no_writes_performed: true/);
 });
 
-test("buildPostWorkerQualityPlanForController makes coding work scheduler-visible", () => {
-  const decision = decideController({
-    caoVerdict: "PASS",
-    humanGateLevel: "HG-2.5",
-    ceoConfidence: HUMAN_GATE_AUTO_GO_THRESHOLDS["HG-2.5"],
-  });
-  const plan = buildPostWorkerQualityPlanForController({
-    registry: QUALITY_REGISTRY,
-    decision,
-    contractFields: {
-      agent: "claude",
-      mode: "implement",
-      inferenceclass: "P2-code-shared",
-      postworkerqualitypolicy: "required",
-      scope: "scripts/orchestration runtime auth work",
-    },
-    workerReport: { state: "PASS" },
-    caoVerdict: "PASS",
-  });
-
-  assert.equal(plan.status, "FOLLOWUP_READY");
-  assert.equal(plan.scheduler.scheduler_may_spawn, true);
-  assert.deepEqual(
-    plan.markers_to_post.map((item) => `${item.marker}:${item.worker_class}`),
-    [
-      "controller.audit-followup:quality-auditor",
-      "controller.audit-followup:security-auditor",
-    ],
-  );
-});
-
-test("buildDecisionCardYaml emits post-worker quality markers into controller decision card", () => {
-  const decision = decideController({
-    caoVerdict: "PASS",
-    humanGateLevel: "HG-2.5",
-    ceoConfidence: HUMAN_GATE_AUTO_GO_THRESHOLDS["HG-2.5"],
-  });
-  decision._inputs = { ceoConfidence: HUMAN_GATE_AUTO_GO_THRESHOLDS["HG-2.5"] };
-  const postWorkerQualityPlan = buildPostWorkerQualityPlanForController({
-    registry: QUALITY_REGISTRY,
-    decision,
-    contractFields: {
-      agent: "claude",
-      mode: "implement",
-      inferenceclass: "P2-code-shared",
-      postworkerqualitypolicy: "required",
-      scope: "scripts/orchestration runtime auth work",
-    },
-    workerReport: { state: "PASS" },
-    caoVerdict: "PASS",
-  });
-
-  const yaml = buildDecisionCardYaml({
-    runId: "abc",
-    workItem: { id: "x", sequence_id: 456, name: "Quality Gate Test" },
-    caoVerdict: "PASS",
-    decision,
-    contractFields: { human_gate: "HG-2.5", blockedactions: "merge,push" },
-    signedAt: "2026-05-31T00:00:00.000Z",
-    postWorkerQualityPlan,
-  });
-
-  assert.match(yaml, /post_worker_quality:/);
-  assert.match(yaml, /controller\.audit-followup:/);
-  assert.match(yaml, /worker_class: quality-auditor/);
-  assert.match(yaml, /worker_class: security-auditor/);
-  assert.match(yaml, /scheduler_may_spawn: true/);
-});
-
 test("buildDecisionCardYaml preserves non-COMPA project identifiers", () => {
   const decision = decideController({
     caoVerdict: "PASS",
@@ -607,27 +502,4 @@ test("findCaoVerdictComment picks the most recent CAO verdict", () => {
 test("findCaoVerdictComment returns null if no CAO verdict comment present", () => {
   const r = findCaoVerdictComment([{ id: "x", comment_html: "<p>nope</p>" }]);
   assert.equal(r, null);
-});
-
-test("findHumanGateReleaseComment requires exact marker title and picks latest", () => {
-  const proseOnly = {
-    id: "prose",
-    created_at: "2026-05-08T00:00:00Z",
-    comment_html: "<p>worker.reported mentioned human_gate.released in prose only.</p>",
-  };
-  const older = {
-    id: "old-release",
-    created_at: "2026-05-08T01:00:00Z",
-    comment_html: '<p><strong>human_gate.released</strong></p><pre><code>human_gate.released:\n  level: HG-4\n  released_by: Founder\n  scope: old\n</code></pre>',
-  };
-  const newer = {
-    id: "new-release",
-    created_at: "2026-05-08T02:00:00Z",
-    comment_html: '<p><strong>human_gate.released</strong></p><pre><code>human_gate.released:\n  human_gate_level: HG-4\n  released_by: Mathias Heinke\n  tenant_scope: ARES-private-only\n</code></pre>',
-  };
-  const r = findHumanGateReleaseComment([proseOnly, older, newer]);
-  assert.equal(r.comment_id, "new-release");
-  assert.equal(r.released_by, "Mathias Heinke");
-  assert.equal(r.level, "HG-4");
-  assert.equal(r.scope, "ARES-private-only");
 });

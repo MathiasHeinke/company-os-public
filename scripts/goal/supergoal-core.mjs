@@ -2,11 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { extractContractBlock, validateContract } from "../orchestration/worker-ledger-validator.mjs";
-import {
-  canonicalDescriptionHash,
-  parseYamlScalar,
-  stripHtml,
-} from "../orchestration/plane-html.mjs";
+import { stripHtml } from "../orchestration/plane-html.mjs";
 import { classifySynthesisChild } from "./goal-synthesis-core.mjs";
 
 export const SUPERGOAL_PLANNER_VERSION = "supergoal-planner/v0";
@@ -69,41 +65,7 @@ function roleLabelForItem(item) {
 }
 
 function descriptionOf(item) {
-  const htmlDescription = stripHtml(item?.description_html || "");
-  if (htmlDescription && extractContractBlock(htmlDescription).ok) return htmlDescription;
   return stripHtml(item?.description_stripped || item?.description || item?.description_html || "");
-}
-
-function commentText(row) {
-  return stripHtml(row?.comment_html || row?.body || row?.comment_stripped || row?.text || "");
-}
-
-function commentTimestamp(row) {
-  const ts = Date.parse(row?.created_at || row?.updated_at || "");
-  return Number.isFinite(ts) ? ts : 0;
-}
-
-function latestContractReviewForDescription({ item, comments = [] } = {}) {
-  const currentHash = canonicalDescriptionHash(item || "");
-  let best = null;
-  for (const comment of comments || []) {
-    const body = commentText(comment);
-    if (!body.includes("controller.contract-review")) continue;
-    const match = body.match(/controller\.contract-review:\s*\n([\s\S]*?)(?:\n\S|$)/);
-    if (!match) continue;
-    const fields = parseYamlScalar(match[1]);
-    if (fields.description_hash !== currentHash) continue;
-    const ts = commentTimestamp(comment);
-    if (!best || ts >= best.ts) best = { comment_id: comment?.id || null, ts, fields };
-  }
-  return best;
-}
-
-function contractReviewReasonCodes(review) {
-  if (!review) return [];
-  const verdict = compact(review.fields?.verdict).toUpperCase();
-  if (verdict && verdict !== "CONTRACT_PASS") return ["contract-review.not-pass"];
-  return [];
 }
 
 function isSuperseded(item) {
@@ -203,17 +165,12 @@ function summarizeRow({ item, depth, byParent, byId, commentsByItemId, projectId
     comments: asArray(commentsByItemId?.[item.id]),
     projectIdentifier,
   });
-  const contractReview = latestContractReviewForDescription({
-    item,
-    comments: asArray(commentsByItemId?.[item.id]),
-  });
   const humanGate = normalizeHumanGate(fields.human_gate) || null;
   const done = isDoneState(item) || synthesis.complete;
   const superseded = isSuperseded(item);
   const leaf = children.length === 0;
   const reasonCodes = Array.from(new Set([
     ...(contract.reason_codes || []),
-    ...contractReviewReasonCodes(contractReview),
     ...(superseded ? ["supergoal.superseded"] : []),
     ...(!leaf ? ["supergoal.parent-has-children"] : []),
     ...(done ? ["supergoal.complete"] : []),
@@ -246,10 +203,7 @@ function summarizeRow({ item, depth, byParent, byId, commentsByItemId, projectId
     worker_reported: synthesis.worker_reported,
     cao_verdict: synthesis.cao_verdict,
     controller_decision: synthesis.controller_decision,
-    blockers: [
-      ...synthesis.blockers,
-      ...contractReviewReasonCodes(contractReview),
-    ],
+    blockers: synthesis.blockers,
   };
   return { ...row, model_route: modelRouteFor(row) };
 }
@@ -273,14 +227,6 @@ function stage05SortValue(row) {
   const text = `${row.ref} ${row.name}`.toLowerCase();
   if (/\breconcile\b/.test(text)) return 0;
   return 1;
-}
-
-function isRuntimeDispatchable(row) {
-  if (!row.leaf || !row.contract_ok || row.superseded) return false;
-  if (!row.worker_reported) {
-    return row.blockers.every((blocker) => blocker === "worker.reported-missing");
-  }
-  return row.blockers.length === 0;
 }
 
 export function buildSupergoalPlan({
@@ -321,7 +267,7 @@ export function buildSupergoalPlan({
     .sort((a, b) => sequenceSortValue(a) - sequenceSortValue(b) || a.name.localeCompare(b.name));
   const activeRows = includeSuperseded ? allRows : allRows.filter((row) => !row.superseded);
   const incomplete = activeRows.filter((row) => !row.complete);
-  const dispatchable = incomplete.filter(isRuntimeDispatchable);
+  const dispatchable = incomplete.filter((row) => row.leaf && row.contract_ok && !row.superseded);
   const stage05Candidates = incomplete
     .filter((row) => row.leaf && !row.superseded && row.reason_codes.length === 1 && row.reason_codes[0] === "contract.dispatch-not-ready")
     .sort((a, b) => stage05SortValue(a) - stage05SortValue(b) || sequenceSortValue(a) - sequenceSortValue(b) || a.name.localeCompare(b.name));
@@ -362,10 +308,7 @@ export function buildSupergoalPlan({
     nextAction = "Route HG-3.5 items to Chief-of-Staff / Founder-proxy review before worker dispatch.";
   } else if (!selected.length) {
     status = "BLOCKED_DEPENDENCY";
-    reasonCodes = Array.from(new Set(blocked.flatMap((row) => [
-      ...(row.reason_codes || []),
-      ...(row.blockers || []),
-    ]))).filter(Boolean);
+    reasonCodes = Array.from(new Set(blocked.flatMap((row) => row.reason_codes))).filter(Boolean);
     if (!reasonCodes.length) reasonCodes = ["child.no-runnable-candidates"];
     nextAction = "Resolve blocked contracts, parent container dependencies or dispatch state before the next pass.";
   }

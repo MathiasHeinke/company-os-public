@@ -232,29 +232,13 @@ Enforcement:
 - Calendar is for attention, decisions, reviews, and deep work; Linear remains
   the execution ledger.
 - Do not create a calendar event for every agent task.
-- Do not default review, reminder, decision or follow-up events to all-day
-  events. All-day calendar items are date markers, not attention blocks.
-- If an agent is about to create an all-day event for anything that expects the
-  founder/CEO to notice, review, approve, send or decide, it must ask whether a
-  visible timed block would be better.
-- If the runtime cannot ask but the attention block is already approved, create
-  a timed block in the user's configured attention window instead of an all-day
-  event. Default fallback: a 30-60 minute morning block in local timezone,
-  avoiding known conflicts.
 - If a sequence of meetings would overlap after the 30-minute minimum, move the
   later meeting instead of creating overlapping micro-events.
 - Event descriptions must explain the decision/review purpose, not dump raw task
   memory.
 
-All-day events are allowed only when one of these is true:
-
-- the user explicitly requested all-day;
-- the event is a true date-only marker, such as a birthday, deadline, travel
-  day, vacation day or legal/administrative date without a known time;
-- the system first asked and the user chose all-day.
-
-Failure Mode: meetings become invisible, noisy, stacked above the day, or
-detached from real CEO attention.
+Failure Mode: meetings become invisible, noisy, or detached from real CEO
+attention.
 
 ## DIRECTIVE-016: Automations Must Be Always-Allow Inside Approved Scope
 

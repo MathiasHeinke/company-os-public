@@ -51,16 +51,12 @@ Examples:
   /update_eve -> run check first, then request operator approval before apply
 
 Options:
-  --source PATH       Company.OS repo root, public clone, or release bundle. Default: current working directory.
+  --source PATH       Company.OS repo root. Default: current working directory.
   --target PATH       Installed target workspace. Required.
   --to VERSION        Target version label. Defaults to source VERSION.
   --date YYYY-MM-DD   Report date.
   --write-report      For check mode, also write reports/company-os-updates/...
   --json              Print machine-readable result.
-
-Reports include source_kind and source_provenance so private/client installs can
-prove which public upstream version, origin URL, commit, or release bundle they
-consumed.
 `;
 }
 

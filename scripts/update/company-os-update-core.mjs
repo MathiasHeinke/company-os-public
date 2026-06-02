@@ -83,99 +83,10 @@ function parseInstalledVersion(text) {
   return match ? compact(match[1]) : "";
 }
 
-function readJsonOptional(filePath) {
-  try {
-    return JSON.parse(fs.readFileSync(filePath, "utf8"));
-  } catch {
-    return null;
-  }
-}
-
 function resolveDate(value) {
   const text = compact(value);
   if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return text;
   return new Date().toISOString().slice(0, 10);
-}
-
-function resolveGitDir(sourceRoot) {
-  const dotGit = path.join(sourceRoot, ".git");
-  if (!fs.existsSync(dotGit)) return "";
-  const stat = fs.statSync(dotGit);
-  if (stat.isDirectory()) return dotGit;
-  const pointer = readOptional(dotGit);
-  const match = pointer.match(/^gitdir:[ \t]*(.+)$/im);
-  if (!match) return "";
-  return path.resolve(sourceRoot, compact(match[1]));
-}
-
-function readGitOriginUrl(gitDir) {
-  const config = readOptional(path.join(gitDir, "config"));
-  const remoteMatch = config.match(/\[remote "origin"\]([\s\S]*?)(?:\n\[|$)/);
-  if (!remoteMatch) return "";
-  const urlMatch = remoteMatch[1].match(/^\s*url\s*=\s*(.+)$/m);
-  return urlMatch ? compact(urlMatch[1]) : "";
-}
-
-function readGitCommit(gitDir) {
-  const head = readOptional(path.join(gitDir, "HEAD"));
-  const refMatch = head.match(/^ref:[ \t]*(.+)$/m);
-  if (!refMatch) return compact(head);
-  const ref = compact(refMatch[1]);
-  const refValue = compact(readOptional(path.join(gitDir, ref)));
-  if (refValue) return refValue;
-  const packedRefs = readOptional(path.join(gitDir, "packed-refs"));
-  for (const line of packedRefs.split(/\r?\n/)) {
-    if (!line || line.startsWith("#") || line.startsWith("^")) continue;
-    const [commit, packedRef] = line.split(/\s+/);
-    if (packedRef === ref) return compact(commit);
-  }
-  return "";
-}
-
-function readReleaseMetadata(sourceRoot) {
-  for (const relativePath of ["company-os-release.json", ".company-os-release.json"]) {
-    const absolutePath = path.join(sourceRoot, relativePath);
-    const parsed = readJsonOptional(absolutePath);
-    if (parsed && typeof parsed === "object") return { path: relativePath, data: parsed };
-  }
-  return null;
-}
-
-function sourceProvenanceFor(sourceRoot, sourceVersion) {
-  const releaseMetadata = readReleaseMetadata(sourceRoot);
-  if (releaseMetadata) {
-    const data = releaseMetadata.data;
-    const kind = compact(data.source_kind || data.kind) || "release-bundle";
-    return {
-      kind,
-      version: sourceVersion,
-      path: sourceRoot,
-      origin_url: compact(data.source_url || data.origin_url || data.url),
-      commit: compact(data.source_commit || data.commit),
-      build_id: compact(data.build_id || data.release_id),
-      metadata_path: releaseMetadata.path,
-    };
-  }
-
-  const gitDir = resolveGitDir(sourceRoot);
-  if (gitDir) {
-    const originUrl = readGitOriginUrl(gitDir);
-    return {
-      kind: originUrl ? "git-clone" : "git-working-tree",
-      version: sourceVersion,
-      path: sourceRoot,
-      origin_url: originUrl,
-      commit: readGitCommit(gitDir),
-    };
-  }
-
-  return {
-    kind: "local-directory",
-    version: sourceVersion,
-    path: sourceRoot,
-    origin_url: "",
-    commit: "",
-  };
 }
 
 // Classify a single kit file change into one of six update statuses.
@@ -201,12 +112,11 @@ const BLOCKED_ACTIONS = [
 export function planCompanyOsUpdate({ source, target, toVersion = "", date } = {}) {
   const resolvedSource = path.resolve(source || "");
   const resolvedTarget = path.resolve(target || "");
-  const sourceVersion = compact(readOptional(path.join(resolvedSource, "VERSION"))) || "unknown";
-  const sourceProvenance = sourceProvenanceFor(resolvedSource, sourceVersion);
 
   // Explicit source==target classification: this is a kit source check, not a
   // client update check. Operators must not mistake this for an update plan.
   if (resolvedSource === resolvedTarget) {
+    const sourceVersion = compact(readOptional(path.join(resolvedSource, "VERSION"))) || "unknown";
     return {
       ok: true,
       version: COMPANY_OS_UPDATE_VERSION,
@@ -216,8 +126,6 @@ export function planCompanyOsUpdate({ source, target, toVersion = "", date } = {
       date: resolveDate(date),
       source: resolvedSource,
       target: resolvedTarget,
-      source_kind: sourceProvenance.kind,
-      source_provenance: sourceProvenance,
       source_version: sourceVersion,
       target_version: "n/a",
       to_version: "n/a",
@@ -245,8 +153,6 @@ export function planCompanyOsUpdate({ source, target, toVersion = "", date } = {
       errors,
       source: resolvedSource,
       target: resolvedTarget,
-      source_kind: sourceProvenance.kind,
-      source_provenance: sourceProvenance,
       changes: [],
     };
   }
@@ -255,6 +161,7 @@ export function planCompanyOsUpdate({ source, target, toVersion = "", date } = {
   const installRecordPath = path.join(resolvedTarget, ".company-os", "install-record.md");
   const installed = fs.existsSync(installRecordPath);
 
+  const sourceVersion = compact(readOptional(path.join(resolvedSource, "VERSION"))) || "unknown";
   const targetVersion = parseInstalledVersion(readOptional(installRecordPath)) || "unknown";
   const effectiveToVersion = compact(toVersion) || sourceVersion;
 
@@ -297,8 +204,6 @@ export function planCompanyOsUpdate({ source, target, toVersion = "", date } = {
     date: resolveDate(date),
     source: resolvedSource,
     target: resolvedTarget,
-    source_kind: sourceProvenance.kind,
-    source_provenance: sourceProvenance,
     source_version: sourceVersion,
     target_version: targetVersion,
     to_version: effectiveToVersion,
@@ -342,15 +247,6 @@ export function renderUpdateReport(plan, { applied = false, dryRun = true } = {}
     `Source version: ${plan.source_version}`,
     `Installed version: ${plan.target_version}`,
     `Target version: ${plan.to_version}`,
-    "",
-    "## Source Provenance",
-    "",
-    `Source kind: ${plan.source_kind || plan.source_provenance?.kind || "unknown"}`,
-    `Source path: ${plan.source_provenance?.path || plan.source || "unknown"}`,
-    `Source origin: ${plan.source_provenance?.origin_url || "n/a"}`,
-    `Source commit: ${plan.source_provenance?.commit || "n/a"}`,
-    `Source build id: ${plan.source_provenance?.build_id || "n/a"}`,
-    `Source metadata: ${plan.source_provenance?.metadata_path || "n/a"}`,
     "",
     "## Summary",
     "",
@@ -486,7 +382,6 @@ export function renderEveUpdateSummary(plan) {
     "",
     `Date: ${plan.date}`,
     `Status: ${plan.status}`,
-    `Source: ${plan.source_kind || "unknown"} (${plan.source_version || "unknown"})`,
     "",
     "## Safe to Apply",
     `- Add: ${s.add || 0} new kit files`,

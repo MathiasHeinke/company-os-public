@@ -40,10 +40,6 @@ import {
   buildRaindropOutputDir,
   writeRaindropCallSummary,
 } from "./raindrop-call-adapter.mjs";
-import {
-  loadPostWorkerQualityRegistry,
-  planPostWorkerQualityLoop,
-} from "./post-worker-quality-loop-core.mjs";
 import { extractContractBlock } from "./worker-ledger-validator.mjs";
 
 // Closed set of decision modes per docs/orchestration/codex-controller-runtime.md.
@@ -163,12 +159,11 @@ function numericField(...values) {
 }
 
 export function resolveControllerInputs({ args = {}, contractFields = {} } = {}) {
-  const cliReleaseAuthority = String(args.releaseAuthority || "").trim();
-  const releaseAuthorityDeclared = (cliReleaseAuthority || String(contractField(
+  const releaseAuthorityDeclared = String(contractField(
     contractFields,
     "releaseauthority",
     "release_authority",
-  ) || "")).trim();
+  ) || "").trim();
   const founderPrediction = String(contractField(
     contractFields,
     "founderprediction",
@@ -307,7 +302,6 @@ export function decideController({
   humanGateLevel = "HG-0",
   ceoConfidence = 0,
   releaseAuthorityDeclared = "",
-  humanGateRelease = null,
   selfFixRequested = false,
   changeScope = {},
   gates = { green: [], red: [] },
@@ -315,7 +309,6 @@ export function decideController({
 } = {}) {
   const normalizedHumanGateLevel = normalizeHumanGateLevel(humanGateLevel);
   const normalizedReleaseAuthority = String(releaseAuthorityDeclared || "").trim();
-  const humanGateReleased = Boolean(humanGateRelease?.ok);
   if (!caoVerdict) {
     return {
       decision_mode: DECISION_MODES.PARK,
@@ -359,16 +352,6 @@ export function decideController({
       release_authority: "none",
       next_state_hint: "parked",
       selffix: null,
-    };
-  }
-  if (normalizedHumanGateLevel === "HG-4" && humanGateReleased) {
-    return {
-      decision_mode: DECISION_MODES.AUTO_GO,
-      reason: "hg-4-founder-released",
-      release_authority: "FOUNDER_REQUIRED",
-      next_state_hint: "founder-released",
-      selffix: null,
-      human_gate_release: humanGateRelease,
     };
   }
   if (normalizedHumanGateLevel === "HG-4") {
@@ -462,89 +445,6 @@ export function decideController({
   };
 }
 
-function asList(value) {
-  if (value === undefined || value === null || value === "") return [];
-  if (Array.isArray(value)) return value.flatMap(asList);
-  return String(value)
-    .split(/[,;\n]/)
-    .map((item) => item.trim())
-    .filter(Boolean);
-}
-
-function contractText(fields = {}, ...names) {
-  return names.flatMap((name) => asList(contractField(fields, name))).join("\n");
-}
-
-function inferPostWorkerQualityClass(contractFields = {}) {
-  const explicit = contractField(contractFields, "inferenceclass", "inference_class", "InferenceClass");
-  if (explicit) return explicit;
-  const text = [
-    contractText(contractFields, "scope", "source_of_truth", "sourceoftruth", "allowedwritepaths", "allowed_write_paths", "gates"),
-    contractField(contractFields, "mode", "Mode"),
-  ].join("\n").toLowerCase();
-  if (/\b(cross[-\s]?repo|multi[-\s]?repo|multiple workspaces)\b/.test(text)) return "P3-cross-repo";
-  if (/(scripts\/(?:orchestration|runtime|update|release|release-gates|capabilities)|registries\/|auth|rls|service-role|capability|scheduler|dispatcher|controller)/.test(text)) {
-    return "P2-code-shared";
-  }
-  return "P1-code-bounded";
-}
-
-function shouldRunPostWorkerQuality(contractFields = {}, decision = {}) {
-  const policy = String(contractField(
-    contractFields,
-    "postworkerqualitypolicy",
-    "post_worker_quality_policy",
-    "PostWorkerQualityPolicy",
-  ) || "").trim().toLowerCase();
-  if (["off", "disabled", "none", "optional"].includes(policy)) return false;
-  if (["required", "enforced", "post-worker-quality-loop/v0"].includes(policy)) return true;
-  const mode = String(contractField(contractFields, "mode", "Mode") || "").trim().toLowerCase();
-  const agent = String(contractField(contractFields, "agent", "Agent") || "").trim().toLowerCase();
-  const decisionMode = decision?.decision_mode || "";
-  return (
-    ["implement", "verify", "review"].includes(mode)
-    && ["claude", "codex", "gemini"].includes(agent)
-    && ![
-      DECISION_MODES.ASK_FOUNDER,
-      DECISION_MODES.ASK_CEO_HG3,
-      DECISION_MODES.HG_35_PENDING_ARTIFACT_REVIEW,
-      DECISION_MODES.PARK,
-    ].includes(decisionMode)
-  );
-}
-
-export function buildPostWorkerQualityPlanForController({
-  registry,
-  decision,
-  contractFields = {},
-  workerReport = {},
-  caoVerdict = "",
-  findings = [],
-  previousHotfixRounds = 0,
-  now = new Date(),
-} = {}) {
-  if (!registry || !shouldRunPostWorkerQuality(contractFields, decision)) return null;
-  const inferenceClass = inferPostWorkerQualityClass(contractFields);
-  const report = {
-    state: workerReport.state || workerReport.verdict || workerReport.status || (caoVerdict === "REJECT" ? "REJECT" : "PASS"),
-    reason: workerReport.reason || "",
-    summary: workerReport.summary || "",
-    reason_codes: workerReport.reason_codes || [],
-  };
-  return planPostWorkerQualityLoop({
-    registry,
-    contractFields: {
-      ...contractFields,
-      InferenceClass: inferenceClass,
-    },
-    workerReport: report,
-    caoVerdict,
-    findings,
-    previousHotfixRounds,
-    now,
-  });
-}
-
 /**
  * Build the controller.decision YAML block. Pure function for reuse and
  * testing.
@@ -558,7 +458,6 @@ export function buildDecisionCardYaml({
   signedAt,
   version = "codex-controller-dryrun-v0",
   noWritesPerformed = true,
-  postWorkerQualityPlan = null,
 }) {
   const lines = ["controller.decision:"];
   const indent = (n) => " ".repeat(n);
@@ -605,17 +504,6 @@ export function buildDecisionCardYaml({
     emitLiteralBlock(lines, indent(4), "sign_template", decision.hg35.sign_template);
     emitLiteralBlock(lines, indent(4), "reject_template", decision.hg35.reject_template);
   }
-  if (decision.human_gate_release) {
-    lines.push(`${indent(2)}human_gate_release:`);
-    lines.push(`${indent(4)}source: human_gate.released`);
-    lines.push(`${indent(4)}comment_id: ${decision.human_gate_release.comment_id || "unknown"}`);
-    lines.push(`${indent(4)}released_by: ${decision.human_gate_release.released_by || "unknown"}`);
-    lines.push(`${indent(4)}level: ${decision.human_gate_release.level || "unknown"}`);
-    lines.push(`${indent(4)}scope: ${decision.human_gate_release.scope || "unspecified"}`);
-  }
-  if (postWorkerQualityPlan) {
-    emitPostWorkerQualityPlan(lines, indent, postWorkerQualityPlan, seq);
-  }
   lines.push(`${indent(2)}blocked_actions_remaining:`);
   for (const a of blocked) lines.push(`${indent(4)}- ${a}`);
   lines.push(`${indent(2)}signed_at: ${signedAt}`);
@@ -632,33 +520,6 @@ function formatControllerWorkItemSequence(workItem = {}) {
     || "COMPA";
   const prefix = String(rawPrefix || "COMPA").trim().toUpperCase();
   return `${prefix || "COMPA"}-${workItem.sequence_id}`;
-}
-
-function emitPostWorkerQualityPlan(lines, indent, plan, workItemRef) {
-  lines.push(`${indent(2)}post_worker_quality:`);
-  lines.push(`${indent(4)}version: ${plan.version || "post-worker-quality-loop/v0"}`);
-  lines.push(`${indent(4)}status: ${plan.status || "UNKNOWN"}`);
-  lines.push(`${indent(4)}inference_class: ${plan.inference_class || "unknown"}`);
-  lines.push(`${indent(4)}scheduler_may_spawn: ${Boolean(plan.scheduler?.scheduler_may_spawn)}`);
-  lines.push(`${indent(4)}reason_codes:`);
-  for (const reason of plan.reason_codes || []) lines.push(`${indent(6)}- ${reason}`);
-  lines.push(`${indent(4)}markers_to_post:`);
-  for (const marker of plan.markers_to_post || []) {
-    lines.push(`${indent(6)}- ${marker.marker}:${marker.worker_class}`);
-  }
-  for (const marker of plan.markers_to_post || []) {
-    lines.push(`${marker.marker}:`);
-    lines.push(`${indent(2)}version: ${plan.version || "post-worker-quality-loop/v0"}`);
-    lines.push(`${indent(2)}work_item: ${workItemRef || "unknown"}`);
-    lines.push(`${indent(2)}state: ${marker.state || "AUDIT_REQUESTED"}`);
-    lines.push(`${indent(2)}worker_class: ${marker.worker_class || "unknown"}`);
-    lines.push(`${indent(2)}reason_codes:`);
-    for (const reason of plan.reason_codes || []) lines.push(`${indent(4)}- ${reason}`);
-    if (marker.worker_class === "hotfix-worker") {
-      lines.push(`${indent(2)}max_auto_hotfix_rounds: ${plan.loop_limits?.max_auto_hotfix_rounds ?? 1}`);
-      lines.push(`${indent(2)}previous_hotfix_rounds: ${plan.loop_limits?.previous_hotfix_rounds ?? 0}`);
-    }
-  }
 }
 
 function emitLiteralBlock(lines, indentText, key, value) {
@@ -728,56 +589,6 @@ export function findCaoVerdictComment(comments) {
   return best;
 }
 
-/**
- * Extract the most recent explicit human gate release marker. This is evidence
- * only when the comment title is exactly `human_gate.released`; prose mentions
- * do not satisfy founder/CEO gates.
- */
-export function findHumanGateReleaseComment(comments) {
-  let best = null;
-  for (const row of comments || []) {
-    const html = row.comment_html || "";
-    const title = html.match(/<strong>\s*([^<]+?)\s*<\/strong>/i)?.[1] || "";
-    if (title.trim() !== "human_gate.released") continue;
-    const body = stripHtml(html);
-    const fields = parseYamlScalar(body.match(/human_gate\.released:\s*\n([\s\S]*?)(?:\n\S|$)/)?.[1] || body);
-    const ts = row.created_at ? Date.parse(row.created_at) : 0;
-    if (!best || ts > best.ts) {
-      best = {
-        ok: true,
-        comment_id: row.id || null,
-        ts,
-        released_by: fields.released_by || fields.founder || null,
-        level: fields.level || fields.human_gate_level || null,
-        scope: fields.scope || fields.tenant_scope || null,
-      };
-    }
-  }
-  return best;
-}
-
-function findLatestWorkerReportedComment(comments) {
-  let best = null;
-  for (const row of comments || []) {
-    const html = row.comment_html || "";
-    const title = html.match(/<strong>\s*([^<]+?)\s*<\/strong>/i)?.[1] || "";
-    if (title.trim() !== "worker.reported") continue;
-    const body = stripHtml(html);
-    const fields = parseYamlScalar(body.match(/worker\.reported:\s*\n([\s\S]*?)(?:\n\S|$)/)?.[1] || body);
-    const ts = row.created_at ? Date.parse(row.created_at) : 0;
-    if (!best || ts > best.ts) {
-      best = {
-        comment_id: row.id || null,
-        ts,
-        state: fields.state || fields.verdict || fields.status || null,
-        reason: fields.reason || null,
-        summary: fields.summary || null,
-      };
-    }
-  }
-  return best;
-}
-
 // ---------- CLI ----------
 
 function parseArgs(argv) {
@@ -790,7 +601,6 @@ function parseArgs(argv) {
     mode: "dry-run",
     json: false,
     confidence: NaN,
-    releaseAuthority: "",
     selfFixRequested: false,
     scopeFilesCount: NaN,
     scopeLinesChanged: NaN,
@@ -810,7 +620,6 @@ function parseArgs(argv) {
     else if (arg === "--auth") args.auth = argv[++i] || "app-token";
     else if (arg === "--base-url") args.baseUrl = argv[++i] || DEFAULT_BASE_URL;
     else if (arg === "--confidence") args.confidence = Number(argv[++i] || 0);
-    else if (arg === "--release-authority") args.releaseAuthority = argv[++i] || "";
     else if (arg === "--selffix") args.selfFixRequested = true;
     else if (arg === "--scope-files") args.scopeFilesCount = Number(argv[++i] || 0);
     else if (arg === "--scope-lines") args.scopeLinesChanged = Number(argv[++i] || 0);
@@ -834,7 +643,7 @@ function usage() {
     --workspace <slug> --project-id <uuid> --work-item-id <uuid> \\
     [--mode dry-run|post] \\
     [--auth api-key|app-token] \\
-    [--confidence 0.92] [--release-authority CEO_AUTONOMOUS|CEO_CRITICAL] [--selffix] \\
+    [--confidence 0.92] [--selffix] \\
     [--scope-files N] [--scope-lines N] [--scope-refactor-lines N] \\
     [--scope-surface refactor --scope-surface auth] \\
     [--gate-green name] [--gate-red name] \\
@@ -949,25 +758,12 @@ async function main() {
     humanGateLevel: contractField(contractFields, "human_gate", "humangate") || "HG-0",
     ceoConfidence: controllerInputs.ceoConfidence,
     releaseAuthorityDeclared: controllerInputs.releaseAuthorityDeclared,
-    humanGateRelease: findHumanGateReleaseComment(comments),
     selfFixRequested: args.selfFixRequested,
     changeScope,
     gates,
     pauseArtifact: contractField(contractFields, "hg35_pause_artifact"),
   });
   decision._inputs = controllerInputs;
-
-  const qualityRegistry = loadPostWorkerQualityRegistry(process.env.COMPANY_OS_POST_WORKER_QUALITY_REGISTRY);
-  const postWorkerQualityPlan = qualityRegistry.ok
-    ? buildPostWorkerQualityPlanForController({
-      registry: qualityRegistry.registry,
-      decision,
-      contractFields,
-      workerReport: findLatestWorkerReportedComment(comments) || {},
-      caoVerdict: cao?.verdict || null,
-      findings: args.gatesRed,
-    })
-    : null;
 
   const runId = randomUUID();
   const signedAt = new Date().toISOString();
@@ -980,7 +776,6 @@ async function main() {
     signedAt,
     version: args.mode === "post" ? "codex-controller-v0" : "codex-controller-dryrun-v0",
     noWritesPerformed: args.mode !== "post",
-    postWorkerQualityPlan,
   });
 
   result.cao_verdict = cao?.verdict || null;

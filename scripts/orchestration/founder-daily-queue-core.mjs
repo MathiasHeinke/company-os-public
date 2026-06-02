@@ -296,32 +296,15 @@ export function readContractFields(item) {
  *     evidence: { ... }
  *   }
  */
-export function classifyItemForQueue({
-  item,
-  comments = [],
-  labelNames = [],
-  projectIdentifier = "COMPA",
-}) {
-  return classifyItemForQueueWithProject({ item, comments, labelNames, projectIdentifier });
-}
-
-export function classifyItemForQueueWithProject({
-  item,
-  comments = [],
-  labelNames = [],
-  projectIdentifier = "COMPA",
-}) {
+export function classifyItemForQueue({ item, comments = [], labelNames = [] }) {
   if (!item) return null;
-  if (isSupersededQueueItem(item, labelNames)) return null;
   const contractFields = readContractFields(item);
   const rawGate = String(contractFields.human_gate || "").trim();
   if (!rawGate) return null;
   const gate = normalizeQueueGate(rawGate);
   if (gate !== "HG-4" && gate !== "HG-3.5") return null;
 
-  const seq = item.sequence_id
-    ? `${normalizeProjectIdentifier(projectIdentifier)}-${item.sequence_id}`
-    : (item.id || "unknown");
+  const seq = item.sequence_id ? `COMPA-${item.sequence_id}` : (item.id || "unknown");
   const title = sanitizeOneLine(item.name || "");
   const role = resolveRole(labelNames, contractFields);
   const updatedAt = String(item.updated_at || item.created_at || "").trim();
@@ -457,7 +440,6 @@ export function buildQueueModel({
   records = [],
   date,
   workspace = "companyos",
-  projectIdentifier = "COMPA",
 }) {
   if (!date) throw new Error("buildQueueModel requires an explicit date");
   const classifiedRaw = [];
@@ -477,15 +459,12 @@ export function buildQueueModel({
         item: record.item,
         comments,
         labelNames: Array.isArray(record.labelNames) ? record.labelNames : [],
-        projectIdentifier,
       });
       if (classified) classifiedRaw.push(classified);
     } catch (err) {
       malformed.push({
         reason: "classify-threw",
-        sequence: record.item?.sequence_id
-          ? `${normalizeProjectIdentifier(projectIdentifier)}-${record.item.sequence_id}`
-          : null,
+        sequence: record.item?.sequence_id ? `COMPA-${record.item.sequence_id}` : null,
         error: String(err?.message || err).slice(0, 200),
       });
     }
@@ -514,7 +493,6 @@ export function buildQueueModel({
     workspace,
     date,
     generated_for_date: date,
-    project_identifier: normalizeProjectIdentifier(projectIdentifier),
     total_in_scope: sorted.length,
     primary,
     overflow,
@@ -522,17 +500,6 @@ export function buildQueueModel({
     malformed,
     warnings,
   };
-}
-
-function normalizeProjectIdentifier(value) {
-  const cleaned = String(value || "COMPA").trim().toUpperCase().replace(/[^A-Z0-9_-]/g, "");
-  return cleaned || "COMPA";
-}
-
-function isSupersededQueueItem(item, labelNames = []) {
-  const name = String(item?.name || "");
-  if (/\bSUPERSEDED(?:[-_\s]DUPLICATE)?\b/i.test(name)) return true;
-  return (labelNames || []).some((label) => /\bsuperseded\b/i.test(String(label || "")));
 }
 
 function compareQueueItems(a, b) {
@@ -642,7 +609,6 @@ export function renderQueueJson(model) {
   return {
     version: model.version,
     workspace: model.workspace,
-    project_identifier: model.project_identifier || "COMPA",
     date: model.date,
     total_in_scope: model.total_in_scope,
     primary_count: model.primary.length,

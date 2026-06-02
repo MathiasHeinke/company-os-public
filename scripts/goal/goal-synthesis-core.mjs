@@ -150,15 +150,6 @@ export function classifySynthesisChild({ item, comments = [], projectIdentifier 
   if (verdict === "PASS" && !controllerDecision && !done && selfFixVerdict !== "ACCEPTED") {
     blockers.push("controller.decision-missing");
   }
-  if (
-    decisionMode === "DELEGATE"
-    && !done
-    && selfFixVerdict !== "ACCEPTED"
-    && !ceoCriticalReview
-    && !founderGateReview
-  ) {
-    blockers.push("controller.delegate-open");
-  }
   if (decisionMode === "ASK-FOUNDER" && selfFixVerdict !== "ACCEPTED") blockers.push("founder-attention-required");
 
   return {

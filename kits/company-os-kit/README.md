@@ -62,7 +62,25 @@ docs/integrations/plane-app-control-plane.md
 
 ## Fresh Project Install
 
-From the Company.OS repo root, run a dry-run first:
+For `0.9.0-rc.0`, the recommended public-RC entrypoint is:
+
+```bash
+node scripts/install/public-rc.mjs install \
+  --target /path/to/target-workspace \
+  --company "Acme Systems" \
+  --website "https://acme.example" \
+  --offer "AI operating-system setup" \
+  --buyer "founder-led service firms" \
+  --founder "Jane Founder" \
+  --approval-owner "Jane Founder" \
+  --first-department marketing \
+  --json
+```
+
+This wraps the low-level bootstrap installer, writes the first intake, generates
+EVE's boot packet and writes update/handoff provenance from the public source.
+
+If an operator needs the low-level bootstrap only, run a dry-run first:
 
 ```bash
 node scripts/install/bootstrap.mjs install \
@@ -91,8 +109,15 @@ versioned examples/templates:
 - `.company-os/operations/software-stack.md`
 - `.company-os/operations/human-gates.md`
 
-Before EVE greets the founder for real work, generate the first-company packet
-from the confirmed signup/report seed:
+The public-RC wrapper also writes:
+
+- `.company-os/onboarding/company-intake.json`
+- `.company-os/onboarding/intake-record.json`
+- `.company-os/onboarding/eve-boot-packet.json`
+- `reports/company-os-public-rc/YYYY-MM-DD/company-os-public-rc-0.9.0-rc.0.md`
+
+If using the low-level bootstrap path, generate the first-company packet from
+the confirmed signup/report seed before EVE greets the founder for real work:
 
 ```bash
 node /path/to/Company.OS/scripts/onboarding/first-company-packet.mjs \
@@ -260,9 +285,11 @@ registry, software stack, human gates, intake record or first Plane draft.
 
 ## Productization Boundary
 
-This kit is ready for guided done-for-you alpha installs.
+This kit is ready for public release-candidate installs from a public clone or
+sanitized public mirror.
 
-It is not a self-serve installer yet. A Company.OS operator must still:
+It is not stable unattended autonomy. A Company.OS operator or EVE setup flow
+must still:
 
 - pin the exact repo `VERSION`
 - configure Plane App / bot-token identity

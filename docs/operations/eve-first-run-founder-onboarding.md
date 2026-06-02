@@ -31,7 +31,6 @@ Do not mix these layers:
 | Runtime probe | What the local machine and sidecars can actually do. | AionUI preflight, Hermes profile, model auth, local files, connected tools. |
 | Capability matrix | What EVE may do now, soon, later or never without approval. | `eve-boot-packet.json`, stack registry, HumanGate files. |
 | Soul / posture | How EVE thinks, speaks, challenges and refuses. | `.company-os/eve/SOUL.md`, `docs/operations/eve-soul-boot-contract.md`. |
-| Founder Voice and Belief Model | How EVE projects the founder's voice, belief system, frame, refusals, proof repertoire and positioning into outward content. | `docs/operations/eve-founder-voice-belief-model.md`, `docs/operations/eve-m0-seed-interview.md`. |
 | North star | The top-level product test for responsible founder decoupling. | `north_star.founder-offline-test` in `eve-boot-packet.json`. |
 | Readiness ladder | How far the install is from the Founder Offline Test. | `docs/operations/command-eve-founder-offline-readiness.md`. |
 | Growth review | How EVE improves after weeks of real Chief-of-Staff work. | `docs/operations/eve-chief-of-staff-growth-review.md`. |
@@ -77,7 +76,7 @@ EVE may ask at most three initial questions before summarizing a next action.
 | Tier | Meaning | Required now? |
 |---|---|---|
 | T0 | Talk, confirm seed, remember allowed local context. | yes, after model auth |
-| T1 | Company understanding, FVBM seed and setup continuity. | yes, after intake confirmation |
+| T1 | Company understanding and setup continuity. | yes, after intake confirmation |
 | T2 | Existing-system inventory. | yes before new work structure |
 | T3 | Company.OS-native work planning. | yes for first Plane parent draft |
 | T4 | Worker and C-Level delegation. | blocked until CEO/Codex review |
@@ -99,7 +98,6 @@ EVE can start a useful first session when these exist:
 
 - account seed or intake record
 - EVE soul / role doctrine
-- FVBM status: confirmed existing model, or explicit M0 seed gap
 - model provider access through Hermes or AionUI
 - local workspace with `.company-os/`
 - memory policy and blocked actions
@@ -109,8 +107,6 @@ EVE must block or defer:
 
 - durable cloud memory until Honcho or another memory layer is explicitly
   configured
-- autonomous founder-voice content until a confirmed FVBM or M0 seed interview
-  exists
 - code delegation until Git/GitHub/GitNexus and worker runtime policies are
   configured
 - production/backend work until Supabase or equivalent connector scope and HG-3
@@ -136,7 +132,6 @@ generated_at:
 source_of_truth:
 north_star:
 account_seed:
-fvbm_status:
 runtime_probe:
 capability_matrix:
 first_greeting_protocol:
@@ -171,11 +166,10 @@ fully configured workspace.
 If the boot packet exists, EVE should:
 
 1. confirm the account seed
-2. summarize FVBM status: confirmed model, M0 seed present or missing
-3. summarize what can be done now
-4. list what is blocked
-5. ask for one next setup choice
-6. keep all work at `dispatch: manual`
+2. summarize what can be done now
+3. list what is blocked
+4. ask for one next setup choice
+5. keep all work at `dispatch: manual`
 
 ## Existing System Rule
 

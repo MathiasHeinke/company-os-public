@@ -241,32 +241,6 @@ function contractFor(registry, id, reason) {
   };
 }
 
-function markerForFollowup(registry, workerClass) {
-  if (workerClass === "hotfix-worker") {
-    return {
-      marker: registry.plane_markers.hotfix_request,
-      state: "HOTFIX_REQUESTED",
-      worker_class: "hotfix-worker",
-    };
-  }
-  return {
-    marker: registry.plane_markers.audit_request,
-    state: workerClass === "deep-audit-worker" ? "DEEP_AUDIT_REQUESTED" : "AUDIT_REQUESTED",
-    worker_class: workerClass,
-  };
-}
-
-function markerKey(marker = {}) {
-  return `${marker.marker || ""}:${marker.worker_class || ""}:${marker.state || ""}`;
-}
-
-function markerRank(marker = {}) {
-  if (marker.worker_class === "controller-only") return 0;
-  if (marker.marker === "controller.audit-followup") return 1;
-  if (marker.marker === "controller.hotfix-request") return 2;
-  return 3;
-}
-
 function needsFix(workerReport, caoVerdict, findings) {
   const state = workerState(workerReport);
   const cao = caoState(caoVerdict);
@@ -392,20 +366,6 @@ export function planPostWorkerQualityLoop({
     seen.add(item.worker_class);
     dedupedFollowups.push(item);
   }
-
-  const markerKeys = new Set(markers.map(markerKey));
-  const sortedFollowups = [...dedupedFollowups].sort((left, right) => {
-    return markerRank(markerForFollowup(registry, left.worker_class)) - markerRank(markerForFollowup(registry, right.worker_class));
-  });
-  for (const followup of sortedFollowups) {
-    const marker = markerForFollowup(registry, followup.worker_class);
-    const key = markerKey(marker);
-    if (!markerKeys.has(key)) {
-      markers.push(marker);
-      markerKeys.add(key);
-    }
-  }
-  markers.sort((left, right) => markerRank(left) - markerRank(right));
 
   if (successful && dedupedFollowups.length === 0 && !markers.length) {
     reasonCodes.push(QUALITY_LOOP_REASONS.NO_FOLLOWUP);

@@ -50,8 +50,7 @@ export const INCLUDE_RULES = [
   // v2 (0.7.x): Command EVE public product + brand surface.
   // Excluded by design: scripts/linear/** (superseded by Plane), the private
   // .claude/.agents/CLAUDE.md harness layer, and raw registries/*/company-os.json
-  // (example registries plus the generic post-worker quality policy are public).
-  // Verified by the --verify invariant scan.
+  // (only example.json registries are public). Verified by the --verify invariant scan.
   { pattern: "assets/brand/eve-command/**" },
   { pattern: "schemas/eve/**" },
   { pattern: "scripts/operator-shell/**" },
@@ -84,7 +83,9 @@ export const INCLUDE_RULES = [
   { pattern: "metrics/ai-cost-ledger.example.jsonl" },
   { pattern: "registries/capabilities/example.json" },
   { pattern: "registries/inference/example.json" },
-  { pattern: "registries/quality/post-worker-quality-loop.json" },
+  { pattern: "registries/domain-packs/**" },
+  { pattern: "registries/plane-templates/**" },
+  { pattern: "registries/quality/**" },
   { pattern: "reports/.gitkeep" },
   { pattern: "reports/examples/**" },
 ];

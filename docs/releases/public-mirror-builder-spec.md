@@ -45,15 +45,22 @@ precedence on exact matches.
 | `scripts/artifact-truth/**` | Artifact truth verifier. |
 | `scripts/model-router/**` | Cost router scripts. |
 | `scripts/runtime/**` | Hard cron wrapper and warm preflight. |
+| `scripts/install/**` | Bootstrap, self-serve smoke and public-RC install wrapper. |
+| `scripts/release/**` | Public mirror, clean-clone and fresh-history remote verifiers. |
+| `scripts/operator-shell/**` | Command EVE / AionUI / Hermes local start helpers. |
+| `scripts/update/**` | `/update_eve` kit update planner and dry-run/apply helper. |
+| `scripts/onboarding/**` | First-company packet and EVE boot packet materializer. |
 | `kits/company-os-kit/templates/**` | Kit templates after PUB-05 (founder identity scrub). |
 | `kits/company-os-kit/.agents/**` | Kit agent rules and workflows. |
 | `kits/company-os-kit/.company-os/**` | Kit Company.OS operations layer. |
 | `kits/company-os-kit/.antigravity/*.md` | Generic overlays: `agentic-plan-template.md`, `agentic-router.md`, `copy-rules.md`, `system-prompt.md` (after PUB-05 template strip), `tech-stack-context.md` (after PUB-05 template strip), `workspace-strategy.md`. |
-| `kits/company-os-kit/.antigravity/knowledge/**` | After PUB-09 provenance audit approves each file. |
 | `kits/company-os-kit/.antigravity/personas/**` | Role-based variants only if PUB-06 doctrine A is chosen; skip named-person files. |
 | `kits/company-os-kit/README.md` | |
 | `registries/capabilities/example.json` | Template version only (see §4). |
 | `registries/inference/example.json` | Template version only (see §4). |
+| `registries/domain-packs/**` | Public onboarding/domain-pack registry required by first install. |
+| `registries/plane-templates/**` | Public Plane template registry required by setup. |
+| `registries/quality/**` | Public post-worker quality routing registry. |
 | `LICENSE` | MIT license. |
 | `README.md` | After PUB-10 release-status alignment. |
 | `CHANGELOG.md` | After PUB-10. |
@@ -128,6 +135,9 @@ copies them into the output tree at their declared target paths.
 | `reports/examples/runtime-pilot.example.stream.jsonl` | same path | ≤200 lines. Heartbeat and completion events only; all paths use `[COMPANY_OS_ROOT]` placeholder. |
 | `registries/capabilities/example.json` | same path | Capability registry template. Blocked actions list kept for public value; all `company-os`-specific IDs replaced with `[client]`. |
 | `registries/inference/example.json` | same path | Inference registry template. Task classes and model routing patterns retained; all workspace slugs and Plane UUIDs replaced. |
+| `registries/domain-packs/company-os.json` | same path | Public first-run domain pack registry. |
+| `registries/plane-templates/company-os.json` | same path | Public setup template registry for Plane workspaces/items/pages. |
+| `registries/quality/post-worker-quality-loop.json` | same path | Public lower-worker quality/audit/hotfix routing registry. |
 
 If any fixture file is missing from the private staging tree, the builder must exit with
 `RUNTIME_ERROR` and name the missing file — it must not silently omit the fixture.

@@ -111,8 +111,6 @@ EVE may not:
 `First-run boot` is the setup compiler:
 
 - account/report/intake seed
-- Founder Voice and Belief Model status for content-facing voice, belief,
-  frame, refusals, proof and positioning
 - runtime probe
 - capability matrix
 - progressive setup queue
@@ -189,7 +187,7 @@ Required fields:
 - `founder_offline_test_relevance`
 - `desired_outcome`
 - `non_goals`
-- `taste_and_voice_notes` or `fvbm_projection`
+- `taste_and_voice_notes`
 - `risk_tolerance`
 - `founder_decisions_needed`
 - `known_constraints`
@@ -214,11 +212,6 @@ Required fields:
 - `blocked_actions`
 - `why_this_now`
 - `what_ceo_should_challenge`
-
-For content-producing work, `taste_and_voice_notes` should be a projection from
-the FVBM instead of a one-off prose field. If no confirmed FVBM exists, the CEO
-Delegation Packet must say whether the M0 seed interview is required before
-drafting.
 
 ### Plane Parent Draft
 

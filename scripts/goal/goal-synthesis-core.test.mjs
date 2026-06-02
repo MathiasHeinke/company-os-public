@@ -239,23 +239,6 @@ test("classifySynthesisChild lets HG-3 CEO review trump intermediate controller 
   assert.equal(child.complete, false);
 });
 
-test("classifySynthesisChild treats controller DELEGATE as open follow-up, not complete", () => {
-  const child = classifySynthesisChild({
-    item: { id: "child-1", sequence_id: 598, name: "Runtime gate" },
-    comments: [
-      comment(1, "worker.reported:\n  state: PASS"),
-      comment(2, "controller.verdict:\n  verdict: PASS"),
-      comment(3, "controller.decision:\n  decision_mode: DELEGATE"),
-      comment(4, "controller.audit-followup:\n  state: AUDIT_COMPLETED\n  worker_class: security-auditor\n  verdict: PASS_WITH_FINDING"),
-    ],
-  });
-
-  assert.equal(child.integration_status, "controller:delegate");
-  assert.equal(child.controller_decision, "DELEGATE");
-  assert.deepEqual(child.blockers, ["controller.delegate-open"]);
-  assert.equal(child.complete, false);
-});
-
 test("classifySynthesisChild ignores prose-only HG-3 mentions in audit follow-up body", () => {
   const child = classifySynthesisChild({
     item: { id: "child-1", sequence_id: 228, name: "Claim gate" },

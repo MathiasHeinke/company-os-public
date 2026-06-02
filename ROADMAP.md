@@ -1,18 +1,18 @@
 # Company.OS Roadmap
 
-Canonical current version: `0.7.4-rc.0`
+Canonical current version: `0.9.0-rc.0`
 
 Roadmap headings are planning tracks. The canonical release version lives in
 `VERSION` and `CHANGELOG.md`.
 
 ## Release Accounting Snapshot - 2026-05-31
 
-`0.7.4-rc.0` is the current Command EVE / Supergoal Factory release candidate.
-It sits on top of the `0.7.1-rc.0` self-serve install/onboarding/update
-candidate and the `0.7.3-rc.0` governance spine. It adds the reusable
-Supergoal Factory hardening layer: execution-truth ladder, State-Truth Pass,
-HG-2.5 Merge Readiness Pack, post-worker quality marker routing, scheduler
-lower-worker candidates and public-safe lower-worker capability examples.
+`0.9.0-rc.0` is the current public self-serve release candidate. It sits on top
+of the `0.7.1-rc.0` install/onboarding/update candidate, the `0.7.3-rc.0`
+governance spine and the `0.7.4-rc.0` Supergoal Factory hardening layer. It
+adds the public-upstream install/update path: a public clone or sanitized
+public mirror can install a fresh target from generic company seed, generate
+EVE's boot packet and write update/handoff provenance.
 
 `0.6.5-beta.5` remains the previous private/guided-beta baseline for bounded
 worker dispatch, CAO/Controller gates, sandbox workspace guards, Raindrop
@@ -23,15 +23,14 @@ Unchecked items below are backlog tracks, not retroactive blockers for the
 current release line, unless a specific `VERSION`/`CHANGELOG.md` release entry
 or release-gate report names them as blockers.
 
-Open after `0.7.4-rc.0`:
+Open after `0.9.0-rc.0`:
 
 - Public release actions remain gated: public tags, release uploads,
   autonomous publish/schedule/send/spend actions and production writes are not
   released.
-- The next 0.7.x hardening should close the Public-Upstream Update Channel:
-  public repo/release bundle becomes the canonical distribution upstream, while
-  private/client installs become downstream overlays that update from public
-  with dry-run-first provenance reports.
+- Private/client installs should now update from the public upstream, with
+  dry-run-first provenance reports. Private-to-public backflow is not the
+  distribution path.
 - Raindrop currently covers promoted managed runtime surfaces. Hosted ingestion,
   unmanaged local LLM calls, Scheduler/Hermes/AionUI producers and external
   manual sessions remain future promotion tracks.

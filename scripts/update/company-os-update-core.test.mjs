@@ -36,19 +36,6 @@ function makeSource() {
   return source;
 }
 
-function addGitMetadata(root, { remoteUrl = "https://github.com/MathiasHeinke/Company.OS.git", commit = "abc123def456" } = {}) {
-  writeFile(root, ".git/config", [
-    "[core]",
-    "\trepositoryformatversion = 0",
-    "[remote \"origin\"]",
-    `\turl = ${remoteUrl}`,
-    "\tfetch = +refs/heads/*:refs/remotes/origin/*",
-    "",
-  ].join("\n"));
-  writeFile(root, ".git/HEAD", "ref: refs/heads/main\n");
-  writeFile(root, ".git/refs/heads/main", `${commit}\n`);
-}
-
 function makeTarget() {
   const target = tmpDir();
   writeFile(target, "README.md", "# Kit v1\n");
@@ -139,65 +126,6 @@ test("renderUpdateReport names blocked actions for /update_eve handoff", () => {
   const markdown = renderUpdateReport(plan, { applied: false, dryRun: true });
   assert.match(markdown, /do not overwrite active \.company-os local state/);
   assert.match(markdown, /AionUI\/Hermes sidecar updates/);
-});
-
-test("planCompanyOsUpdate records git source provenance for public clone sources", () => {
-  const source = makeSource();
-  const target = makeTarget();
-  addGitMetadata(source, {
-    remoteUrl: "https://github.com/MathiasHeinke/Company.OS.git",
-    commit: "0123456789abcdef",
-  });
-  const plan = planCompanyOsUpdate({ source, target, toVersion: "0.7.2", date: "2026-05-31" });
-  assert.equal(plan.ok, true);
-  assert.equal(plan.source_kind, "git-clone");
-  assert.equal(plan.source_provenance.kind, "git-clone");
-  assert.equal(plan.source_provenance.version, "0.7.2");
-  assert.equal(plan.source_provenance.path, path.resolve(source));
-  assert.equal(plan.source_provenance.origin_url, "https://github.com/MathiasHeinke/Company.OS.git");
-  assert.equal(plan.source_provenance.commit, "0123456789abcdef");
-});
-
-test("planCompanyOsUpdate records release bundle metadata when present", () => {
-  const source = makeSource();
-  const target = makeTarget();
-  writeFile(source, "company-os-release.json", `${JSON.stringify({
-    source_kind: "release-bundle",
-    source_url: "https://github.com/MathiasHeinke/Company.OS/releases/download/v0.7.4/company-os-0.7.4.tgz",
-    source_commit: "feedface",
-    build_id: "release-2026-05-31",
-  }, null, 2)}\n`);
-  const plan = planCompanyOsUpdate({ source, target, toVersion: "0.7.2", date: "2026-05-31" });
-  assert.equal(plan.ok, true);
-  assert.equal(plan.source_kind, "release-bundle");
-  assert.equal(plan.source_provenance.kind, "release-bundle");
-  assert.equal(plan.source_provenance.origin_url, "https://github.com/MathiasHeinke/Company.OS/releases/download/v0.7.4/company-os-0.7.4.tgz");
-  assert.equal(plan.source_provenance.commit, "feedface");
-  assert.equal(plan.source_provenance.build_id, "release-2026-05-31");
-});
-
-test("renderUpdateReport includes source provenance fields", () => {
-  const source = makeSource();
-  const target = makeTarget();
-  addGitMetadata(source, { remoteUrl: "https://github.com/MathiasHeinke/Company.OS.git", commit: "0123456789abcdef" });
-  const plan = planCompanyOsUpdate({ source, target, toVersion: "0.7.2", date: "2026-05-31" });
-  const markdown = renderUpdateReport(plan, { applied: false, dryRun: true });
-  assert.match(markdown, /## Source Provenance/);
-  assert.match(markdown, /Source kind: git-clone/);
-  assert.match(markdown, /Source origin: https:\/\/github.com\/MathiasHeinke\/Company.OS.git/);
-  assert.match(markdown, /Source commit: 0123456789abcdef/);
-});
-
-test("writeUpdateReport JSON includes source provenance", () => {
-  const source = makeSource();
-  const target = makeTarget();
-  addGitMetadata(source, { remoteUrl: "https://github.com/MathiasHeinke/Company.OS.git", commit: "0123456789abcdef" });
-  const plan = planCompanyOsUpdate({ source, target, toVersion: "0.7.2", date: "2026-05-31" });
-  const report = writeUpdateReport({ target, plan, applied: false, dryRun: true });
-  const json = JSON.parse(fs.readFileSync(path.join(target, report.json), "utf8"));
-  assert.equal(json.source_kind, "git-clone");
-  assert.equal(json.source_provenance.origin_url, "https://github.com/MathiasHeinke/Company.OS.git");
-  assert.equal(json.source_provenance.commit, "0123456789abcdef");
 });
 
 // --- New tests: source==target, not-installed, collision, blocked, manual-review, version pin, EVE summary ---

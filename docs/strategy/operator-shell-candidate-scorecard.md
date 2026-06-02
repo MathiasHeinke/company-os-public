@@ -2,7 +2,7 @@
 
 Status: sidecar decision package
 Use for: choosing the first sandboxed Operator UI / Hermes assistant surface
-Last updated: 2026-05-31
+Last updated: 2026-05-13
 
 ## Decision Frame
 
@@ -32,7 +32,6 @@ fit. One star means weak fit or high uncertainty.
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
 | AionUi | https://github.com/iOfficeAI/AionUi | ***** | ***** | **** | *** | ** | *** | **** | ***** | Adopt as primary read-only UX sidecar pilot |
 | Mission-Control | https://github.com/builderz-labs/mission-control | **** | **** | ** | **** | **** | ** | **** | **** | Adapter-only or fork candidate for fleet/gate cockpit |
-| Clicky | https://github.com/farzaa/clicky | **** | * | * | * | ** | ***** | *** | ** | Reference architecture for EVE Quick Mode, not primary Operator Shell |
 | The Kitchen | https://github.com/jozef-barton/the-kitchen | *** | *** | **** | ** | *** | *** | *** | *** | Hermes benchmark, not primary control shell |
 | Hermes Workspace | https://github.com/outsourc-e/hermes-workspace | **** | **** | ***** | ** | ** | ** | *** | *** | Reference-only unless forkability/security passes |
 | OpenAgents | https://github.com/openagents-org/openagents | *** | **** | ** | * | ** | * | *** | ** | Monitor; too broad for v0.7 control layer |
@@ -40,13 +39,11 @@ fit. One star means weak fit or high uncertainty.
 | Cogpit | https://github.com/gentritbiba/cogpit | *** | ** | * | ** | *** | ** | ** | ** | Claude Code observability sidecar only |
 | OrbitDock | https://github.com/Robdel12/OrbitDock | *** | *** | ** | ** | ** | * | ** | ** | Monitor; needs separate security and adapter review |
 
-Original operator-shell snapshot was verified on 2026-05-13 via GitHub CLI /
-GitHub search. Clicky was added from the 2026-05-31 research compact. The
-volatile numbers are deliberately not used as decision authority, but they
-matter for ecosystem health: AionUi, Mission-Control, Hermes Workspace and
-OpenAgents were active in May 2026; Clicky proved the macOS voice/overlay
-pattern has strong developer pull; The Kitchen is small but current; Cogpit,
-amux and OrbitDock are useful comparison surfaces.
+Verified snapshot on 2026-05-13 via GitHub CLI / GitHub search. The volatile
+numbers are deliberately not used as decision authority, but they matter for
+ecosystem health: AionUi, Mission-Control, Hermes Workspace and OpenAgents were
+active in May 2026; The Kitchen is small but current; Cogpit, amux and OrbitDock
+are useful comparison surfaces.
 
 ## Shortlist
 
@@ -128,56 +125,9 @@ OpenAgents is interesting for broader agent networks and collaboration, but it
 is too broad for the v0.7 Operator Shell. Treat it as long-horizon ecosystem
 watch, not the first Company.OS UI.
 
-Clicky is not a primary Operator Shell candidate because the public repo is a
-macOS voice companion, not a Plane-first control room. It is highly relevant as
-a reference for a future Command EVE Quick Mode: menu bar/notch presence,
-push-to-talk, per-turn screen context, short spoken responses and overlay
-pointing. Its public code should inform macOS mechanics, not governance or
-state ownership.
-
 amux, Cogpit and OrbitDock are useful for lower-level coding-agent monitoring
 and parallel session ergonomics. They should inform the Worker Session view, but
 they are not the CEO-level Samantha/Jarvis surface.
-
-## Quick Interaction Sidecars
-
-Clicky/Flicky-style tools are a separate lane from AionUI/Hermes.
-
-They map to:
-
-```text
-Command EVE Quick Mode
-  -> status bar / notch
-  -> push-to-talk or wake gesture
-  -> current screen/app/window context
-  -> short answer, local capture, intent-card draft or gated skill trigger
-```
-
-They do not replace:
-
-```text
-Command EVE Deep Mode
-  -> AionUI/Hermes
-  -> Founder Intent Packet
-  -> CEO Delegation Packet
-  -> Plane parent/child contracts
-  -> CAO/Controller evidence
-```
-
-Roadmap placement:
-
-- `0.7.x`: research compact and read-only spike only.
-- `0.8`: no-write EVE Quick Mode design packet and synthetic/local-safe
-  prototype.
-- `0.9`: privacy, consent, retention, audit log, provider-cost and kill-switch
-  gates before client-facing pilot.
-- `1.0`: one or two narrow guided-beta quick actions, such as YouTube
-  transcript capture or local report lookup.
-- `1.3+`: persistent personal desktop/session observation only after the
-  Life-OS boundary layer exists.
-
-Canonical research compact:
-`reports/operator-shell/2026-05-31/clicky-voice-desktop-research-compact.md`.
 
 ## Observability Sidecars
 

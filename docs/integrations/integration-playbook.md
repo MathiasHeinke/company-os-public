@@ -193,12 +193,6 @@ Only create events for human decisions, review blocks, department meetings or
 real deep-work slots. Default duration should be long enough to be visible in
 the user's calendar.
 
-Do not create all-day events for review, reminder, approval or decision work by
-default. If a date-only marker is tempting, ask whether the user wants an
-all-day marker or a visible timed block. If the runtime cannot ask and the work
-is an attention item, use the configured attention window instead; default to a
-30-60 minute morning block in the user's local timezone.
-
 ### Vercel / Hosting
 
 Purpose:

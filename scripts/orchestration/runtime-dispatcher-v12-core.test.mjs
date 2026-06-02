@@ -974,7 +974,6 @@ test("evaluateGateToolAllowlist treats common non-node runners as executable gat
     contractFields: {
       gates: [
         "python -m pytest tests/",
-        "python3 -m pytest tests/",
         "python3 scripts/check.py",
         "make test",
         "cargo test",
@@ -989,10 +988,9 @@ test("evaluateGateToolAllowlist treats common non-node runners as executable gat
   });
 
   assert.equal(result.ok, false);
-  assert.equal(result.checked_count, 8);
-  assert.equal(result.allowed_tools.includes("Bash(python -m pytest*)"), true);
-  assert.equal(result.allowed_tools.includes("Bash(python3 -m pytest*)"), true);
+  assert.equal(result.checked_count, 7);
   assert.deepEqual(result.missing.map((item) => item.command), [
+    "python -m pytest tests/",
     "python3 scripts/check.py",
     "make test",
     "cargo test",
@@ -1146,103 +1144,6 @@ test("inferRuntimeStateFromWorkerOutput reads direct JSON state properties", () 
 
   assert.equal(result.state, "REJECT");
   assert.equal(result.worker_declared_state, "REJECT");
-});
-
-test("inferRuntimeStateFromWorkerOutput accepts explicit PASS from report artifact after nonzero exit", () => {
-  const result = inferRuntimeStateFromWorkerOutput({
-    exitCode: 1,
-    stdout: "runtime ended after max turns",
-    stderr: "",
-    reportArtifactText: [
-      "worker.reported:",
-      "  state: PASS",
-      "reflection:",
-      "learning_proposals:",
-    ].join("\n"),
-    timedOut: false,
-    killedReason: "",
-  });
-
-  assert.equal(result.state, "PASS");
-  assert.equal(result.worker_declared_state, "PASS");
-  assert.equal(result.reason, "worker-declared-pass-after-nonzero-exit");
-});
-
-test("inferRuntimeStateFromWorkerOutput ignores runtime_state caveats inside worker.reported blocks", () => {
-  const result = inferRuntimeStateFromWorkerOutput({
-    exitCode: 0,
-    stdout: "",
-    stderr: "",
-    reportArtifactText: [
-      "## worker.reported",
-      "```yaml",
-      "state: PASS",
-      "prior_run:",
-      "  runtime_state: RUNTIME_ERROR",
-      "```",
-      "reflection:",
-      "learning_proposals:",
-    ].join("\n"),
-    timedOut: false,
-    killedReason: "",
-  });
-
-  assert.equal(result.state, "PASS");
-  assert.equal(result.worker_declared_state, "PASS");
-  assert.equal(result.reason, "worker-declared-pass");
-});
-
-test("inferRuntimeStateFromWorkerOutput prefers canonical worker.reported block over later recovery caveat prose", () => {
-  const result = inferRuntimeStateFromWorkerOutput({
-    exitCode: 0,
-    stdout: "",
-    stderr: "",
-    reportArtifactText: [
-      "The prior dispatcher recorded worker.reported state: RUNTIME_ERROR.",
-      "## worker.reported",
-      "```yaml",
-      "state: PASS",
-      "```",
-      "reflection:",
-      "The earlier run exited with `state=RUNTIME_ERROR`, but this recovery is PASS.",
-    ].join("\n"),
-    timedOut: false,
-    killedReason: "",
-  });
-
-  assert.equal(result.state, "PASS");
-  assert.equal(result.worker_declared_state, "PASS");
-  assert.equal(result.reason, "worker-declared-pass");
-});
-
-test("inferRuntimeStateFromWorkerOutput rejects loose report verdict prose after nonzero exit", () => {
-  const result = inferRuntimeStateFromWorkerOutput({
-    exitCode: 1,
-    stdout: "runtime ended after max turns",
-    stderr: "",
-    reportArtifactText: "Verdict: PASS. The report is useful, but no worker state field is present.",
-    timedOut: false,
-    killedReason: "",
-  });
-
-  assert.equal(result.state, "RUNTIME_ERROR");
-  assert.equal(result.worker_declared_state, "");
-  assert.equal(result.reason, "nonzero-exit");
-});
-
-test("inferRuntimeStateFromWorkerOutput keeps timeout dominant over report artifact PASS", () => {
-  const result = inferRuntimeStateFromWorkerOutput({
-    exitCode: 1,
-    stdout: "",
-    stderr: "",
-    reportArtifactText: "state: PASS",
-    timedOut: true,
-    killedReason: "",
-  });
-
-  assert.equal(result.state, "TIMEOUT");
-  assert.equal(result.worker_declared_state, "PASS");
-  assert.equal(result.reason, "timeout");
 });
 
 test("buildWorkerPrompt includes hard boundaries and capability profile", () => {

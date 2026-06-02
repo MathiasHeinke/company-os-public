@@ -183,7 +183,6 @@ HumanGate: only the explicit external-impact boundaries listed for that job.
 | `marketing-blog-article` | Blog Article Controller | daily | Audits Blog Engine article state and gates publish/index decisions. | L1/L2 report / HG-2.5 publish gate | optional |
 | `marketing-distribution` | Distribution Planner | after eval | Builds schedule and channel plan; no auto-publishing. | L1 plan | optional |
 | `performance-analytics` | Performance Analytics | morning | Pulls performance data and feeds next decisions. | L1 report | optional |
-| `lead-signal-intelligence` | Lead Signal Intelligence Loop | morning + midday | Scans public buying-intent signals, scores fit, writes one singleton queue and prepares human-gated drafts. No auto-send. | L1/L2 report + draft | optional |
 | `independent-reviewer` | Independent Reviewer Observability Loop | after completed runtime pilots or weekly | Reads Plane/report/event evidence and proposes contract, gate, eval and prompt improvements without control-plane authority. | L2 review | pilot |
 
 ## Current Local Pilot Mapping
@@ -214,7 +213,6 @@ The ARES/Fyn local pilot currently maps to the generic registry like this:
 | `marketing-distribution` | `ares-distribution-planner` | Distribution plan, not direct publishing. |
 | `marketing-distribution` | `ares-upload-post-scheduler` | Schedules only after approval/eval gates. |
 | `performance-analytics` | `ares-daily-performance-analytics` | Morning performance pull before CEO brief. |
-| `lead-signal-intelligence` | `command-eve-lead-signal-loop` | Draft. Should write to one `Lead Signal Queue - Current` singleton and private reports; no new session per scan and no autonomous outbound. |
 | `plane-ui-worker` | `company-os-plane-ui-worker-cadence` | Browser-backed Company.OS lane. Uses `scripts/runtime/plane-ui-worker-cadence-runner.mjs`; starts at `pilot-cron-report`, not continuous queue dispatch. |
 | `raindrop-observability` | `company-os-raindrop-llm-call-observability` | Target lane for Raindrop Workshop call-level observability across Company.OS-owned LLM calls. Worker contract only until adapter exists. |
 | `independent-reviewer` | `company-os-independent-reviewer-observability` | Paused. Downstream consumer of Raindrop/report evidence, not a substitute for call-level LLM observability. |

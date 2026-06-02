@@ -81,6 +81,9 @@ function writeMinimalIncludeTree(root) {
       },
     }, null, 2),
   );
+  write(root, "registries/domain-packs/company-os.json", "{\"version\":\"domain-pack-registry/v0\",\"packs\":[]}\n");
+  write(root, "registries/domain-packs/company-os.schema.json", "{\"title\":\"Domain Pack Registry\"}\n");
+  write(root, "registries/plane-templates/company-os.json", "{\"version\":\"plane-template-registry/v0\"}\n");
 
   write(root, "kits/company-os-kit/README.md", "# Kit\n");
   write(root, "kits/company-os-kit/templates/AGENTS.md", "# Template\n");
@@ -160,6 +163,9 @@ test("isIncluded recognizes documented include rules", () => {
   assert.ok(isIncluded("docs/operations/example.md"));
   assert.ok(isIncluded("scripts/install/bootstrap.mjs"));
   assert.ok(isIncluded("scripts/plane/plane-app-token-rotation.mjs"));
+  assert.ok(isIncluded("registries/domain-packs/company-os.json"));
+  assert.ok(isIncluded("registries/plane-templates/company-os.json"));
+  assert.ok(isIncluded("registries/quality/post-worker-quality-loop.json"));
   assert.ok(isIncluded("kits/company-os-kit/.antigravity/agentic-plan-template.md"));
   assert.ok(isIncluded("kits/company-os-kit/.antigravity/personas/compliance-officer.md"));
   assert.equal(isIncluded("docs/CLAUDE-private.txt") !== null, true);
@@ -178,6 +184,8 @@ test("planPublicMirror returns copied + stripped + missing_fixtures for a synthe
   assert.ok(plan.copied.some((entry) => entry.path === "README.md"));
   assert.ok(plan.copied.some((entry) => entry.path === "metrics/agent-events.example.jsonl"));
   assert.ok(plan.copied.some((entry) => entry.path === "registries/capabilities/example.json"));
+  assert.ok(plan.copied.some((entry) => entry.path === "registries/domain-packs/company-os.json"));
+  assert.ok(plan.copied.some((entry) => entry.path === "registries/plane-templates/company-os.json"));
   assert.ok(plan.copied.some((entry) => entry.path === "registries/quality/post-worker-quality-loop.json"));
   assert.ok(
     plan.copied.some((entry) => entry.path === "kits/company-os-kit/.antigravity/personas/compliance-officer.md"),
@@ -281,6 +289,18 @@ test("runBuildPublicMirror full build copies sanitized tree and writes provenanc
   );
   assert.equal(
     fs.existsSync(path.join(outRoot, "registries/capabilities/example.json")),
+    true,
+  );
+  assert.equal(
+    fs.existsSync(path.join(outRoot, "registries/domain-packs/company-os.json")),
+    true,
+  );
+  assert.equal(
+    fs.existsSync(path.join(outRoot, "registries/domain-packs/company-os.schema.json")),
+    true,
+  );
+  assert.equal(
+    fs.existsSync(path.join(outRoot, "registries/plane-templates/company-os.json")),
     true,
   );
   assert.equal(

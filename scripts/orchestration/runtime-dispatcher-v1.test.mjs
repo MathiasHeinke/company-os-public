@@ -1287,12 +1287,12 @@ test("runDryRun PASS includes raindrop_hook_shape preflight evidence with curren
   assert.equal(hookPreflight.evidence.producer_count, Object.keys(RAINDROP_HOOK_PRODUCER_REGISTRY).length);
 });
 
-test("runDryRun fails closed when capability profile is missing without fabricating gate evidence", () => {
+test("runDryRun still surfaces gate allowlist failure when capability profile is missing", () => {
   const desc = "<p>hello</p>";
   const fields = {
     ...VALID_CONTRACT_FIELDS,
     capabilityprofile: "missing-profile",
-    gates: ["curl https://example.invalid/"],
+    gates: ["python -m pytest tests/"],
   };
   const r = runDryRun({
     workItem: { id: "x", sequence_id: 233, name: "Missing Profile" },
@@ -1308,12 +1308,9 @@ test("runDryRun fails closed when capability profile is missing without fabricat
 
   assert.equal(r.state, RUN_STATES.BLOCKED_DEPENDENCY);
   assert.ok(r.blocked_reasons.includes(PREFLIGHT_REASONS.CAPABILITY_PROFILE_NOT_FOUND));
+  assert.ok(r.blocked_reasons.includes(PREFLIGHT_REASONS.GATE_TOOL_NOT_ALLOWED));
   const gatePreflight = r.preflights.find((item) => item.name === "gate_tool_allowlist");
-  assert.equal(gatePreflight.state, RUN_STATES.PASS);
-  assert.equal(gatePreflight.evidence.checked_count, 0);
-  assert.deepEqual(gatePreflight.evidence.missing, []);
-  const runtimePreflight = r.preflights.find((item) => item.name === "runtime_executability");
-  assert.equal(runtimePreflight.state, RUN_STATES.BLOCKED_DEPENDENCY);
+  assert.equal(gatePreflight.evidence.missing[0].command, "python -m pytest tests/");
 });
 
 // ---------- runtime process helpers ----------

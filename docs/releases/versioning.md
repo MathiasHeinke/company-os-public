@@ -1,7 +1,7 @@
 # Company.OS Versioning
 
 Status: canonical versioning doctrine
-Current version: `0.7.4-rc.0`
+Current version: `0.9.0-rc.0`
 Last updated: 2026-06-02
 
 ## Purpose
@@ -15,7 +15,7 @@ audit, upgrade and discuss the system without relying on chat memory.
 
 | Layer | Example | Meaning | Source |
 |---|---|---|---|
-| Product version | `0.7.4-rc.0` | Version of the Company.OS repo and installable kit baseline. | `VERSION`, `CHANGELOG.md` |
+| Product version | `0.9.0-rc.0` | Version of the Company.OS repo and installable kit baseline. | `VERSION`, `CHANGELOG.md` |
 | Runtime buildout stage | `Stage 7 / 9 proven, Stage 8-9 gated` | How far the Plane -> worker -> CAO -> Codex controller run chain is executable. | `docs/orchestration/company-os-runtime-dispatcher-v1.md` |
 | Autonomy profile | `Stage 3.65 / 5` | Operational autonomy maturity of the current control plane. | rollout docs, audit reports |
 | Internal maturity score | `7.45 / 10` | Evidence-backed quality score for current internal readiness. | audit/CEO synthesis |
@@ -26,22 +26,21 @@ audit, upgrade and discuss the system without relying on chat memory.
 ## Current Canonical Version
 
 ```text
-0.7.4-rc.0
+0.9.0-rc.0
 ```
 
 This means:
 
 - `0`: pre-1.0 product, still evolving quickly.
-- `7`: the active product layer is the operator-shell entry: Command EVE,
-  AionUI/Hermes sidecar packaging, first-run context boot, client
-  self-onboarding preparation and bounded runtime policy.
-- `4`: fifth claim in the 0.7 line. It adds the Supergoal Factory hardening
-  layer on top of the Command EVE v1.3 governance spine: execution-truth
-  ladder, state-truth pass, merge-readiness packs, post-worker quality routing
-  and public lower-worker profiles.
-- `rc.0`: release-candidate evidence for the 0.7.4 Supergoal Factory control
-  plane. It is not stable, not an unattended public release and not an
-  autonomous publishing/scheduling/outreach/spend/release-worker release.
+- `9`: the active product layer is the public-upstream install/update release
+  candidate: a public clone or sanitized public mirror can install a fresh
+  target from generic company seed, generate EVE's first boot packet and write
+  update plus handoff provenance.
+- `0`: first claim in the 0.9 line. It closes the public-first distribution
+  path without claiming stable unattended autonomy.
+- `rc.0`: release-candidate evidence for public self-serve install packaging.
+  It is not stable, not scheduler-default-on and not an autonomous
+  publishing/scheduling/outreach/spend/release-worker release.
 
 Included in this candidate:
 
@@ -56,6 +55,10 @@ Included in this candidate:
   lower-worker candidate handoff and post-worker quality registry
 - public mirror coverage for the reusable Supergoal / Post-Worker Quality
   docs, scripts, generic quality registry and lower-worker capability profiles
+- public mirror coverage for domain-pack and Plane-template registries needed
+  by a fresh install
+- `scripts/install/public-rc.mjs`: public-RC wrapper for seed -> bootstrap ->
+  EVE boot packet -> update provenance -> handoff report
 - Command EVE runtime policy gate for AionUI/Hermes launch posture
 - first-response boot-packet behavior so broad openers answer from known
   runtime/company facts instead of dumping a full questionnaire
@@ -66,19 +69,20 @@ Included in this candidate:
 
 Known limits:
 
-- the self-serve smoke remains an evidence drill, not a full unattended
-  installer or hosted account provisioner
-- the next 0.7 hardening target is the Public-Upstream Update Channel: public
-  repo/release bundle must become the canonical update source for private/client
-  overlays, with provenance in update reports and no private-to-public shortcut
+- the public-RC wrapper is a release-candidate installer, not a hosted account
+  provisioner or stable unsupported self-serve product
+- private/client overlays must update from the public source after public
+  install/update evidence exists; private-to-public backflow is not the
+  distribution path
 - AionUI native scheduled tasks/team mode/assistant switching/YOLO and Hermes
   native cron/delegation/kanban/toolset autonomy remain disabled or gated at
   launch
 - Clicky-style status-bar/notch quick voice interaction is research only, not
   part of the released Command EVE runtime path
 - no autonomous Plane Done, production writes, public publishing, outreach,
-  spend, customer communication, direct controller spawning or scheduler
-  default-on autonomy is released by this version
+  spend, customer communication, direct controller spawning, scheduler
+  default-on autonomy, public tags or release uploads are released by this
+  version
 
 ## Bump Rules
 

@@ -121,12 +121,6 @@ eve_cos_growth_review:
       - conclusion: ""
         evidence: []
         acceptance_required: Founder
-    fvbm_updates:
-      - dimension: voice | belief | frame | refusals | proof | positioning
-        proposal: ""
-        evidence: []
-        confidence_change: ""
-        human_gate: HG-4
     plane_worker_contracts:
       - title: ""
         role: role:coo
@@ -157,7 +151,6 @@ score without evidence is invalid.
 | Delegation throughput | Did EVE create useful, bounded work instead of broad plans? |
 | Memory precision | Were proposed memories specific, useful, reversible and accepted? |
 | Founder taste preservation | Did EVE preserve voice, standards and refusal patterns without flattery? |
-| FVBM calibration | Did confirmed founder corrections improve the Voice and Belief Model without silently expanding authority? |
 | Health and overload protection | Did EVE reduce hidden founder debt and protect recovery capacity? |
 | Raindrop evidence quality | Is there enough safe evidence to improve the system honestly? |
 
@@ -168,8 +161,6 @@ Accepted findings go to the right layer:
 - `SOUL.md`: only stable identity, posture, North Star or hard-boundary changes.
 - Skills/workflows: repeatable procedures EVE should run again.
 - Honcho: accepted durable founder/company facts and preferences.
-- FVBM file/Honcho representation: accepted voice, belief, frame, refusal,
-  proof and positioning updates with evidence and founder confirmation.
 - Docs/ADR: reusable Company.OS product doctrine.
 - Capability profiles: connector and permission changes.
 - Plane: concrete implementation, audit or productization work.

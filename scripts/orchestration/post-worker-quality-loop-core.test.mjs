@@ -48,14 +48,6 @@ test("P1 bounded code failure gets one bug audit and one hotfix worker", () => {
   assert.equal(result.status, "FOLLOWUP_READY");
   assert.equal(result.scheduler.scheduler_may_spawn, true);
   assert.deepEqual(workerClasses(result), ["bug-regression-auditor", "hotfix-worker"]);
-  assert.deepEqual(
-    result.markers_to_post.map((item) => `${item.marker}:${item.worker_class}`),
-    [
-      "controller.audit-followup:controller-only",
-      "controller.audit-followup:bug-regression-auditor",
-      "controller.hotfix-request:hotfix-worker",
-    ],
-  );
   assert.ok(result.reason_codes.includes(QUALITY_LOOP_REASONS.HOTFIX_ELIGIBLE));
 });
 
@@ -105,13 +97,6 @@ test("P2 shared runtime work receives Codex quality audit and Claude security au
   assert.equal(result.status, "FOLLOWUP_READY");
   assert.equal(result.scheduler.scheduler_may_spawn, true);
   assert.deepEqual(workerClasses(result), ["quality-auditor", "security-auditor"]);
-  assert.deepEqual(
-    result.markers_to_post.map((item) => `${item.marker}:${item.worker_class}`),
-    [
-      "controller.audit-followup:quality-auditor",
-      "controller.audit-followup:security-auditor",
-    ],
-  );
   assert.ok(result.reason_codes.includes(QUALITY_LOOP_REASONS.SECURITY_AUDIT_REQUIRED));
 });
 
@@ -126,13 +111,6 @@ test("P3 cross-repo work gets deep audit but no autonomous hotfix", () => {
 
   assert.equal(result.status, "FOLLOWUP_READY");
   assert.deepEqual(workerClasses(result), ["quality-auditor", "deep-audit-worker"]);
-  assert.deepEqual(
-    result.markers_to_post.map((item) => `${item.state}:${item.worker_class}`),
-    [
-      "AUDIT_REQUESTED:quality-auditor",
-      "DEEP_AUDIT_REQUESTED:deep-audit-worker",
-    ],
-  );
   assert.ok(result.reason_codes.includes(QUALITY_LOOP_REASONS.DEEP_AUDIT_REQUIRED));
   assert.equal(result.reason_codes.includes(QUALITY_LOOP_REASONS.HOTFIX_ELIGIBLE), false);
 });

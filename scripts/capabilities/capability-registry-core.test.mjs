@@ -241,7 +241,6 @@ test("validateSandboxPatternEntry catches empty, relative and traversal inputs",
 
 // [WORK_ITEM_ID] acceptance criteria: real registry validation
 const REAL_REGISTRY_RESULT = loadCapabilityRegistry();
-const PUBLIC_EXAMPLE_REGISTRY_RESULT = loadCapabilityRegistry("registries/capabilities/example.json");
 
 test("[WORK_ITEM_ID]: real registry cto/runtime PASS for company-os sandbox path", () => {
   assert.equal(REAL_REGISTRY_RESULT.ok, true, `real registry load failed: ${JSON.stringify(REAL_REGISTRY_RESULT.reason_codes)}`);
@@ -342,24 +341,6 @@ test("Post-worker quality loop lower-worker profiles are registered with safe de
     assert.ok(profile.source.includes("registries/quality/post-worker-quality-loop.json"));
     assert.ok(profile.forbidden_surfaces.includes("plane-done-by-worker"));
     assert.ok(profile.forbidden_surfaces.includes("production-write"));
-  }
-});
-
-test("Public capability example includes executable post-worker quality profiles", () => {
-  assert.equal(
-    PUBLIC_EXAMPLE_REGISTRY_RESULT.ok,
-    true,
-    `public example registry load failed: ${JSON.stringify(PUBLIC_EXAMPLE_REGISTRY_RESULT.reason_codes)}`,
-  );
-  const profileIds = PUBLIC_EXAMPLE_REGISTRY_RESULT.registry.profiles.map((profile) => profile.id);
-  for (const profileId of [
-    "codex-lower-worker/cto/quality-auditor",
-    "claude-lower-worker/cto/security-auditor",
-    "claude-lower-worker/cto/bug-regression-auditor",
-    "claude-lower-worker/cto/deep-audit",
-    "claude-lower-worker/cto/hotfix",
-  ]) {
-    assert.ok(profileIds.includes(profileId), `${profileId} missing from public example registry`);
   }
 });
 
@@ -720,20 +701,3 @@ for (const [role, profile] of [
     assert.equal(result.ok, true, `expected PASS but got: ${JSON.stringify(result.reason_codes)}`);
   });
 }
-
-test("[WORK_ITEM_ID]: atlas-backend profile allows only the bounded G6 env preflight node script", () => {
-  assert.equal(REAL_REGISTRY_RESULT.ok, true, `real registry load failed: ${JSON.stringify(REAL_REGISTRY_RESULT.reason_codes)}`);
-  const profile = REAL_REGISTRY_RESULT.registry.profiles.find(
-    (candidate) => candidate.id === "claude-clevel-worker/cto/atlas-backend"
-  );
-  assert.ok(profile, "atlas-backend profile missing");
-  assert.ok(
-    profile.allowed_claude_tools.includes("Bash(node ${LOCAL_WORKSPACE})"),
-    "atlas-backend profile must allow the bounded G6 env preflight script",
-  );
-  assert.equal(
-    profile.allowed_claude_tools.includes("Bash(node *)"),
-    false,
-    "atlas-backend profile must not allow arbitrary node commands",
-  );
-});

@@ -2072,12 +2072,7 @@ async function main() {
     },
   });
   const endedAt = new Date().toISOString();
-  const workerReportExists = existsSync(reportPath);
-  const workerReportText = workerReportExists ? readFileSync(reportPath, "utf8") : "";
-  const stateInference = inferRuntimeStateFromWorkerOutput({
-    ...runtime,
-    reportArtifactText: workerReportText,
-  });
+  const stateInference = inferRuntimeStateFromWorkerOutput(runtime);
   const changedFiles = subtractBaselineChangedFiles(await listChangedFiles(workspacePath), baselineChangedFiles);
   const finalAttribution = splitChangedFilesByRuntimeAttribution(
     changedFiles,
@@ -2094,6 +2089,8 @@ async function main() {
   });
   let state = finalState.state;
   let stateReason = finalState.reason;
+  const workerReportExists = existsSync(reportPath);
+  const workerReportText = workerReportExists ? readFileSync(reportPath, "utf8") : "";
   const runtimeReportPath = deriveRuntimeRunReportPath(reportPath, runId);
   const report = buildRunReportMarkdown({
     runId,

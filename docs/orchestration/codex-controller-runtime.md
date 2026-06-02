@@ -5,7 +5,7 @@ Phase: doctrine first; dry-run only adapter is the next slice; bounded
 controller automation is HG-2.5/HG-3 gated and not implemented in this doc
 Use for: deciding what Codex CLI (GPT-5.5 xhigh) is allowed to do as a
 deputy CEO controller against Plane work items already audited by CAO
-Last updated: 2026-05-31
+Last updated: 2026-05-21
 
 Related doctrine: `docs/orchestration/multi-inference-c-level-runtime.md`
 defines a future Codex-as-worker lane. That future lane is a separate runtime
@@ -276,23 +276,13 @@ next step. The allowed follow-up classes are `quality-auditor`,
 `hotfix-worker`.
 
 The controller may write `controller.audit-followup` or
-`controller.hotfix-request` comments, but still does not spawn the worker. In
-the bounded `codex-controller-dryrun.mjs` path, coding contracts can now produce
-those markers directly inside the `controller.decision` card whenever the
-post-worker policy requires an audit, security check, deep audit or bounded
-hotfix. A separate scheduler can consume those markers only when the policy
-registry, HumanGate level, loop limit and capability profile pass. The
-executable handoff is
-`scripts/orchestration/post-worker-quality-scheduler-core.mjs`: it converts
-eligible markers from the latest controller card into separate
-`dispatch: ready` lower-worker contracts and writes or spawns nothing itself.
-P2/P3/P4 work cannot quietly become an autonomous hotfix loop.
-
-[WORK_ITEM_ID] is the current reference run for this boundary. The controller posted
-`controller.audit-followup` markers; the scheduler produced lower-worker
-candidates; `quality-auditor` and then `security-auditor` executed as follow-up
-workers. The controller did not directly spawn them, and neither worker nor CAO
-set Plane `Done`.
+`controller.hotfix-request` comments, but still does not spawn the worker. A
+separate scheduler can consume those markers only when the policy registry,
+HumanGate level, loop limit and capability profile pass. The executable handoff
+is `scripts/orchestration/post-worker-quality-scheduler-core.mjs`: it converts
+the latest explicit marker into one `dispatch: ready` lower-worker contract and
+writes or spawns nothing itself. P2/P3/P4 work cannot quietly become an
+autonomous hotfix loop.
 
 ## Phase Plan
 

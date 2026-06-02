@@ -3,19 +3,17 @@
 Company.OS is an AI-native operating system for small companies, founders, and
 agentic teams.
 
-Current version: `0.7.4-rc.0`
+Current version: `0.9.0-rc.0`
 
-Current productization status: self-serve candidate, not stable. Company.OS now
-has a reproducible install/onboarding/update smoke on top of the Command EVE
-AionUI/Hermes local start path, first-run skill pack, connector manifest and
-runtime smoke evidence. The 0.7.4 RC adds the Supergoal Factory hardening:
-execution-ladder truth, state-truth pass, HG-2.5 merge-readiness packets,
-post-worker quality marker routing, lower-worker audit/hotfix profiles and
-public-mirror doctrine for reusable controller/scheduler loops. The sanitized
-fresh-history public mirror remains the distribution strategy, but external
-posting, outreach sends, spend changes, production writes, scheduler-default-on,
-unsupported client rollout, stable self-serve distribution, tags and release
-uploads remain gated.
+Current productization status: public self-serve release candidate, not stable.
+Company.OS now has a public-first install path: a sanitized public clone or
+public mirror artifact can install a fresh target from generic signup/report
+seed, generate EVE's first boot packet, write update provenance and produce a
+public-RC handoff report. The 0.9 RC carries forward the 0.7.4 Supergoal
+Factory hardening, post-worker quality lane and lower-worker audit/hotfix
+profiles, but external posting, outreach sends, spend changes, production
+writes, scheduler-default-on, Plane Done, stable self-serve claims, tags and
+release uploads remain gated.
 
 Current runtime proof: Stage 7 / 9 proven by live pilots; Stage 8-9 still
 gated.
@@ -62,39 +60,36 @@ controller review, department rollout and HumanGate model.
 
 ## Quick Start
 
-For a new company or a clean MacBook setup, start here:
+For a new company or a clean MacBook setup, start from the public source:
 
 ```bash
 git clone https://github.com/MathiasHeinke/company-os.git
 cd company-os
 
-node scripts/install/bootstrap.mjs install \
-  --source "$PWD" \
+node scripts/install/public-rc.mjs install \
   --target /path/to/company-workspace \
-  --dry-run \
-  --json
-
-node scripts/install/bootstrap.mjs install \
-  --source "$PWD" \
-  --target /path/to/company-workspace \
-  --json
-
-cp /path/to/company-workspace/.company-os/onboarding/company-intake.example.json \
-  /path/to/company-workspace/.company-os/onboarding/company-intake.json
-
-node scripts/onboarding/first-company-packet.mjs \
-  --target /path/to/company-workspace \
-  --input /path/to/company-workspace/.company-os/onboarding/company-intake.json \
-  --registry "$PWD/registries/domain-packs/company-os.json" \
-  --date YYYY-MM-DD \
-  --force \
+  --company "Acme Systems" \
+  --website "https://acme.example" \
+  --offer "AI operating-system setup" \
+  --buyer "founder-led service firms" \
+  --founder "Jane Founder" \
+  --approval-owner "Jane Founder" \
+  --first-department marketing \
   --json
 ```
 
-The onboarding command writes EVE's first-run boot packet to:
+The public-RC installer performs the bootstrap dry-run, kit install, intake
+write, EVE boot packet generation, update dry-run and handoff report in one
+bounded flow. It writes EVE's first-run boot packet to:
 
 ```text
 /path/to/company-workspace/.company-os/onboarding/eve-boot-packet.json
+```
+
+It also writes the release-candidate handoff to:
+
+```text
+/path/to/company-workspace/reports/company-os-public-rc/YYYY-MM-DD/company-os-public-rc-0.9.0-rc.0.md
 ```
 
 1. [Fresh Company Setup](./docs/bootstrap/fresh-company-setup.md)
@@ -132,16 +127,16 @@ The onboarding command writes EVE's first-run boot packet to:
 
 ## Readiness
 
-`0.7.0-alpha.1` is the Command EVE guided operator-shell alpha. It carries the
-`0.6.5-beta.5` runtime-hardening substrate forward and adds repo-packaged
-AionUI overlay assets, Hermes/EVE first-run boot context, connector manifests
-and local smoke evidence.
+`0.9.0-rc.0` is the public self-serve release candidate for the install,
+onboarding and update path. It carries the `0.7.4-rc.0` Supergoal Factory
+substrate forward and closes the public-upstream distribution path for fresh
+targets.
 
-For installs, this is a self-serve candidate and not stable. The fresh-history
-public mirror is live, but tags, release uploads, unsupported client rollout
-and stable self-serve distribution remain gated. Before any new public
-remote push, tag, package, unsupported client rollout or self-serve
-distribution, run:
+For installs, this is a release candidate and not stable. The public clone or
+fresh-history mirror is the distribution source, but tags, release uploads,
+unsupported stable rollout, production writes and default-on autonomy remain
+gated. Before any public remote push, tag, package or broader release action,
+run:
 
 ```bash
 node scripts/release/build-public-mirror.mjs --out /tmp/company-os-public --verify
@@ -155,15 +150,24 @@ For private/guided alpha work:
 node scripts/release-gates/productization-readiness.mjs check
 ```
 
-For the current `0.7.1` self-serve candidate drill:
+For the current public-RC install drill:
 
 ```bash
-node scripts/install/self-serve-smoke.mjs run --source . --date YYYY-MM-DD --json
+node scripts/install/public-rc.mjs install \
+  --target /tmp/company-os-rc-target \
+  --company "Acme Systems" \
+  --website "https://acme.example" \
+  --offer "AI operating-system setup" \
+  --buyer "founder-led service firms" \
+  --approval-owner "Jane Founder" \
+  --first-department marketing \
+  --date YYYY-MM-DD \
+  --json
 ```
 
-This proves install, first onboarding packet generation and update dry-run
-together against a fresh target. Passing it is necessary for the next
-self-serve candidate, but it is not a stable unattended client release.
+This proves install, first onboarding packet generation, update provenance and
+public-RC handoff together against a fresh target. Passing it is necessary for
+the release candidate, but it is not a stable unattended autonomy release.
 
 The private staging tree still contains internal `reports/` and live
 `metrics/*.jsonl` ledgers. They are allowed in private staging and intentionally
@@ -259,6 +263,12 @@ the public mirror includes the generic Post-Worker Quality Registry plus
 lower-worker capability profiles. It is still a release candidate, not
 scheduler-default-on or stable unattended client autonomy.
 
+`0.9.0-rc.0` closes the public-upstream install/update path: the public clone
+or sanitized public mirror contains the domain-pack, Plane-template and
+post-worker-quality registries needed for a fresh external install, and
+`scripts/install/public-rc.mjs` collapses bootstrap, onboarding, EVE boot packet
+and update provenance into one generic flow.
+
 ```bash
 node scripts/release/build-public-mirror.mjs --out /tmp/company-os-public --verify
 node scripts/release/verify-clean-clone.mjs --root /tmp/company-os-public
@@ -272,10 +282,10 @@ generated fresh-history mirror to
 `https://github.com/MathiasHeinke/company-os-public`. Do not push the private
 history to a public remote.
 
-Company.OS 0.7.4-rc.0 remains a self-serve candidate. Scheduler-default-on, full
-department autonomy, autonomous publish/schedule/send actions, spend changes,
-production writes, public publish and stable unsupported self-serve installs stay
-gated past this cut.
+Company.OS 0.9.0-rc.0 remains a public release candidate. Scheduler-default-on,
+full department autonomy, autonomous publish/schedule/send actions, spend
+changes, production writes, Plane Done, public tags/release uploads and stable
+unsupported self-serve claims stay gated past this cut.
 
 ## Company.OS Kit
 
@@ -371,16 +381,17 @@ should stay reusable, clean, and safe to publish.
 
 Current status:
 
-- `0.7.4-rc.0` is the current self-serve Command EVE / Supergoal Factory
-  release candidate. It
+- `0.9.0-rc.0` is the current public self-serve release candidate. It
   includes the 0.6.5 Plane-first runtime substrate, the 0.7.0 AionUI/Hermes/EVE
   operator-shell packaging, the 0.7.1 install/onboarding/update smoke, the 0.7.3
-  governance spine, goal/supergoal planner, confidence reporting, public mirror
-  include-list v2 and the 0.7.4 post-worker quality / lower-worker scheduler
-  handoff doctrine. Public remote push, autonomous publishing, scheduling,
+  governance spine, goal/supergoal planner, confidence reporting, the 0.7.4
+  post-worker quality / lower-worker scheduler handoff doctrine and the 0.9
+  public-RC install wrapper. Public remote push, autonomous publishing, scheduling,
   outreach sends, spend changes, production writes, regulated claim approvals,
   direct controller spawning and stable unattended self-serve installs remain
   gated.
+- `0.7.4-rc.0` was the Supergoal Factory and post-worker quality release
+  candidate.
 - `0.7.1-rc.0` was the first self-serve install/onboarding/update candidate.
 - `0.7.0-alpha.1` was the EVE / AionUI / Hermes guided alpha that first made
   the installable EVE boot path explicit.

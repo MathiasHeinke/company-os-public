@@ -4,7 +4,7 @@ Status: canonical doctrine for lower-worker audit, deep-audit and hotfix routing
 Phase: v0 deterministic router and contract vocabulary
 Use for: deciding what happens after a C-level or lower worker reports work,
 before CEO/Codex accepts, delegates, hotfixes or closes the item
-Last updated: 2026-05-31
+Last updated: 2026-05-27
 
 ## Purpose
 
@@ -27,9 +27,9 @@ worker.reported
   -> CAO/controller re-check
 ```
 
-Codex Controller still does not spawn workers directly. It writes one or more
-markers. The scheduler consumes those markers only when policy, HumanGate and
-loop limits allow it.
+Codex Controller still does not spawn workers directly. It writes a marker.
+The scheduler consumes the marker only when policy, HumanGate and loop limits
+allow it.
 
 ## Worker Classes
 
@@ -164,33 +164,11 @@ The router writes nothing. It returns:
 - `scheduler.scheduler_may_spawn`
 - loop limits and reason codes
 
-The Codex controller loads the same registry during its bounded dry-run/post
-flow. For coding contracts it now embeds a `post_worker_quality` summary plus
-root-level `controller.audit-followup` and `controller.hotfix-request` marker
-blocks into the controller decision card. The scheduler reads the latest
-controller card and fans out every eligible marker into a separate
-lower-worker candidate. This makes Security, regression, deep-audit and
-bounded hotfix follow-ups visible to the existing scheduler without giving the
-controller direct spawn authority.
-
-Operational proof: [WORK_ITEM_ID] used this exact path. Codex wrote scheduler-visible
-`controller.audit-followup` markers, the scheduler translated them into lower
-worker candidates, a `quality-auditor` ran first, and a refreshed
-`security-auditor` ran afterward. No Plane `Done` transition was made, and the
-controller never spawned either worker directly.
-
-The public Company.OS mirror ships the generic policy registry at
-`registries/quality/post-worker-quality-loop.json` and executable lower-worker
-profiles in `registries/capabilities/example.json`. Private capability
-registries and customer-specific routing remain excluded from the public
-distribution.
-
 ## Scheduler Handoff
 
 When the controller has posted `controller.audit-followup` or
-`controller.hotfix-request`, the scheduler must translate each eligible marker
-from the latest controller card into a normal lower-worker contract before
-Runtime Dispatcher v1 can touch it.
+`controller.hotfix-request`, the scheduler must translate that marker into a
+normal lower-worker contract before Runtime Dispatcher v1 can touch it.
 
 Executable dry-run:
 
@@ -206,8 +184,6 @@ The scheduler handoff writes nothing and spawns nothing. It returns:
 
 - `NO_SPAWN` for controller-only markers
 - `LOWER_WORKER_READY` with a flat `dispatch: ready` Worker Issue Contract
-- `CANDIDATES_READY` when one controller card contains multiple eligible
-  lower-worker markers
 - `BLOCKED` for unknown worker classes, missing hotfix write scope, exceeded
   hotfix round limits or invalid policy registry
 
@@ -246,13 +222,11 @@ What it does:
 
 - reads the Plane work item and its comments through the Plane Auth Bridge
 - extracts the parent Worker Issue Contract from the work item description
-- finds the latest controller card with `controller.audit-followup` or
-  `controller.hotfix-request`
-- calls the scheduler handoff core and preserves fanout candidates
+- finds the latest `controller.audit-followup` or `controller.hotfix-request`
+- calls the scheduler handoff core
 - optionally writes a local report with `--write-report`
 - in `--mode post`, posts one `scheduler.lower-worker-candidate` Plane comment
-  per candidate, bounded by `--post-limit`, only when the scheduler produced
-  `LOWER_WORKER_READY` or `CANDIDATES_READY`
+  only when the scheduler produced `LOWER_WORKER_READY`
 - in `--scan-project` mode, scans a bounded number of Plane items, ignores
   unmarked items before contract validation and posts at most `--post-limit`
   candidates when explicitly run with `--mode post`

@@ -55,7 +55,6 @@ function parseArgs(argv) {
     auth: process.env.PLANE_AUTH_MODE || "app-token",
     workspace: process.env.PLANE_WORKSPACE_SLUG || "",
     projectId: process.env.PLANE_PROJECT_ID || "",
-    projectIdentifier: process.env.PLANE_PROJECT_IDENTIFIER || "COMPA",
     output: "",
     date: "",
     json: false,
@@ -65,7 +64,6 @@ function parseArgs(argv) {
     const arg = argv[i];
     if (arg === "--workspace") args.workspace = argv[++i] || "";
     else if (arg === "--project-id") args.projectId = argv[++i] || "";
-    else if (arg === "--project-identifier") args.projectIdentifier = argv[++i] || "COMPA";
     else if (arg === "--output") args.output = argv[++i] || "";
     else if (arg === "--date") args.date = argv[++i] || "";
     else if (arg === "--auth") args.auth = argv[++i] || "app-token";
@@ -81,7 +79,7 @@ function parseArgs(argv) {
 function usage() {
   return `Usage:
   node scripts/orchestration/founder-daily-queue.mjs \\
-    --workspace <slug> [--project-id <uuid>] [--project-identifier <key>] \\
+    --workspace <slug> [--project-id <uuid>] \\
     --output <path/to/founder-queue.md> \\
     [--date YYYY-MM-DD] [--auth api-key|app-token] [--json]
 
@@ -92,8 +90,6 @@ to Plane, never marks any work item Done, never spawns a worker.
 When --project-id is omitted, the CLI defaults to the COMPA project
 anchor (${COMPA_PROJECT_ID}). Override with PLANE_PROJECT_ID env or the
 flag for other Plane projects.
-When --project-identifier is omitted, rendered work item refs default to
-COMPA. Pass --project-identifier ATLAS for the Atlas Bio.OS project.
 
 Auth resolution mirrors scripts/plane/plane-auth.mjs:
   api key:   ${PLANE_API_KEY_SERVICE} / ${PLANE_API_KEY_ACCOUNT}
@@ -192,7 +188,6 @@ async function main() {
     version: "founder-daily-queue-cli/v0",
     workspace: args.workspace,
     projectId: args.projectId,
-    projectIdentifier: args.projectIdentifier,
     output: args.output,
     date,
     authMode: auth.authMode,
@@ -250,12 +245,7 @@ async function main() {
     });
   }
 
-  const model = buildQueueModel({
-    records,
-    date,
-    workspace: args.workspace,
-    projectIdentifier: args.projectIdentifier,
-  });
+  const model = buildQueueModel({ records, date, workspace: args.workspace });
   const markdown = renderQueueMarkdown(model);
 
   try {

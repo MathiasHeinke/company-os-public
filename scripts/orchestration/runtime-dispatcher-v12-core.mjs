@@ -585,7 +585,6 @@ export function isSafeClaudeAllowedTool(tool) {
   if (!bash) return true;
   const pattern = bash[1].trim();
   if (!pattern || pattern === "*" || pattern.toLowerCase() === "bash") return false;
-  if (/^(python|python3)\s+-m\s+pytest\b/i.test(pattern)) return true;
   if (/^(rg|grep|find|cat|sed|awk|python|python3|perl)\b/i.test(pattern)) return false;
   if (/[;&|`$<>]/.test(pattern)) return false;
   return true;
@@ -653,8 +652,6 @@ function safeGateBashPattern(command) {
     "node scripts/goal/goal.mjs run",
     "node scripts/goal/goal.mjs adapt",
     "node scripts/goal/goal.mjs synthesize",
-    "python -m pytest",
-    "python3 -m pytest",
     "npx gitnexus status",
     "npx gitnexus detect-changes",
     "${LOCAL_WORKSPACE} status",
@@ -860,9 +857,6 @@ function collectJsonStates(value, out = []) {
 }
 
 export function extractWorkerDeclaredState(text) {
-  const canonicalWorkerReportedState = extractCanonicalWorkerReportedState(text);
-  if (canonicalWorkerReportedState) return canonicalWorkerReportedState;
-
   const chunks = [];
   const states = [];
   for (const line of String(text || "").split(/\r?\n/)) {
@@ -883,7 +877,7 @@ export function extractWorkerDeclaredState(text) {
   }
 
   for (const chunk of chunks) {
-    const matcher = /(?:^|[\s*`>-])(?:\*\*)?state(?:\*\*)?\s*[:=](?:\*\*)?\s*`?([A-Z_]+)`?/gim;
+    const matcher = /(?:^|[\s*_`>-])(?:\*\*)?state(?:\*\*)?\s*[:=](?:\*\*)?\s*`?([A-Z_]+)`?/gim;
     let match;
     while ((match = matcher.exec(chunk))) {
       const state = String(match[1] || "").toUpperCase();
@@ -891,27 +885,6 @@ export function extractWorkerDeclaredState(text) {
     }
   }
   return states.length ? states[states.length - 1] : "";
-}
-
-function extractCanonicalWorkerReportedState(text) {
-  const body = String(text || "");
-  const markerRe = /(?:^|\n)\s*(?:#{1,6}\s+(?:\d+(?:\.\d+)*[.)]?\s+)?worker\.reported\b|worker\.reported\s*:)/gim;
-  const matches = [...body.matchAll(markerRe)];
-  for (const match of matches.reverse()) {
-    const start = match.index || 0;
-    const rest = body.slice(start);
-    const afterMarker = rest.slice(match[0].length);
-    const nextHeading = afterMarker.search(/\n#{1,6}\s+/);
-    const section = nextHeading >= 0 ? rest.slice(0, match[0].length + nextHeading) : rest;
-    const fenced = section.match(/```[a-zA-Z0-9_-]*\s*\n([\s\S]*?)```/);
-    const candidates = fenced ? [fenced[1], section] : [section];
-    for (const candidate of candidates) {
-      const stateMatch = candidate.match(/^\s{0,4}(?:\*\*)?state(?:\*\*)?\s*[:=]\s*(?:\*\*)?`?([A-Z_]+)`?/im);
-      const state = String(stateMatch?.[1] || "").toUpperCase();
-      if (STABLE_RUN_STATES.has(state)) return state;
-    }
-  }
-  return "";
 }
 
 function workerStateJsonFragments(value) {
@@ -984,18 +957,16 @@ export function inferRuntimeStateFromWorkerOutput({
   exitCode,
   stdout = "",
   stderr = "",
-  reportArtifactText = "",
   timedOut = false,
   killedReason = "",
 }) {
-  const evidenceText = `${stdout}\n${stderr}\n${reportArtifactText}`;
   if (timedOut) {
-    return { state: "TIMEOUT", worker_declared_state: extractWorkerDeclaredState(evidenceText), reason: "timeout" };
+    return { state: "TIMEOUT", worker_declared_state: extractWorkerDeclaredState(`${stdout}\n${stderr}`), reason: "timeout" };
   }
   if (killedReason) {
-    return { state: "NEEDS_HUMAN", worker_declared_state: extractWorkerDeclaredState(evidenceText), reason: killedReason };
+    return { state: "NEEDS_HUMAN", worker_declared_state: extractWorkerDeclaredState(`${stdout}\n${stderr}`), reason: killedReason };
   }
-  const workerDeclaredState = extractWorkerDeclaredState(evidenceText);
+  const workerDeclaredState = extractWorkerDeclaredState(`${stdout}\n${stderr}`);
   if (workerDeclaredState && workerDeclaredState !== "PASS") {
     return { state: workerDeclaredState, worker_declared_state: workerDeclaredState, reason: "worker-declared-non-pass" };
   }
@@ -1004,13 +975,6 @@ export function inferRuntimeStateFromWorkerOutput({
       state: "PASS",
       worker_declared_state: workerDeclaredState || "",
       reason: workerDeclaredState === "PASS" ? "worker-declared-pass" : "exit-zero",
-    };
-  }
-  if (workerDeclaredState === "PASS") {
-    return {
-      state: "PASS",
-      worker_declared_state: "PASS",
-      reason: "worker-declared-pass-after-nonzero-exit",
     };
   }
   return {

@@ -1,0 +1,452 @@
+{
+  "version": "domain-pack-registry/v0",
+  "generated_at": "2026-05-18",
+  "source": "docs/operations/adaptive-company-onboarding-domain-packs.md",
+  "activation_policy": {
+    "model": "opt-in",
+    "description": "Operator explicitly selects which domain packs to activate during onboarding. No pack runs until the operator has confirmed the company reality summary and selected the domain. Company.OS activates one pack at a time, starting with the operator's highest-priority domain. Deeper questions are only asked for the chosen domain.",
+    "first_pack_default": "marketing-outreach",
+    "gate_before_activation": "operator-confirmation-complete",
+    "draft_first": true
+  },
+  "packs": [
+    {
+      "id": "marketing-outreach",
+      "name": "Marketing / Outreach",
+      "owner_role": "role:cmo",
+      "first_useful_scope": "ICP hypothesis, channel selection, draft messaging, competitor-informed positioning",
+      "intake_questions": [
+        "What company, product or offer should outreach support?",
+        "What is the website and which pages best describe the offer?",
+        "Who is the target buyer, user and economic decision maker?",
+        "Which channels are currently allowed: email, LinkedIn, X, phone, events, partners, direct mail or print?",
+        "What has been tried already?",
+        "What must never be claimed?",
+        "What tone should be preserved?",
+        "Who approves messages before they are sent?"
+      ],
+      "ai_discovery": [
+        "Read public website pages",
+        "Summarize offer and proof points",
+        "Identify competitors and alternatives",
+        "Infer ICP hypotheses",
+        "Propose positioning angles"
+      ],
+      "confirmation_steps": [
+        "Present discovery summary grouped by: offer, ICP, channels, competitors",
+        "Operator must accept, correct or reject each item before any draft is produced",
+        "No draft output is generated until operator explicitly confirms or marks items stale",
+        "Loop repeats until all dimensions confirmed or marked stale",
+        "Approval owner is identified and recorded; required before HG-2 releases"
+      ],
+      "outputs": [
+        "outreach-context.md",
+        "competitor-brief.md",
+        "icp-hypotheses.md",
+        "message-angles.md",
+        "draft-sequence.md",
+        "Plane child worker contracts for follow-up work"
+      ],
+      "claim_policy": {
+        "mode": "draft-only",
+        "regulated_claim_gate": "separate-gate-required",
+        "regulated_classes": ["health", "financial", "legal", "comparative", "superlative"],
+        "operator_off-limits_required": true,
+        "approval_owner_reviews_all_claims": true,
+        "minimum_send_gate": "HG-2"
+      },
+      "default_human_gate": "HG-2",
+      "activation_mode": "draft-only",
+      "operator_confirmation_required": true,
+      "blocked_actions": [
+        "email-send",
+        "linkedin-send",
+        "x-post",
+        "crm-mass-write",
+        "scraped-personal-data-storage",
+        "public-claim-without-review",
+        "regulated-claim-without-gate",
+        "distribution-without-approval-owner-sign-off"
+      ]
+    },
+    {
+      "id": "content-engine",
+      "name": "Content Engine",
+      "owner_role": "role:cmo",
+      "first_useful_scope": "Editorial calendar, blog draft, LinkedIn draft, newsletter outline, content topic backlog",
+      "intake_questions": [
+        "What topics, themes or categories should content cover?",
+        "Which channels are active: blog, LinkedIn, X, newsletter, podcast or other?",
+        "What is the publishing cadence goal?",
+        "Who is the primary audience for each channel?",
+        "What content has performed well or poorly in the past?",
+        "What claims or topics must be avoided?",
+        "Who reviews and approves content before publishing?",
+        "Are there brand guidelines or tone documents to follow?"
+      ],
+      "ai_discovery": [
+        "Read existing public content and website",
+        "Summarize current content themes and gaps",
+        "Identify competitor content patterns",
+        "Propose initial editorial calendar with topic clusters",
+        "Ask operator to confirm or correct"
+      ],
+      "outputs": [
+        "editorial-calendar.md",
+        "content-topic-backlog.md",
+        "draft-blog-post.md",
+        "draft-newsletter.md",
+        "Plane child worker contracts for follow-up drafts"
+      ],
+      "default_human_gate": "HG-2",
+      "activation_mode": "draft-only",
+      "operator_confirmation_required": true,
+      "blocked_actions": [
+        "publish-without-review",
+        "social-post-without-approval",
+        "regulated-claim-without-gate",
+        "personal-data-storage-without-consent"
+      ]
+    },
+    {
+      "id": "video-first-content-engine",
+      "name": "Video-First Content Engine",
+      "owner_role": "role:cmo",
+      "first_useful_scope": "Create a local raw-video drop folder and dry-run package plan for YouTube, clips, social posts and article output without publishing.",
+      "intake_questions": [
+        "What company, offer and audience should video content support?",
+        "Which local target root should hold the video-engine folder structure?",
+        "Which channels are in scope: YouTube, LinkedIn, X, blog, newsletter or internal-only?",
+        "Who approves upload, scheduling or public publishing?",
+        "Which topics, claims, screens, people or data classes are off-limits?",
+        "Which health, legal, financial, customer or private-screen content must route to HG-3 or HG-4?",
+        "What publishing cadence goal should the pipeline support after dry-runs are proven?",
+        "What does a useful first test package include?"
+      ],
+      "ai_discovery": [
+        "Summarize the company, audience, channels and approval owner from provided sources",
+        "Create a dry-run-only folder initialization plan",
+        "Classify risk boundaries before media processing",
+        "Draft CMO parent and child worker contracts with dispatch: manual",
+        "Run the start command and evaluator before any publisher adapter is considered"
+      ],
+      "confirmation_steps": [
+        "Present the capture and privacy boundary",
+        "Operator confirms target root and approval owner",
+        "Operator confirms off-limits claims and data classes",
+        "No upload, schedule or publish occurs until HG-2.5 or higher release",
+        "HG-3/HG-4 material is routed to review instead of publish-ready output"
+      ],
+      "outputs": [
+        "content/video-engine/RUNBOOK.md",
+        "content/video-engine/video-engine.config.json",
+        "video-package-risk-report.md",
+        "youtube-package.md",
+        "clip-plan.md",
+        "linkedin-x-post-drafts.md",
+        "article-draft.md",
+        "controller-scorecard.md"
+      ],
+      "default_human_gate": "HG-2.5",
+      "activation_mode": "draft-only",
+      "operator_confirmation_required": true,
+      "blocked_actions": [
+        "public-upload-without-release",
+        "public-post-without-release",
+        "public-schedule-without-release",
+        "publisher-api-write-without-release",
+        "regulated-claim-without-gate",
+        "private-screen-data-in-publish-ready-output",
+        "secret-read",
+        "production-write",
+        "done-transition-by-worker-or-cao"
+      ]
+    },
+    {
+      "id": "department-capability-pack-creator",
+      "name": "Department Capability Pack Creator",
+      "owner_role": "role:cto",
+      "first_useful_scope": "Department Intent Packet, CEO Delegation Packet, parent/child worker contracts, AionUI/Hermes skill seed and 10/10 evaluator proof",
+      "intake_questions": [
+        "What new skill, capability, workflow or department should Company.OS support?",
+        "Which C-Level role owns the department?",
+        "What is the first useful artifact the department must produce?",
+        "Which source-of-truth documents, systems or examples should the pack inherit?",
+        "Which reads, writes, connectors, public actions, spend or regulated claims are off-limits?",
+        "Which HumanGate owner approves setup, promotion and public/runtime authority?",
+        "What does a 10/10 result look like, and how should it be verified?",
+        "What should Hermes or workers learn and propose back after each run?"
+      ],
+      "ai_discovery": [
+        "Classify the requested capability as skill, workflow, department, worker lane or automation",
+        "Map founder intent into Department Intent Packet and CEO Delegation Packet",
+        "Draft parent and child worker contracts with dispatch: manual",
+        "Run scaffold dry-run before writing pack artifacts",
+        "Run deterministic 10/10 capability-pack evaluator before promotion"
+      ],
+      "outputs": [
+        "department-intent-packet.md",
+        "ceo-delegation-packet.md",
+        "company-os-<pack-id>-department-pack-v0.md",
+        "aionui-hermes-<pack-id>-skill.md",
+        "company-os-<pack-id>-parent-worker-contract.md",
+        "company-os-<pack-id>-research-worker-contract.md",
+        "company-os-<pack-id>-draft-worker-contract.md",
+        "department-pack-evaluation.example.md"
+      ],
+      "default_human_gate": "HG-2.5",
+      "activation_mode": "draft-only",
+      "operator_confirmation_required": true,
+      "blocked_actions": [
+        "worker-dispatch-without-ceo-review",
+        "dispatch-ready-during-scaffold",
+        "production-write",
+        "public-publish-send-schedule-or-spend",
+        "connector-expansion-without-controller-review",
+        "secret-read",
+        "direct-memory-write",
+        "plane-done-by-worker-or-cao",
+        "hg4-approval"
+      ]
+    },
+    {
+      "id": "sales-crm",
+      "name": "Sales / CRM",
+      "owner_role": "role:coo",
+      "first_useful_scope": "Lead stage map, qualification rubric, CRM hygiene checklist, handoff note templates",
+      "intake_questions": [
+        "What CRM or lead tracking tool is currently in use?",
+        "What are the active deal stages or pipeline steps?",
+        "What does a qualified lead look like?",
+        "What is the handoff process between marketing and sales, and between sales and customer success?",
+        "What information must every deal record contain?",
+        "Are there compliance or privacy rules around how lead data is stored or used?",
+        "Who approves bulk outreach or CRM automation rules?",
+        "What is the current biggest bottleneck in the sales process?"
+      ],
+      "ai_discovery": [
+        "Read public pricing and product pages",
+        "Infer likely buyer personas and deal complexity from product positioning",
+        "Propose initial lead stage map and qualification criteria",
+        "Draft CRM hygiene checklist based on typical gaps",
+        "Ask operator to confirm or correct"
+      ],
+      "outputs": [
+        "lead-stage-map.md",
+        "qualification-rubric.md",
+        "crm-hygiene-checklist.md",
+        "handoff-note-template.md",
+        "Plane child worker contracts for pipeline definition work"
+      ],
+      "default_human_gate": "HG-2.5",
+      "activation_mode": "draft-only",
+      "operator_confirmation_required": true,
+      "blocked_actions": [
+        "crm-mass-write-without-hg25",
+        "bulk-outreach-without-approval",
+        "lead-enrichment-without-consent",
+        "deal-stage-automation-without-review",
+        "personal-data-export-without-gate"
+      ]
+    },
+    {
+      "id": "customer-support",
+      "name": "Customer Support",
+      "owner_role": "role:coo",
+      "first_useful_scope": "Ticket triage framework, response draft templates, knowledge base article outlines",
+      "intake_questions": [
+        "What support channels are active: email, live chat, phone, help desk, community?",
+        "What ticketing or help desk tool is in use?",
+        "What are the most common support request categories?",
+        "What is the expected response time or SLA per tier?",
+        "Are there topics that require escalation or legal review before responding?",
+        "Who approves responses before they are sent to customers?",
+        "What tone should support communications use?",
+        "Are there any compliance or regulatory constraints on customer communication?"
+      ],
+      "ai_discovery": [
+        "Read public help docs and FAQ pages",
+        "Identify common product pain points from public reviews or community posts",
+        "Propose initial ticket triage categories and escalation rules",
+        "Draft response templates for top issue types",
+        "Ask operator to confirm or correct"
+      ],
+      "outputs": [
+        "ticket-triage-framework.md",
+        "response-draft-templates.md",
+        "kb-article-outlines.md",
+        "escalation-rules.md",
+        "Plane child worker contracts for KB article drafts"
+      ],
+      "default_human_gate": "HG-2",
+      "activation_mode": "draft-only",
+      "operator_confirmation_required": true,
+      "blocked_actions": [
+        "customer-send-without-approval",
+        "automated-reply-without-review",
+        "regulated-advice-without-gate",
+        "personal-data-storage-without-consent",
+        "case-close-without-human-sign-off"
+      ]
+    },
+    {
+      "id": "finance-ops",
+      "name": "Finance Ops",
+      "owner_role": "role:cfo",
+      "first_useful_scope": "Invoice checklist, cashflow ritual outline, metrics dashboard skeleton, budget view template",
+      "intake_questions": [
+        "What finance or accounting tool is in use?",
+        "What is the current invoicing and payment collection process?",
+        "What financial metrics does the founder or leadership review weekly?",
+        "Are there open invoices, overdue accounts or cashflow concerns right now?",
+        "What budget categories matter most at this stage?",
+        "Who has authority to approve financial actions or payments?",
+        "Are there external accountants, bookkeepers or CFO advisors involved?",
+        "What compliance or tax obligations shape financial operations?"
+      ],
+      "ai_discovery": [
+        "Read public pricing and billing information",
+        "Infer likely revenue model and cost structure from product and team signals",
+        "Propose initial metrics dashboard and cashflow ritual",
+        "Draft invoice checklist template",
+        "Ask operator to confirm or correct"
+      ],
+      "outputs": [
+        "invoice-checklist.md",
+        "cashflow-ritual-outline.md",
+        "metrics-dashboard-skeleton.md",
+        "budget-view-template.md",
+        "Plane child worker contracts for financial ritual setup"
+      ],
+      "default_human_gate": "HG-3",
+      "activation_mode": "draft-only",
+      "operator_confirmation_required": true,
+      "blocked_actions": [
+        "bank-action-of-any-kind",
+        "payment-initiation",
+        "financial-data-export-without-gate",
+        "accounting-system-write-without-approval",
+        "tax-filing-without-human-sign-off"
+      ]
+    },
+    {
+      "id": "hiring",
+      "name": "Hiring",
+      "owner_role": "role:coo",
+      "first_useful_scope": "Role brief drafts, screening rubric, outreach message templates (unsent), interview question bank",
+      "intake_questions": [
+        "What roles are currently open or planned to open in the next 90 days?",
+        "What sourcing channels are being used: job boards, LinkedIn, referrals, agencies?",
+        "What are the non-negotiable requirements for each role?",
+        "What is the interview process and who is involved?",
+        "Are there diversity, equity or inclusion goals or constraints?",
+        "Who makes the final hiring decision?",
+        "What must not be said or asked during outreach or interviews under employment law?",
+        "What is the target salary range or compensation model?"
+      ],
+      "ai_discovery": [
+        "Read company website, about page and team page",
+        "Infer team size, growth stage and likely skill gaps from product and market signals",
+        "Propose initial role brief outlines for open roles",
+        "Draft screening rubric and interview question bank",
+        "Ask operator to confirm or correct"
+      ],
+      "outputs": [
+        "role-brief-drafts.md",
+        "screening-rubric.md",
+        "outreach-message-templates.md",
+        "interview-question-bank.md",
+        "Plane child worker contracts for role brief finalization"
+      ],
+      "default_human_gate": "HG-2.5",
+      "activation_mode": "draft-only",
+      "operator_confirmation_required": true,
+      "blocked_actions": [
+        "candidate-decision-automation",
+        "outreach-send-without-approval",
+        "regulated-employment-claim-without-review",
+        "personal-candidate-data-storage-without-consent",
+        "rejection-send-without-human-sign-off"
+      ]
+    },
+    {
+      "id": "product-discovery",
+      "name": "Product Discovery",
+      "owner_role": "role:cpo",
+      "first_useful_scope": "User feedback synthesis, roadmap candidate list, opportunity brief, spec draft outlines",
+      "intake_questions": [
+        "What are the top user complaints or requested features right now?",
+        "Where does user feedback currently live: support tickets, interviews, reviews, community?",
+        "What is the current product roadmap horizon?",
+        "What are the main strategic bets or themes for the next release cycle?",
+        "Who owns product decisions and who has veto rights?",
+        "What is the release process and gate for shipping a feature?",
+        "What user research has been done recently?",
+        "Are there any technical, regulatory or contractual constraints on what can be built?"
+      ],
+      "ai_discovery": [
+        "Read public product pages, changelog and release notes",
+        "Read public reviews, community posts and support forum signals",
+        "Propose initial opportunity brief from signal synthesis",
+        "Draft roadmap candidate list with confidence levels",
+        "Ask operator to confirm or correct"
+      ],
+      "outputs": [
+        "user-feedback-synthesis.md",
+        "roadmap-candidates.md",
+        "opportunity-brief.md",
+        "spec-draft-outlines.md",
+        "Plane child worker contracts for spec drafting"
+      ],
+      "default_human_gate": "HG-2",
+      "activation_mode": "draft-only",
+      "operator_confirmation_required": true,
+      "blocked_actions": [
+        "ship-deploy-without-release-gate",
+        "production-write-without-approval",
+        "spec-publish-without-review",
+        "roadmap-commit-without-product-owner-sign-off"
+      ]
+    },
+    {
+      "id": "print-magazine",
+      "name": "Print / Magazine",
+      "owner_role": "role:cmo",
+      "first_useful_scope": "Editorial plan outline, issue structure draft, vendor checklist, proof review workflow",
+      "intake_questions": [
+        "What is the publication name, cadence and format?",
+        "Who is the target audience and what is the distribution model?",
+        "What are the main sections or departments in each issue?",
+        "Who is the editor-in-chief and who has final approval over content?",
+        "What is the print or publish deadline for the next issue?",
+        "Which vendors or suppliers are involved: printers, distributors, designers?",
+        "Are there advertising, sponsorship or regulated content sections?",
+        "What claims, topics or images are off-limits?"
+      ],
+      "ai_discovery": [
+        "Read public website, archive pages or previous issues if available",
+        "Identify audience, format and editorial themes from public signals",
+        "Propose initial issue structure and editorial calendar",
+        "Draft vendor checklist and proof review workflow",
+        "Ask operator to confirm or correct"
+      ],
+      "outputs": [
+        "editorial-plan.md",
+        "issue-outline.md",
+        "vendor-checklist.md",
+        "proof-review-workflow.md",
+        "Plane child worker contracts for article commissioning and proofing"
+      ],
+      "default_human_gate": "HG-2.5",
+      "activation_mode": "draft-only",
+      "operator_confirmation_required": true,
+      "blocked_actions": [
+        "publish-without-editor-approval",
+        "print-order-without-human-sign-off",
+        "distribution-trigger-without-gate",
+        "regulated-claim-without-review",
+        "advertising-copy-publish-without-approval"
+      ]
+    }
+  ]
+}

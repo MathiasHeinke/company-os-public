@@ -1,23 +1,24 @@
 # Client Productization Readiness
 
-Status: canonical productization gate for `0.5.1-alpha.1`
+Status: canonical productization gate for `0.9.0-rc.0`
 Use for: deciding whether Company.OS can be installed into another company
-Last updated: 2026-05-17
+Last updated: 2026-06-02
 
 ## Verdict
 
-Company.OS `0.5.1-alpha.1` is ready for a **guided done-for-you pilot** and can
-generate a sanitized public mirror artifact, rehearse the fresh-history public
-repo path through a local temporary bare remote and install the kit from that
-remote clone.
+Company.OS `0.9.0-rc.0` is ready as a **public self-serve release candidate**
+for the install/onboarding/update path. A public clone or sanitized public
+mirror artifact can install the kit into a fresh target, write the first intake
+from generic signup/report seed, generate EVE's boot packet, write update
+provenance and produce a public-RC handoff report.
 
-It is not yet an unrestricted self-serve public product.
+It is not yet a stable unrestricted autonomy product.
 
 ```text
-guided pilot: yes
+public self-serve rc install: yes
 public mirror artifact: yes
-public open repo push: gated
-unsupported self-serve install: gated
+private overlays update from public: yes
+stable unsupported autonomy: gated
 default scheduler autonomy: gated
 ```
 
@@ -25,11 +26,11 @@ The repo contains the reusable operating system, contracts, runtime gates,
 Plane integration, capability registry, controller/CAO doctrine and installable
 kit. A trained operator can install it for a client tomorrow.
 
-A random company should not yet clone the private repo and enable full
-automation without an operator. The supported public-surface path is the
-generated mirror artifact plus guided setup; credentials, Plane App install,
-Honcho workspace separation, scheduler policy and first-pilot gates still need
-operator review.
+A random company may use the public-RC install path to create a local
+Company.OS workspace and start EVE's guided first-run conversation. It must not
+enable scheduler autonomy, production writes, public publishing, outreach,
+spend or durable memory writes without the relevant setup evidence and
+HumanGate release.
 
 ## Productized Surfaces
 
@@ -39,12 +40,12 @@ operator review.
 | Company discovery | ready | `docs/operations/client-onboarding-discovery-pipeline.md`, `docs/templates/company-discovery-brief.md` |
 | EVE first-run boot packet | ready | `docs/operations/eve-first-run-founder-onboarding.md`, `kits/company-os-kit/.company-os/onboarding/eve-boot-packet.example.json`, `scripts/onboarding/first-company-packet.mjs` |
 | Client stack registry | ready | `docs/registries/company-os-client-stack-registry.md` |
-| Kit install | guided alpha | `scripts/install/bootstrap.mjs`, `kits/company-os-kit/`, `docs/bootstrap/fresh-company-setup.md` |
+| Kit install | public RC | `scripts/install/public-rc.mjs`, `scripts/install/bootstrap.mjs`, `kits/company-os-kit/`, `docs/bootstrap/fresh-company-setup.md` |
 | Plane execution ledger | ready for guided installs | `docs/orchestration/plane-first-linear-bridge.md`, `docs/integrations/plane-app-control-plane.md` |
 | Worker contracts | ready | `docs/templates/worker-issue-contract.md`, `docs/orchestration/spec-to-worker-pipeline.md` |
 | Capability registry | ready as gate | `docs/registries/capability-registry.md`, `registries/capabilities/company-os.json` |
 | Runtime Dispatcher | alpha | `docs/orchestration/company-os-runtime-dispatcher-v1.md`, `scripts/orchestration/runtime-dispatcher-v1.mjs` |
-| Update routine | dry-run ready; public-upstream hardening pending | `scripts/update/company-os-update.mjs`, `docs/releases/0.7.1-client-self-onboarding-readiness.md`, `docs/templates/supergoals-2026-05-31/public-upstream-update-parent.md` |
+| Update routine | dry-run ready from public upstream | `scripts/update/company-os-update.mjs`, `docs/releases/0.7.1-client-self-onboarding-readiness.md` |
 | Scheduler | gated alpha | `docs/orchestration/headless-worker-runtime-boot-contract.md`, `docs/operations/automation-cutover-to-plane-dispatcher.md` |
 | CAO/controller | alpha | `docs/agents/cao.md`, `docs/orchestration/codex-controller-runtime.md` |
 | Honcho memory | policy-ready, setup-guided | `docs/orchestration/claude-clevel-worker-runtime.md`, kit boot files |
@@ -52,7 +53,7 @@ operator review.
 | Page Index | ready | `docs/operations/page-index-generator.md`, `scripts/page-index/` |
 | Supabase | optional connector/backend | this document, kit knowledge files |
 | Public mirror artifact | ready | `scripts/release/build-public-mirror.mjs`, `scripts/release/verify-clean-clone.mjs`, `scripts/release/verify-fresh-history-remote.mjs` |
-| Public repo push | gated | `docs/github/repository-strategy.md`, HumanGate release |
+| Public repo push/tag/release upload | gated | `docs/github/repository-strategy.md`, HumanGate release |
 
 ## Guided Pilot Bar
 
@@ -79,22 +80,27 @@ Before installing Company.OS into a new firm, the operator must complete:
 10. **CEO/Founder acceptance.** Done, merge, deploy, public release and autonomy
     increases stay behind HG-2.5/HG-3 gates.
 
-## Self-Serve Release Bar
+## Public-RC Release Bar
 
-Unsupported self-serve release remains blocked until all of the following are true:
+The current public-RC install bar is:
 
-- install script or wizard provisions kit files and active local setup files
-  without overwriting existing client rules or installation state
+- `scripts/install/public-rc.mjs` provisions kit files and active local setup
+  files without overwriting existing client rules or installation state
+- public mirror builder includes domain-pack, Plane-template and
+  post-worker-quality registries needed by a fresh install
+- first-run seed creates `.company-os/onboarding/company-intake.json`,
+  `.company-os/onboarding/eve-boot-packet.json` and a public-RC handoff report
+- update check and update apply dry-run work from the public source
+- README, VERSION, CHANGELOG, ROADMAP and install docs agree on the version
+
+Unsupported stable self-serve release remains blocked until all of the
+following are true:
+
 - Plane App setup is documented with callback, token rotation and dry-run
   verification
 - Honcho setup is documented with workspace IDs and safe memory boundaries
 - scheduler can run `--dry-run` and `--mode run` pilots with clear kill switch
 - Capability Registry validates declared tools/connectors/subagents before spawn
-- public mirror builder and clean-clone verifier pass from current `main`
-- public repo or release bundle can update a private/client install in
-  dry-run-first mode, with report provenance proving the consumed public
-  version and protected local state preservation
-- README, VERSION, CHANGELOG, ROADMAP and install docs agree on the version
 - at least one non-founder pilot completes Plane -> Worker -> CAO -> Controller
   without chat copy/paste
 

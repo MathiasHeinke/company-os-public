@@ -14,7 +14,6 @@ import {
   buildPlaneQualitySchedulerHandoff,
   findExistingCandidateComment,
   loadDefaultQualityRegistry,
-  postableCandidateResults,
   renderPlaneCandidateMarkdown,
   writePlaneHandoffReport,
   writePlaneProjectScanReport,
@@ -86,13 +85,13 @@ function usage() {
     [--write-report] \\
     [--json]
 
-Reads a real Plane work item plus comments, finds the latest controller card
-with controller.audit-followup / controller.hotfix-request markers, and
-converts each eligible marker into a scheduler.lower-worker-candidate comment.
+Reads a real Plane work item plus comments, finds the latest
+controller.audit-followup / controller.hotfix-request marker, and converts it
+into one scheduler.lower-worker-candidate comment.
 
 Hard boundary:
   - dry-run writes nothing
-  - post writes at most --post-limit Plane comments
+  - post writes at most one Plane comment
   - never locks, spawns, transitions state, marks Done, deploys or pushes
 `;
 }
@@ -412,52 +411,38 @@ async function main() {
   }
 
   if (args.mode === "post") {
-    const postable = postableCandidateResults(result).slice(0, args.postLimit);
-    if (!postable.length) {
+    if (result.status !== "LOWER_WORKER_READY") {
       result.post = {
         ok: true,
         skipped: true,
         reason: "no lower-worker candidate to post",
       };
     } else {
-      const posts = [];
-      for (const candidate of postable) {
-        const existing = findExistingCandidateComment(comments.comments, candidate);
-        if (existing) {
-          posts.push({
-            work_item: candidate.work_item.ref,
-            worker_class: candidate.worker_class,
-            ok: true,
-            skipped: true,
-            reason: "candidate already posted for marker",
-            comment_id: existing.id,
-          });
-          continue;
-        }
+      const existing = findExistingCandidateComment(comments.comments, result);
+      if (existing) {
+        result.post = {
+          ok: true,
+          skipped: true,
+          reason: "candidate already posted for marker",
+          comment_id: existing.id,
+        };
+      } else {
         const post = await postComment({
           baseUrl: args.baseUrl,
           authHeaders: auth.headers,
           workspace: args.workspace,
           projectId: args.projectId,
           workItemId: itemResponse.body.id,
-          markdown: renderPlaneCandidateMarkdown(candidate),
+          markdown: renderPlaneCandidateMarkdown(result),
         });
-        posts.push({
-          work_item: candidate.work_item.ref,
-          worker_class: candidate.worker_class,
+        result.post = {
           ok: post.ok,
           status: post.status,
           comment_id: post.body?.id || null,
           error: post.ok ? null : post.body,
-        });
+        };
+        if (!post.ok) result.ok = false;
       }
-      result.post = {
-        attempted: posts.length,
-        post_limit: args.postLimit,
-        ok: posts.every((post) => post.ok),
-        posts,
-      };
-      if (!result.post.ok) result.ok = false;
     }
   }
 
