@@ -45,7 +45,7 @@ test("secret prompts are blocked even when private override is enabled", () => {
 test("private prompts require explicit allow-private", () => {
   const plan = buildRunPlan({
     mode: "morning-briefing-redacted",
-    prompt: "Read ${LOCAL_WORKSPACE}",
+    prompt: "Read [LOCAL_WORKSPACE]",
   });
 
   assert.equal(plan.blocked, true);
@@ -54,7 +54,7 @@ test("private prompts require explicit allow-private", () => {
 
 test("blocked prompts are not persisted to run files", () => {
   const fakeOpenRouterKey = ["sk-or-v1", "secretvalue"].join("-");
-  const privatePath = "${LOCAL_WORKSPACE}";
+  const privatePath = "[LOCAL_WORKSPACE]";
   const prompt = `Use ${fakeOpenRouterKey} and ${privatePath}`;
   const outDir = fs.mkdtempSync(path.join(os.tmpdir(), "codex-cost-router-blocked-"));
   const plan = buildRunPlan({
@@ -193,11 +193,11 @@ test("persistModelResult redacts leaked secrets in reports", () => {
 
 test("sanitizeWorkerOutput redacts private markers and truncates noisy logs", () => {
   const sanitized = sanitizeWorkerOutput(
-    "private ${LOCAL_WORKSPACE} contact ceo@example.com\n".repeat(20),
+    "private [LOCAL_WORKSPACE] contact ceo@example.com\n".repeat(20),
     { maxChars: 120 },
   );
 
-  assert.equal(sanitized.text.includes("${LOCAL_WORKSPACE}"), false);
+  assert.equal(sanitized.text.includes("[LOCAL_WORKSPACE]"), false);
   assert.equal(sanitized.text.includes("ceo@example.com"), false);
   assert.ok(sanitized.privateHits.includes("mh_dev_path"));
   assert.ok(sanitized.privateHits.includes("email_address"));
@@ -217,14 +217,14 @@ test("persistModelResult stores log-isolation metadata for redacted worker outpu
     result: {
       status: 0,
       signal: null,
-      stdout: "private ${LOCAL_WORKSPACE}",
+      stdout: "private [LOCAL_WORKSPACE]",
       stderr: "",
     },
   });
   const report = fs.readFileSync(result.report, "utf8");
   const meta = JSON.parse(fs.readFileSync(path.join(plan.outDir, "grok-4-3.json"), "utf8"));
 
-  assert.equal(report.includes("${LOCAL_WORKSPACE}"), false);
+  assert.equal(report.includes("[LOCAL_WORKSPACE]"), false);
   assert.ok(meta.logIsolation.stdoutPrivateHits.includes("mh_dev_path"));
 });
 

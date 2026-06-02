@@ -104,7 +104,7 @@ const VALID_CAPABILITY_REGISTRY = {
       role: "role:cto",
       agents: ["claude"],
       modes: ["implement", "audit"],
-      workspaces: ["company-os", "registry:company-os", "${LOCAL_WORKSPACE}"],
+      workspaces: ["company-os", "registry:company-os", "[LOCAL_WORKSPACE]"],
       max_autonomy_level: "L3",
       allowed_plugins: ["gitnexus"],
       allowed_connectors: ["plane-app"],
@@ -427,7 +427,7 @@ test("preflightSandboxWorkspace BLOCKED for implement+sandbox-required with cano
     contractFields: {
       mode: "implement",
       sandbox: "required",
-      workspace: "${LOCAL_WORKSPACE}",
+      workspace: "[LOCAL_WORKSPACE]",
     },
   });
   assert.equal(r.state, RUN_STATES.BLOCKED_DEPENDENCY);
@@ -439,7 +439,7 @@ test("preflightSandboxWorkspace PASS for implement+sandbox-required with absolut
     contractFields: {
       mode: "implement",
       sandbox: "required",
-      workspace: "${LOCAL_WORKSPACE}",
+      workspace: "[LOCAL_WORKSPACE]",
     },
   });
   assert.equal(r.state, RUN_STATES.PASS);
@@ -451,7 +451,7 @@ test("preflightSandboxWorkspace BLOCKED when workspace is only the sandbox root"
     contractFields: {
       mode: "implement",
       sandbox: "required",
-      workspace: "${LOCAL_WORKSPACE}",
+      workspace: "[LOCAL_WORKSPACE]",
     },
   });
   assert.equal(r.state, RUN_STATES.BLOCKED_DEPENDENCY);
@@ -463,7 +463,7 @@ test("preflightSandboxWorkspace BLOCKED when workspace stops at sandbox workspac
     contractFields: {
       mode: "implement",
       sandbox: "required",
-      workspace: "${LOCAL_WORKSPACE}",
+      workspace: "[LOCAL_WORKSPACE]",
     },
   });
   assert.equal(r.state, RUN_STATES.BLOCKED_DEPENDENCY);
@@ -475,7 +475,7 @@ test("preflightSandboxWorkspace BLOCKED when sandbox path uses traversal segment
     contractFields: {
       mode: "implement",
       sandbox: "required",
-      workspace: "${LOCAL_WORKSPACE}",
+      workspace: "[LOCAL_WORKSPACE]",
     },
   });
   assert.equal(r.state, RUN_STATES.BLOCKED_DEPENDENCY);
@@ -1009,7 +1009,7 @@ test("runDryRun BLOCKED_DEPENDENCY for implement+sandbox-required with registry:
 
 test("runDryRun PASS for implement+sandbox-required with absolute approved sandbox worktree", () => {
   const desc = "<p>hello</p>";
-  const sandboxPath = "${LOCAL_WORKSPACE}";
+  const sandboxPath = "[LOCAL_WORKSPACE]";
   const fields = {
     ...VALID_CONTRACT_FIELDS,
     sandbox: "required",
@@ -1316,7 +1316,7 @@ test("runDryRun still surfaces gate allowlist failure when capability profile is
 // ---------- runtime process helpers ----------
 
 test("parseGitStatusChangedFiles includes modified, untracked, and renamed paths", () => {
-  const workspace = "${LOCAL_WORKSPACE}";
+  const workspace = "[LOCAL_WORKSPACE]";
   const parsed = parseGitStatusChangedFiles([
     " M docs/a.md",
     "?? scripts/new.mjs",

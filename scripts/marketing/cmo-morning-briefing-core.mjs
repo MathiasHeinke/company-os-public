@@ -3,13 +3,13 @@ import path from "node:path";
 
 export const CMO_MORNING_BRIEF_VERSION = "cmo-morning-brief/v0";
 
-const DEFAULT_COMPANY_ROOT = "${LOCAL_WORKSPACE}";
-const DEFAULT_ARES_WEBSITE_ROOT = "${LOCAL_WORKSPACE}";
+const DEFAULT_COMPANY_ROOT = "[LOCAL_WORKSPACE]";
+const DEFAULT_ARES_WEBSITE_ROOT = "[LOCAL_WORKSPACE]";
 const LINKEDIN_CREATOR_ANALYTICS_URL = "https://www.linkedin.com/analytics/creator/content/";
 const LINKEDIN_CREATOR_EXPORT_ANCHOR_URL = "https://www.linkedin.com/analytics/creator/content/#:~:text=Zielgruppe-,Exportieren,-Vergangene%207%20Tage";
 const LINKEDIN_PULL_PROFILE = "mheinke_founder";
 const POST_METRICS_MAX_TARGETS = 100;
-const MH_DEV_LINKEDIN_OUTPUT_ROOT = "${LOCAL_WORKSPACE}";
+const MH_DEV_LINKEDIN_OUTPUT_ROOT = "[LOCAL_WORKSPACE]";
 const LINKEDIN_DOWNLOAD_MAX_AGE_MINUTES = 720;
 
 export function localDate(now = new Date()) {

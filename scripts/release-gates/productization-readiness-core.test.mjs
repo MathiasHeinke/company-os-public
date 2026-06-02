@@ -201,7 +201,7 @@ test("docs.hard-coded-developer-paths warns in guided alpha, blocks for public r
   write(
     root,
     "docs/operations/example.md",
-    "Run ${LOCAL_WORKSPACE}",
+    "Run [LOCAL_WORKSPACE]",
   );
 
   const guided = evaluateProductizationReadiness({ root });
@@ -224,7 +224,7 @@ test("docs.hard-coded-developer-paths also covers scripts before public release"
   write(
     root,
     "scripts/orchestration/local-path.mjs",
-    "const root = '${LOCAL_WORKSPACE}';\n",
+    "const root = '[LOCAL_WORKSPACE]';\n",
   );
 
   const guided = evaluateProductizationReadiness({ root });

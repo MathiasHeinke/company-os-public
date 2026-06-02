@@ -24,10 +24,10 @@ RunAt: 2026-05-07 23:10 Europe/Berlin
 DependsOn: [WORK_ITEM_ID]
 Sandbox: required
 BranchName: codex/sandbox/[SOURCE_WORKSPACE]/2026-05-07-mat-170-claude-cto-recovery-reader-231000
-WorktreeRoot: ${LOCAL_WORKSPACE}
+WorktreeRoot: [LOCAL_WORKSPACE]
 IntegrationTarget: main
 SourceOfTruth:
-- ${LOCAL_WORKSPACE}
+- [LOCAL_WORKSPACE]
 Scope:
 - Include: one narrow Recovery reader helper.
 Acceptance Criteria:
@@ -71,7 +71,7 @@ BlockedActions:
 - memory-write
 - done-transition
 Reporting:
-- ${LOCAL_WORKSPACE}
+- [LOCAL_WORKSPACE]
 MaxRuntime: 900s
 MaxSpend: EUR 0
 KillSwitch: Linear #stop
@@ -94,7 +94,7 @@ test("prepare-sandbox-pr-pilot writes a ready packet and JSON without creating a
       "--output-dir",
       outputDir,
       "--workspace-root",
-      "${LOCAL_WORKSPACE}",
+      "[LOCAL_WORKSPACE]",
       "--json",
     ],
     { cwd: path.resolve("."), encoding: "utf8" },

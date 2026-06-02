@@ -263,7 +263,7 @@ test("planted /Users private path in docs forces BLOCKED_PRIVATE_PATH exit 4", a
   write(
     root,
     "docs/operations/local-paths.md",
-    "Run ${LOCAL_WORKSPACE} to start.\n",
+    "Run [LOCAL_WORKSPACE] to start.\n",
   );
 
   const result = await runVerifyCleanClone({ root });
@@ -281,7 +281,7 @@ test("planted /Users private path in scripts forces BLOCKED_PRIVATE_PATH exit 4"
   write(
     root,
     "scripts/orchestration/local-path.mjs",
-    "const root = '${LOCAL_WORKSPACE}';\n",
+    "const root = '[LOCAL_WORKSPACE]';\n",
   );
 
   const result = await runVerifyCleanClone({ root });
@@ -498,7 +498,7 @@ test("secret scan takes precedence over private path on combined fail", async ()
   write(
     root,
     "docs/operations/private-path.md",
-    "Run ${LOCAL_WORKSPACE} here.\n",
+    "Run [LOCAL_WORKSPACE] here.\n",
   );
 
   const result = await runVerifyCleanClone({ root });
@@ -530,7 +530,7 @@ test("script-private-path scanner no longer permits source-root leaks", async ()
   write(
     root,
     "scripts/orchestration/path-fixture.mjs",
-    "// reference path ${LOCAL_WORKSPACE} for tests\n",
+    "// reference path [LOCAL_WORKSPACE] for tests\n",
   );
 
   const result = await runVerifyCleanClone({ root });

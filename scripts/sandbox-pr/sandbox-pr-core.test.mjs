@@ -34,10 +34,10 @@ RunAt: 2026-05-07 23:10 Europe/Berlin
 DependsOn: [WORK_ITEM_ID]
 Sandbox: required
 BranchName: codex/sandbox/[SOURCE_WORKSPACE]/2026-05-07-mat-170-claude-cto-recovery-reader-231000
-WorktreeRoot: ${LOCAL_WORKSPACE}
+WorktreeRoot: [LOCAL_WORKSPACE]
 IntegrationTarget: main
 SourceOfTruth:
-- ${LOCAL_WORKSPACE}
+- [LOCAL_WORKSPACE]
 Scope:
 - Include: one narrow Recovery reader helper.
 - Exclude: schema/RLS/auth/service-role writes.
@@ -90,7 +90,7 @@ BlockedActions:
 - memory-write
 - done-transition
 Reporting:
-- ${LOCAL_WORKSPACE}
+- [LOCAL_WORKSPACE]
 MaxRuntime: 900s
 MaxCommits: 1
 MaxSpend: EUR 0
@@ -167,18 +167,18 @@ test("buildSandboxWorktreeCommand creates the exact non-destructive git command"
 
   const command = buildSandboxWorktreeCommand({
     readiness,
-    workspaceRoot: "${LOCAL_WORKSPACE}",
+    workspaceRoot: "[LOCAL_WORKSPACE]",
   });
 
   assert.deepEqual(command, [
     "git",
     "-C",
-    "${LOCAL_WORKSPACE}",
+    "[LOCAL_WORKSPACE]",
     "worktree",
     "add",
     "-b",
     "codex/sandbox/[SOURCE_WORKSPACE]/2026-05-07-mat-170-claude-cto-recovery-reader-231000",
-    "${LOCAL_WORKSPACE}",
+    "[LOCAL_WORKSPACE]",
     "main",
   ]);
 });
@@ -191,7 +191,7 @@ test("writeSandboxPrPacket writes markdown, json and valid sandbox events", () =
   const output = writeSandboxPrPacket({
     contractPath,
     outputDir: path.join(root, "out"),
-    workspaceRoot: "${LOCAL_WORKSPACE}",
+    workspaceRoot: "[LOCAL_WORKSPACE]",
     now: new Date("2026-05-07T21:10:00Z"),
   });
 
@@ -204,7 +204,7 @@ test("writeSandboxPrPacket writes markdown, json and valid sandbox events", () =
     readiness: output.readiness,
     packetPath: output.packetPath,
     jsonPath: output.jsonPath,
-    workspaceRoot: "${LOCAL_WORKSPACE}",
+    workspaceRoot: "[LOCAL_WORKSPACE]",
     now: new Date("2026-05-07T21:10:00Z"),
   });
   assert.equal(events.length, 3);

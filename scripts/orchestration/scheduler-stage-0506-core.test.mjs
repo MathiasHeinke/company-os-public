@@ -212,10 +212,10 @@ const EXECUTIVE_LANE_BLOCK = Object.freeze({
   doctrine: "docs/orchestration/c-level-department-executive-runtime.md",
   template: "docs/templates/department-executive-parent-runner-template.md",
   allowed_write_paths_lane: [
-    "${LOCAL_WORKSPACE}",
-    "${LOCAL_WORKSPACE}",
-    "${LOCAL_WORKSPACE}",
-    "${LOCAL_WORKSPACE}",
+    "[LOCAL_WORKSPACE]",
+    "[LOCAL_WORKSPACE]",
+    "[LOCAL_WORKSPACE]",
+    "[LOCAL_WORKSPACE]",
   ],
   blocked_surfaces_lane: ["plane-done-by-worker", "production-write"],
   required_contract_fields: ["parent_seat", "AllowedWritePaths"],
@@ -261,8 +261,8 @@ function buildExecutiveFirstContractFields(overrides = {}) {
     depends_on: ["[WORK_ITEM_ID]", "[WORK_ITEM_ID]", "[WORK_ITEM_ID]"],
     scope: "supervise parent objective; coordinate children and closeout report",
     allowedwritepaths: [
-      "${LOCAL_WORKSPACE}",
-      "${LOCAL_WORKSPACE}",
+      "[LOCAL_WORKSPACE]",
+      "[LOCAL_WORKSPACE]",
     ],
     blockedactions:
       "no plane-done-by-worker, no push, no merge, no deploy, no publish, "
@@ -290,8 +290,8 @@ test("evaluateExecutiveFirstRouting PASS: sandbox worktree write paths match lan
   const result = evaluateExecutiveFirstRouting({
     contractFields: buildExecutiveFirstContractFields({
       allowedwritepaths: [
-        "${LOCAL_WORKSPACE}",
-        "${LOCAL_WORKSPACE}",
+        "[LOCAL_WORKSPACE]",
+        "[LOCAL_WORKSPACE]",
       ],
     }),
     labelNames: ["role:cmo"],
@@ -351,8 +351,8 @@ test("evaluateExecutiveFirstRouting over-lane: AllowedWritePaths outside lane sc
   const result = evaluateExecutiveFirstRouting({
     contractFields: buildExecutiveFirstContractFields({
       allowedwritepaths: [
-        "${LOCAL_WORKSPACE}",
-        "${LOCAL_WORKSPACE}",
+        "[LOCAL_WORKSPACE]",
+        "[LOCAL_WORKSPACE]",
       ],
     }),
     labelNames: ["role:cmo"],
@@ -400,14 +400,14 @@ depends_on:
   - [WORK_ITEM_ID]
   - [WORK_ITEM_ID]
 source_of_truth:
-  - ${LOCAL_WORKSPACE}
+  - [LOCAL_WORKSPACE]
 scope:
   - include supervise parent objective and coordinate children plus closeout report
   - exclude production systems
 sandbox: required
 allowed_write_paths:
-  - ${LOCAL_WORKSPACE}
-  - ${LOCAL_WORKSPACE}
+  - [LOCAL_WORKSPACE]
+  - [LOCAL_WORKSPACE]
 capabilityprofile: claude-clevel-worker/cmo/runtime
 outcomespec: Executive supervises children and produces closeout report.
 outcomerubric: PASS if closeout report carries the child_status_rollup block.
@@ -502,8 +502,8 @@ test("decideSchedulerStage0506 blocks lock with executive-over-budget when inter
 
 test("decideSchedulerStage0506 blocks lock with executive-over-lane when AllowedWritePaths leak outside the lane", () => {
   const outOfLane = EXECUTIVE_FIRST_PASS_CONTRACT.replace(
-    "  - ${LOCAL_WORKSPACE}",
-    "  - ${LOCAL_WORKSPACE}",
+    "  - [LOCAL_WORKSPACE]",
+    "  - [LOCAL_WORKSPACE]",
   );
   const decision = decideSchedulerStage0506({
     item: executiveItem(outOfLane),

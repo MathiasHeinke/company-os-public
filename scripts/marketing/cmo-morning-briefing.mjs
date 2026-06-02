@@ -24,7 +24,7 @@ function parseArgs(argv) {
   const args = {
     date: localDate(),
     companyRoot: process.cwd(),
-    aresWebsiteRoot: "${LOCAL_WORKSPACE}",
+    aresWebsiteRoot: "[LOCAL_WORKSPACE]",
     workspace: "companyos",
     projectId: "",
     workItemId: "",

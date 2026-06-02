@@ -30,10 +30,10 @@ RunAt: 2026-05-07 23:10 Europe/Berlin
 DependsOn: [WORK_ITEM_ID]
 Sandbox: required
 BranchName: codex/sandbox/[SOURCE_WORKSPACE]/2026-05-07-mat-170-claude-cto-recovery-reader-231000
-WorktreeRoot: ${LOCAL_WORKSPACE}
+WorktreeRoot: [LOCAL_WORKSPACE]
 IntegrationTarget: main
 SourceOfTruth:
-- ${LOCAL_WORKSPACE}
+- [LOCAL_WORKSPACE]
 Scope:
 - Include: one narrow Recovery reader helper.
 - Exclude: schema/RLS/auth/service-role writes.
@@ -82,7 +82,7 @@ BlockedActions:
 - memory-write
 - done-transition
 Reporting:
-- ${LOCAL_WORKSPACE}
+- [LOCAL_WORKSPACE]
 MaxRuntime: 900s
 MaxSpend: EUR 0
 KillSwitch: Linear #stop
@@ -93,7 +93,7 @@ Heartbeat: 15m
 test("buildAutonomyShadowRun predicts the next autonomous steps without authorizing writes", () => {
   const run = buildAutonomyShadowRun({
     contractMarkdown: validContract(),
-    workspaceRoot: "${LOCAL_WORKSPACE}",
+    workspaceRoot: "[LOCAL_WORKSPACE]",
     now: new Date("2026-05-07T21:15:00Z"),
   });
 
@@ -102,7 +102,7 @@ test("buildAutonomyShadowRun predicts the next autonomous steps without authoriz
   assert.equal(run.would_dispatch, true);
   assert.equal(run.selected_issue, "[WORK_ITEM_ID]");
   assert.equal(run.would_create_branch, "codex/sandbox/[SOURCE_WORKSPACE]/2026-05-07-mat-170-claude-cto-recovery-reader-231000");
-  assert.equal(run.would_create_worktree, "${LOCAL_WORKSPACE}");
+  assert.equal(run.would_create_worktree, "[LOCAL_WORKSPACE]");
   assert.equal(run.would_start_worker, "claude implement sandbox");
   assert.deepEqual(run.would_append_events, [
     "worker.locked",
@@ -122,7 +122,7 @@ test("buildAutonomyShadowRun blocks unsafe contracts and predicts no worker star
     contractMarkdown: validContract()
       .replace("AutonomyLevel: L3", "AutonomyLevel: L2")
       .replace("Sandbox: required", "Sandbox: none"),
-    workspaceRoot: "${LOCAL_WORKSPACE}",
+    workspaceRoot: "[LOCAL_WORKSPACE]",
   });
 
   assert.equal(run.would_dispatch, false);
@@ -136,7 +136,7 @@ test("buildAutonomyShadowRun blocks unsafe contracts and predicts no worker star
 test("renderAutonomyShadowRunMarkdown creates a CEO-readable no-side-effects report", () => {
   const run = buildAutonomyShadowRun({
     contractMarkdown: validContract(),
-    workspaceRoot: "${LOCAL_WORKSPACE}",
+    workspaceRoot: "[LOCAL_WORKSPACE]",
   });
 
   const markdown = renderAutonomyShadowRunMarkdown(run);
@@ -163,7 +163,7 @@ test("parseShadowRunContractFile reads only the contract and the CLI writes noth
       "--contract",
       contractPath,
       "--workspace-root",
-      "${LOCAL_WORKSPACE}",
+      "[LOCAL_WORKSPACE]",
       "--json",
     ],
     { cwd: path.resolve("."), encoding: "utf8" },

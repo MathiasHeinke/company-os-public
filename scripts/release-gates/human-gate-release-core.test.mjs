@@ -171,11 +171,11 @@ test("evaluateHumanGateRelease blocks private context and stale cards", () => {
   const validation = evaluateHumanGateRelease(
     passingDecision(root, {
       release: { generated_at: "2026-05-06T10:00:00.000Z" },
-      root: { note: "Read ${LOCAL_WORKSPACE}" },
+      root: { note: "Read [LOCAL_WORKSPACE]" },
     }),
     {
       now: new Date("2026-05-08T10:10:00.000Z"),
-      decisionText: "Read ${LOCAL_WORKSPACE}",
+      decisionText: "Read [LOCAL_WORKSPACE]",
       maxAgeMinutes: 60,
     },
   );

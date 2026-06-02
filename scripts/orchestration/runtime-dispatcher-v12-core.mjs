@@ -4,7 +4,7 @@ import { basename, dirname, extname, isAbsolute, join, relative, resolve, sep } 
 
 export const RUNTIME_V12_VERSION = "runtime-dispatcher-v1.2/run";
 
-const DEFAULT_COMPANY_OS_PATH = "${LOCAL_WORKSPACE}";
+const DEFAULT_COMPANY_OS_PATH = "[LOCAL_WORKSPACE]";
 
 const SECRET_PATTERNS = [
   /\bhch-v3-[A-Za-z0-9_-]{16,}\b/g,
@@ -654,8 +654,8 @@ function safeGateBashPattern(command) {
     "node scripts/goal/goal.mjs synthesize",
     "npx gitnexus status",
     "npx gitnexus detect-changes",
-    "${LOCAL_WORKSPACE} status",
-    "${LOCAL_WORKSPACE} detect-changes",
+    "[LOCAL_WORKSPACE] status",
+    "[LOCAL_WORKSPACE] detect-changes",
   ];
   const prefix = safePrefixes.find((candidate) => normalized === candidate || normalized.startsWith(`${candidate} `));
   return prefix ? `${prefix}*` : "";
@@ -826,7 +826,7 @@ function isSearchPatternToken(command = "", token = "") {
 function normalizeCommandPath(token) {
   const cleaned = cleanPathToken(token);
   if (!cleaned) return "";
-  const home = process.env.HOME || "${LOCAL_WORKSPACE}";
+  const home = process.env.HOME || "[LOCAL_WORKSPACE]";
   if (cleaned === "~") return resolve(home);
   if (cleaned.startsWith("~/")) return resolve(home, cleaned.slice(2));
   if (cleaned === "$HOME") return resolve(home);
@@ -989,7 +989,7 @@ export const WORKER_PROMPT_GUARDS = Object.freeze({
     "Exact read-root guard (exact-read-roots-only):",
     "- Treat every allowed_read_paths entry as an exact root boundary.",
     "- Do not run Grep, Glob, LS, Read, Bash, or any filesystem scan against a shared parent directory when the contract lists narrower child roots.",
-    "- In particular, never scan `${LOCAL_WORKSPACE}` unless that exact path is explicitly listed in allowed_read_paths.",
+    "- In particular, never scan `[LOCAL_WORKSPACE]` unless that exact path is explicitly listed in allowed_read_paths.",
     "- If cross-workspace evidence requires a broader parent-root scan, stop and report BLOCKED_DEPENDENCY with reason `read-root-expansion-required` and name the exact additional root.",
   ].join("\n"),
   "relay-write-temptation": [
@@ -1061,7 +1061,7 @@ export function buildWorkerPrompt({
     "- Include literal top-level markers `reflection:`, `learning_proposals:`, and `capability_context_proof:` in your final worker.reported-ready response or durable report.",
     "- Run the declared Gates yourself when the declared CapabilityProfile and allowed Claude tools permit it.",
     "- If a declared gate is denied by the Claude harness, quote the denied command and denial reason exactly.",
-    "- For Company.OS GitNexus gates, prefer `${LOCAL_WORKSPACE}` over `npx gitnexus` when that exact tool is listed in allowed_claude_tools.",
+    "- For Company.OS GitNexus gates, prefer `[LOCAL_WORKSPACE]` over `npx gitnexus` when that exact tool is listed in allowed_claude_tools.",
     "- Keep the final response suitable for a worker.reported Plane comment.",
     "",
     `dispatcher_run_id: ${runId}`,

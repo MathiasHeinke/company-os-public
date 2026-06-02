@@ -6,7 +6,7 @@ import { buildVisionReleasePacket, derivePerRunOutputPath } from "./marketing-hg
 
 function parseArgs(argv) {
   const args = {
-    workspaceRoot: "${LOCAL_WORKSPACE}",
+    workspaceRoot: "[LOCAL_WORKSPACE]",
     schedulePaths: [],
     output: "",
     runId: "",
@@ -39,7 +39,7 @@ function parseArgs(argv) {
 function usage() {
   return `Usage:
   node scripts/release-gates/marketing-hg25-vision.mjs \\
-    --workspace-root ${LOCAL_WORKSPACE} \\
+    --workspace-root [LOCAL_WORKSPACE] \\
     --schedule /absolute/path/to/scheduled-jobs.json \\
     --output /absolute/path/to/vision-release-packet.md \\
     [--run-id <id>] [--max-jobs 40] [--include-past] [--json]

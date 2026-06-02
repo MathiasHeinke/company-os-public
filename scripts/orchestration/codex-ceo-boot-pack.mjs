@@ -33,8 +33,8 @@ export const BOOT_PACK_REQUIRED_PATHS = Object.freeze([
   "docs/governance/fast-lane-flight-doctrine.md",
 ]);
 
-const DEFAULT_ROOT = "${LOCAL_WORKSPACE}";
-const DEFAULT_USER_CODEX_RULES = `${process.env.HOME || "${LOCAL_WORKSPACE}"}/.codex/AGENTS.md`;
+const DEFAULT_ROOT = "[LOCAL_WORKSPACE]";
+const DEFAULT_USER_CODEX_RULES = `${process.env.HOME || "[LOCAL_WORKSPACE]"}/.codex/AGENTS.md`;
 
 export function buildCodexCeoBootPack({
   root = DEFAULT_ROOT,

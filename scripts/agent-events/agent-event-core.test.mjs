@@ -11,7 +11,7 @@ function baseEvent(overrides = {}) {
     occurred_at: "2026-05-08T10:00:00.000Z",
     producer: "controller",
     workspace: "registry:company-os",
-    workspace_path: "${LOCAL_WORKSPACE}",
+    workspace_path: "[LOCAL_WORKSPACE]",
     issue_id: "[WORK_ITEM_ID]",
     run_id: "run-1",
     session_id: "session-1",

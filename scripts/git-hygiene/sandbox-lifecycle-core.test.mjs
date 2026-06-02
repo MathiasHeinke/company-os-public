@@ -15,7 +15,7 @@ const NOW = new Date("2026-05-20T12:00:00.000Z");
 
 function makeWorktree(overrides = {}) {
   return {
-    root: "${LOCAL_WORKSPACE}",
+    root: "[LOCAL_WORKSPACE]",
     branch: "codex/sandbox/company-os/2026-05-20-compa-999-claude-cto-fix-something-120000",
     commit: "abc123",
     dirty: false,
@@ -43,13 +43,13 @@ test("SANDBOX_LIFECYCLE_STATES defines all seven states", () => {
 });
 
 test("parseSandboxCreationDate extracts date from path with YYYY-MM-DD prefix", () => {
-  const date = parseSandboxCreationDate("${LOCAL_WORKSPACE}");
+  const date = parseSandboxCreationDate("[LOCAL_WORKSPACE]");
   assert.ok(date instanceof Date);
   assert.equal(date.toISOString(), "2026-05-15T00:00:00.000Z");
 });
 
 test("parseSandboxCreationDate returns null for paths without date prefix", () => {
-  assert.equal(parseSandboxCreationDate("${LOCAL_WORKSPACE}"), null);
+  assert.equal(parseSandboxCreationDate("[LOCAL_WORKSPACE]"), null);
   assert.equal(parseSandboxCreationDate(""), null);
   assert.equal(parseSandboxCreationDate(null), null);
 });

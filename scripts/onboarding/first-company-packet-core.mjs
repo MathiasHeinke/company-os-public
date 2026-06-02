@@ -788,20 +788,30 @@ export function buildFirstCompanyPacket(input = {}, { registry, date, now, works
   };
 }
 
-export function writeFirstCompanyPacket({ target, packet, force = false, dryRun = false } = {}) {
+export function writeFirstCompanyPacket({ target, packet, force = false, dryRun = false, allowedCollisions } = {}) {
   const resolvedTarget = path.resolve(target || "");
   const files = packet?.files || [];
   const collisions = files
     .map((file) => file.path)
     .filter((filePath) => fs.existsSync(path.join(resolvedTarget, filePath)));
-  if (!force && collisions.length) {
+  const enforceAllowedCollisions = force && Array.isArray(allowedCollisions);
+  const allowedCollisionSet = new Set(enforceAllowedCollisions ? allowedCollisions : []);
+  const blockedCollisions = force
+    ? enforceAllowedCollisions
+      ? collisions.filter((filePath) => !allowedCollisionSet.has(filePath))
+      : []
+    : collisions;
+  if (blockedCollisions.length) {
     return {
       ok: false,
       status: "blocked",
       target: resolvedTarget,
-      collisions,
+      collisions: blockedCollisions,
+      allowed_collisions: [...allowedCollisionSet],
       files: files.map((file) => file.path),
-      message: `${collisions.length} target file(s) already exist. Re-run with --force after reviewing local state.`,
+      message: force
+        ? `${blockedCollisions.length} target file(s) already exist outside the allowed collision set. Review local state before overwriting.`
+        : `${blockedCollisions.length} target file(s) already exist. Re-run with --force after reviewing local state.`,
     };
   }
   if (dryRun) {

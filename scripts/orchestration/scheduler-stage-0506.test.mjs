@@ -56,24 +56,24 @@ mode: implement
 workspace: registry:company-os
 dispatch: ready
 source_of_truth:
-  - ${LOCAL_WORKSPACE}
+  - [LOCAL_WORKSPACE]
 scope:
   - include scripts/orchestration/scheduler-stage-0506.mjs
 sandbox: required
 allowedreadpaths:
-  - ${LOCAL_WORKSPACE}
+  - [LOCAL_WORKSPACE]
 allowedwritepaths:
-  - ${LOCAL_WORKSPACE}
+  - [LOCAL_WORKSPACE]
 capabilityprofile: claude-clevel-worker/cto/unknown
 outcomespec: Runtime-ready scheduler overlay blocks formally valid but non-executable contracts.
 outcomerubric: Scheduler requires RUNTIME_READY_PASS before lock.
 acceptance_criteria:
   - unknown CapabilityProfile blocks lock before worker context.
 gates:
-  - node --test ${LOCAL_WORKSPACE}
+  - node --test [LOCAL_WORKSPACE]
 human_gate: HG-2.5
 reporting:
-  - ${LOCAL_WORKSPACE}
+  - [LOCAL_WORKSPACE]
 blockedactions: never print secrets; do not deploy, publish, write Linear, mark Done, or touch production.
 runtimeauth: claude max local auth present
 runtimepermissionmode: acceptEdits

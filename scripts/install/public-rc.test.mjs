@@ -149,3 +149,26 @@ test("runPublicRcInstall blocks on target collision before install writes", () =
   assert.ok(result.stages[1].collisions.includes("AGENTS.md"));
   assert.equal(fs.readFileSync(path.join(target, "AGENTS.md"), "utf8"), "# Existing\n");
 });
+
+test("runPublicRcInstall blocks unexpected onboarding packet collisions before overwrite", () => {
+  const source = makeSource();
+  const target = tmpDir("company-os-public-rc-target-");
+  const existingBootPacket = "{\"existing\":true}\n";
+  writeFile(target, ".company-os/onboarding/eve-boot-packet.json", existingBootPacket);
+
+  const result = runPublicRcInstall({
+    source,
+    target,
+    date: "2026-06-02",
+    seed: seed(),
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.status, "blocked");
+  assert.equal(result.failed_stage, "onboarding.packet");
+  assert.ok(result.stages.at(-1).collisions.includes(".company-os/onboarding/eve-boot-packet.json"));
+  assert.equal(
+    fs.readFileSync(path.join(target, ".company-os/onboarding/eve-boot-packet.json"), "utf8"),
+    existingBootPacket,
+  );
+});

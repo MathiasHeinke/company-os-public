@@ -631,7 +631,7 @@ test("validateRaindropHook rejects a hook containing workspace_path or workspace
     agent: "claude",
     mode: "implement",
     instrumentation: "wired",
-    workspace_path: "${LOCAL_WORKSPACE}",
+    workspace_path: "[LOCAL_WORKSPACE]",
   });
   assert.equal(withPath.ok, false);
   assert.ok(withPath.errors.some((e) => e.includes("workspace_path")));

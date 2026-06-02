@@ -114,7 +114,7 @@ test("pack-specific CapabilityProfile can satisfy capability checks", () => {
 
 test("private path literal blocks portability", () => {
   const root = makeCompletePack();
-  fs.appendFileSync(path.join(root, "docs/orchestration/company-os-customer-support-kb-department-pack-v0.md"), "\n${LOCAL_WORKSPACE}");
+  fs.appendFileSync(path.join(root, "docs/orchestration/company-os-customer-support-kb-department-pack-v0.md"), "\n[LOCAL_WORKSPACE]");
   const report = evaluateDepartmentCapabilityPack({ root, packId: "customer-support-kb" });
 
   assert.equal(report.status, "BLOCKED");

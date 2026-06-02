@@ -178,7 +178,7 @@ test("deriveAllowedClaudeToolsFromGates emits safe Bash entries for common execu
     "node scripts/release-gates/productization-readiness.mjs check",
     "git diff --check",
     "git status",
-    "${LOCAL_WORKSPACE} detect-changes --scope all",
+    "[LOCAL_WORKSPACE] detect-changes --scope all",
     "CAO review verifies report shape",
   ]);
 
@@ -187,7 +187,7 @@ test("deriveAllowedClaudeToolsFromGates emits safe Bash entries for common execu
   assert.ok(tools.includes("Bash(node scripts/release-gates/productization-readiness.mjs*)"));
   assert.ok(tools.includes("Bash(git diff --check*)"));
   assert.ok(tools.includes("Bash(git status*)"));
-  assert.ok(tools.includes("Bash(${LOCAL_WORKSPACE} detect-changes*)"));
+  assert.ok(tools.includes("Bash([LOCAL_WORKSPACE] detect-changes*)"));
   assert.deepEqual(rejected, []);
   assert.deepEqual(suggestions, []);
 });
@@ -305,7 +305,7 @@ test("renderWizardMarkdown emits Task only when SubAgentRoster declares non-empt
 
 test("wizard AllowedClaudeTools render avoids the RS-13a runtime.gate-tool-not-allowed failure class", () => {
   const gates = [
-    "${LOCAL_WORKSPACE} detect-changes --scope all --repo /tmp/example",
+    "[LOCAL_WORKSPACE] detect-changes --scope all --repo /tmp/example",
     "node --test scripts/plane/plane-contract-wizard-core.test.mjs",
     "node --test scripts/orchestration/runtime-dispatcher-v12-core.test.mjs",
     "node scripts/page-index/generate-page-index.mjs --check",

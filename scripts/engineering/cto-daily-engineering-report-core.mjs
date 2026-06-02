@@ -4,12 +4,12 @@ import path from "node:path";
 
 export const CTO_DAILY_ENGINEERING_REPORT_VERSION = "cto-engineering-brief/v0";
 
-const DEFAULT_COMPANY_ROOT = "${LOCAL_WORKSPACE}";
+const DEFAULT_COMPANY_ROOT = "[LOCAL_WORKSPACE]";
 const DEFAULT_WORKSPACE_ROOTS = [
-  "${LOCAL_WORKSPACE}",
-  "${LOCAL_WORKSPACE}",
-  "${LOCAL_WORKSPACE}",
-  "${LOCAL_WORKSPACE}",
+  "[LOCAL_WORKSPACE]",
+  "[LOCAL_WORKSPACE]",
+  "[LOCAL_WORKSPACE]",
+  "[LOCAL_WORKSPACE]",
 ];
 
 export function localDate(now = new Date()) {

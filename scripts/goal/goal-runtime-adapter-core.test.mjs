@@ -13,7 +13,7 @@ const CONTRACT = {
   role: "role:cto",
   agent: "claude",
   mode: "implement",
-  workspace: "${LOCAL_WORKSPACE}",
+  workspace: "[LOCAL_WORKSPACE]",
   dispatch: "ready",
   acceptance_criteria: [
     "Claude prompt wrapper includes child acceptance criteria, gates and stop conditions.",

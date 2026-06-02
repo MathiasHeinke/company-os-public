@@ -19,7 +19,7 @@ const REGISTRY = {
       role: "role:cto",
       agents: ["claude"],
       modes: ["implement", "audit"],
-      workspaces: ["companyos", "${LOCAL_WORKSPACE}"],
+      workspaces: ["companyos", "[LOCAL_WORKSPACE]"],
       max_autonomy_level: "L3",
       allowed_plugins: ["gitnexus"],
       allowed_connectors: ["plane-app"],
@@ -146,7 +146,7 @@ test("personal memory on company profile blocks", () => {
 
 const SANDBOX_PROFILE = {
   ...REGISTRY.profiles[0],
-  sandbox_workspaces: ["${LOCAL_WORKSPACE}"]
+  sandbox_workspaces: ["[LOCAL_WORKSPACE]"]
 };
 
 const SANDBOX_REGISTRY = {
@@ -160,7 +160,7 @@ test("approved sandbox workspace pattern resolves without temp registry entry", 
     contractFields: {
       ...CONTRACT,
       Workspace:
-        "${LOCAL_WORKSPACE}"
+        "[LOCAL_WORKSPACE]"
     },
     now: new Date("2026-05-10T00:00:00Z")
   });
@@ -172,7 +172,7 @@ test("unapproved sandbox workspace path is blocked", () => {
     registry: SANDBOX_REGISTRY,
     contractFields: {
       ...CONTRACT,
-      Workspace: "${LOCAL_WORKSPACE}"
+      Workspace: "[LOCAL_WORKSPACE]"
     },
     now: new Date("2026-05-10T00:00:00Z")
   });
@@ -186,7 +186,7 @@ test("workspace path traversal escape is blocked", () => {
     contractFields: {
       ...CONTRACT,
       Workspace:
-        "${LOCAL_WORKSPACE}"
+        "[LOCAL_WORKSPACE]"
     },
     now: new Date("2026-05-10T00:00:00Z")
   });
@@ -211,12 +211,12 @@ test("wildcard outside final path segment is rejected by registry validator", ()
 });
 
 test("matchSandboxWorkspace enforces sandbox root subdirectory", () => {
-  const pattern = "${LOCAL_WORKSPACE}";
-  assert.equal(matchSandboxWorkspace("${LOCAL_WORKSPACE}", pattern), true);
+  const pattern = "[LOCAL_WORKSPACE]";
+  assert.equal(matchSandboxWorkspace("[LOCAL_WORKSPACE]", pattern), true);
   // sandbox root itself is not a worktree
-  assert.equal(matchSandboxWorkspace("${LOCAL_WORKSPACE}", pattern), false);
+  assert.equal(matchSandboxWorkspace("[LOCAL_WORKSPACE]", pattern), false);
   // traversal escape
-  assert.equal(matchSandboxWorkspace("${LOCAL_WORKSPACE}", pattern), false);
+  assert.equal(matchSandboxWorkspace("[LOCAL_WORKSPACE]", pattern), false);
 });
 
 test("sandbox_workspaces patterns layer on top of static workspaces", () => {
@@ -224,7 +224,7 @@ test("sandbox_workspaces patterns layer on top of static workspaces", () => {
   assert.equal(isWorkspaceAllowedForProfile(SANDBOX_PROFILE, "companyos"), true);
   // Static absolute path still matches.
   assert.equal(
-    isWorkspaceAllowedForProfile(SANDBOX_PROFILE, "${LOCAL_WORKSPACE}"),
+    isWorkspaceAllowedForProfile(SANDBOX_PROFILE, "[LOCAL_WORKSPACE]"),
     true
   );
 });
@@ -233,7 +233,7 @@ test("validateSandboxPatternEntry catches empty, relative and traversal inputs",
   assert.deepEqual(validateSandboxPatternEntry(""), [SANDBOX_PATTERN_REASONS.EMPTY]);
   assert.deepEqual(validateSandboxPatternEntry("relative/path/**"), [SANDBOX_PATTERN_REASONS.NOT_ABSOLUTE]);
   assert.equal(
-    validateSandboxPatternEntry("${LOCAL_WORKSPACE}")
+    validateSandboxPatternEntry("[LOCAL_WORKSPACE]")
       .includes(SANDBOX_PATTERN_REASONS.TRAVERSAL),
     true
   );
@@ -248,7 +248,7 @@ test("[WORK_ITEM_ID]: real registry cto/runtime PASS for company-os sandbox path
     registry: REAL_REGISTRY_RESULT.registry,
     contractFields: {
       ...CONTRACT,
-      Workspace: "${LOCAL_WORKSPACE}"
+      Workspace: "[LOCAL_WORKSPACE]"
     },
     now: new Date("2026-05-13T00:00:00Z")
   });
@@ -261,7 +261,7 @@ test("[WORK_ITEM_ID]: real registry cto/runtime REJECT for sibling sandbox path"
     registry: REAL_REGISTRY_RESULT.registry,
     contractFields: {
       ...CONTRACT,
-      Workspace: "${LOCAL_WORKSPACE}"
+      Workspace: "[LOCAL_WORKSPACE]"
     },
     now: new Date("2026-05-13T00:00:00Z")
   });
@@ -279,15 +279,15 @@ test("[WORK_ITEM_ID]: real registry cto/atlas-website-runtime PASS for [SOURCE_W
   const raindropPack = profile.context_packs?.find((candidate) => candidate.id === "raindrop-marketing-observability-v0");
   assert.ok(raindropPack, "raindrop context pack missing");
   assert.equal(raindropPack.write_paths.length, 0);
-  assert.ok(raindropPack.read_paths.includes("${LOCAL_WORKSPACE}"));
-  assert.ok(raindropPack.read_paths.includes("${LOCAL_WORKSPACE}"));
+  assert.ok(raindropPack.read_paths.includes("[LOCAL_WORKSPACE]"));
+  assert.ok(raindropPack.read_paths.includes("[LOCAL_WORKSPACE]"));
   const result = evaluateCapabilityProfile({
     registry: REAL_REGISTRY_RESULT.registry,
     contractFields: {
       ...CONTRACT,
       CapabilityProfile: "claude-clevel-worker/cto/atlas-website-runtime",
       SubAgentRoster: "none",
-      Workspace: "${LOCAL_WORKSPACE}"
+      Workspace: "[LOCAL_WORKSPACE]"
     },
     now: new Date("2026-05-23T00:00:00Z")
   });
@@ -372,7 +372,7 @@ test("Post-worker quality loop allows Codex quality audit and Claude bounded hot
       RoleLabel: "role:cto",
       Role: "role:cto",
       Mode: "implement",
-      Workspace: "${LOCAL_WORKSPACE}",
+      Workspace: "[LOCAL_WORKSPACE]",
       AutonomyLevel: "L2",
       CapabilityProfile: "claude-lower-worker/cto/hotfix",
       SubAgentRoster: "none",
@@ -393,8 +393,8 @@ test("CMO runtime profile declares Opus max-context marketing intelligence pack"
   assert.equal(profile.runtime_defaults?.inference_budget, "max-context");
   const pack = profile.context_packs?.find((candidate) => candidate.id === "atlas-marketing-department-intelligence-v0");
   assert.ok(pack, "marketing intelligence context pack missing");
-  assert.ok(pack.read_paths.includes("${LOCAL_WORKSPACE}"));
-  assert.ok(pack.read_paths.includes("${LOCAL_WORKSPACE}"));
+  assert.ok(pack.read_paths.includes("[LOCAL_WORKSPACE]"));
+  assert.ok(pack.read_paths.includes("[LOCAL_WORKSPACE]"));
   assert.deepEqual(pack.write_paths, []);
 });
 
@@ -406,7 +406,7 @@ test("[WORK_ITEM_ID]: real registry coo/runtime PASS for company-os sandbox path
       ...CONTRACT,
       RoleLabel: "role:coo",
       CapabilityProfile: "claude-clevel-worker/coo/runtime",
-      Workspace: "${LOCAL_WORKSPACE}"
+      Workspace: "[LOCAL_WORKSPACE]"
     },
     now: new Date("2026-05-13T00:00:00Z")
   });
@@ -431,9 +431,9 @@ test("[WORK_ITEM_ID]: every executive C-Level runtime profile carries department
     assert.ok(lane, `${profileId} missing lanes.department_executive_v0 block`);
     assert.ok(Array.isArray(lane.allowed_write_paths_lane) && lane.allowed_write_paths_lane.length > 0,
       `${profileId} lane missing allowed_write_paths_lane entries`);
-    assert.ok(lane.allowed_write_paths_lane.includes("${LOCAL_WORKSPACE}"),
+    assert.ok(lane.allowed_write_paths_lane.includes("[LOCAL_WORKSPACE]"),
       `${profileId} lane missing sandbox reports path pattern`);
-    assert.ok(lane.allowed_write_paths_lane.includes("${LOCAL_WORKSPACE}"),
+    assert.ok(lane.allowed_write_paths_lane.includes("[LOCAL_WORKSPACE]"),
       `${profileId} lane missing sandbox page-index path pattern`);
     assert.ok(Array.isArray(lane.blocked_surfaces_lane) && lane.blocked_surfaces_lane.includes("plane-done-by-worker"),
       `${profileId} lane missing blocked_surfaces_lane entry plane-done-by-worker`);
@@ -479,7 +479,7 @@ test("[WORK_ITEM_ID]: real registry cpo/runtime PASS for company-os sandbox path
       RoleLabel: "role:cpo",
       Role: "role:cpo",
       CapabilityProfile: "claude-clevel-worker/cpo/runtime",
-      Workspace: "${LOCAL_WORKSPACE}"
+      Workspace: "[LOCAL_WORKSPACE]"
     },
     now: new Date("2026-05-18T00:00:00Z")
   });
@@ -495,7 +495,7 @@ test("[WORK_ITEM_ID]: real registry cmo/runtime PASS for company-os sandbox path
       RoleLabel: "role:cmo",
       Role: "role:cmo",
       Mode: "implement",
-      Workspace: "${LOCAL_WORKSPACE}",
+      Workspace: "[LOCAL_WORKSPACE]",
       AutonomyLevel: "L2",
       CapabilityProfile: "claude-clevel-worker/cmo/runtime",
       SubAgentRoster: "none",
@@ -527,7 +527,7 @@ test("GROW visual backfill profiles allow [SOURCE_WORKSPACE] sandbox worktrees",
         RoleLabel: "role:cmo",
         Role: "role:cmo",
         Mode: mode,
-        Workspace: "${LOCAL_WORKSPACE}",
+        Workspace: "[LOCAL_WORKSPACE]",
         AutonomyLevel: "L2",
         CapabilityProfile: profileId,
         SubAgentRoster: "none",
@@ -544,7 +544,7 @@ test("GROW visual backfill image-post profile allows declared local gates", () =
   assert.equal(REAL_REGISTRY_RESULT.ok, true, `real registry load failed: ${JSON.stringify(REAL_REGISTRY_RESULT.reason_codes)}`);
   const profile = REAL_REGISTRY_RESULT.registry.profiles.find((candidate) => candidate.id === "claude-clevel-worker/cmo/atlas-growth-editorial-image-post");
   assert.ok(profile, "atlas growth editorial image post profile missing");
-  assert.ok(profile.allowed_claude_tools.includes("Bash(node ${LOCAL_WORKSPACE})"));
+  assert.ok(profile.allowed_claude_tools.includes("Bash(node [LOCAL_WORKSPACE])"));
   assert.ok(profile.allowed_claude_tools.includes("Bash(npm run marketing:product-images*)"));
   assert.ok(profile.allowed_claude_tools.includes("Bash(sips*)"));
 });
@@ -558,7 +558,7 @@ test("[WORK_ITEM_ID]: real registry cfo/runtime PASS for company-os sandbox path
       RoleLabel: "role:cfo",
       Role: "role:cfo",
       Mode: "implement",
-      Workspace: "${LOCAL_WORKSPACE}",
+      Workspace: "[LOCAL_WORKSPACE]",
       AutonomyLevel: "L2",
       CapabilityProfile: "claude-clevel-worker/cfo/runtime",
       SubAgentRoster: "none",
@@ -579,7 +579,7 @@ test("[WORK_ITEM_ID]: real registry cao/runtime PASS for parent synthesis audit"
       RoleLabel: "role:cao",
       Role: "role:cao",
       Mode: "audit",
-      Workspace: "${LOCAL_WORKSPACE}",
+      Workspace: "[LOCAL_WORKSPACE]",
       AutonomyLevel: "L2",
       CapabilityProfile: "claude-clevel-worker/cao/runtime",
       SubAgentRoster: "none",
@@ -608,7 +608,7 @@ test("[WORK_ITEM_ID]: CMO performance analyst may use TinyFish public-fetch conn
       RoleLabel: "role:cmo",
       Role: "role:cmo",
       Mode: "report",
-      Workspace: "${LOCAL_WORKSPACE}",
+      Workspace: "[LOCAL_WORKSPACE]",
       AutonomyLevel: "L2",
       CapabilityProfile: "claude-clevel-worker/cmo/marketing-performance-analyst",
       SubAgentRoster: "none",
@@ -630,7 +630,7 @@ test("[WORK_ITEM_ID]: CMO visual director cannot request TinyFish by accident", 
       RoleLabel: "role:cmo",
       Role: "role:cmo",
       Mode: "review",
-      Workspace: "${LOCAL_WORKSPACE}",
+      Workspace: "[LOCAL_WORKSPACE]",
       AutonomyLevel: "L2",
       CapabilityProfile: "claude-clevel-worker/cmo/marketing-visual-director",
       SubAgentRoster: "none",
@@ -661,7 +661,7 @@ test("Video-first content engine profile allows local dry-run media setup and bl
       RoleLabel: "role:cmo",
       Role: "role:cmo",
       Mode: "implement",
-      Workspace: "${LOCAL_WORKSPACE}",
+      Workspace: "[LOCAL_WORKSPACE]",
       AutonomyLevel: "L2",
       CapabilityProfile: "claude-clevel-worker/cmo/video-first-content-engine",
       SubAgentRoster: "none",
@@ -688,14 +688,14 @@ for (const [role, profile] of [
         RoleLabel: role,
         Role: role,
         Mode: "audit",
-        Workspace: "${LOCAL_WORKSPACE}",
+        Workspace: "[LOCAL_WORKSPACE]",
         AutonomyLevel: "L2",
         CapabilityProfile: profile,
         SubAgentRoster: "none",
         MemoryStore: "none",
         MemoryUpdatePolicy: "proposal-only"
       },
-      usedCapabilities: { commands: ["${LOCAL_WORKSPACE}"] },
+      usedCapabilities: { commands: ["[LOCAL_WORKSPACE]"] },
       now: new Date("2026-05-16T00:00:00Z")
     });
     assert.equal(result.ok, true, `expected PASS but got: ${JSON.stringify(result.reason_codes)}`);

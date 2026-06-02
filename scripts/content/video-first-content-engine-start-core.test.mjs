@@ -90,7 +90,7 @@ test("rejects private path or token-shaped literals in public config fields", ()
   assert.throws(
     () => buildVideoFirstContentEngineStartPlan({
       root: tmpRoot(),
-      company: "${LOCAL_WORKSPACE}",
+      company: "[LOCAL_WORKSPACE]",
       approvalOwner: "Founder",
     }),
     /company contains a private path or token-shaped literal/,

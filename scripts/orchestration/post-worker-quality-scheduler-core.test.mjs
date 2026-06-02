@@ -11,7 +11,7 @@ import {
 import { validateContract } from "./worker-ledger-validator.mjs";
 
 const loaded = loadPostWorkerQualityRegistry();
-const workspaceRoot = "${LOCAL_WORKSPACE}";
+const workspaceRoot = "[LOCAL_WORKSPACE]";
 
 function comment(id, body, createdAt = "2026-05-27T10:00:00.000Z") {
   return { id, body, created_at: createdAt };
@@ -22,10 +22,10 @@ const parentFields = {
   parent_seat: "role:cto",
   workspace: "registry:company-os",
   source_of_truth: [
-    "${LOCAL_WORKSPACE}",
+    "[LOCAL_WORKSPACE]",
   ],
   allowedwritepaths: [
-    "${LOCAL_WORKSPACE}",
+    "[LOCAL_WORKSPACE]",
   ],
 };
 
@@ -76,7 +76,7 @@ test("hotfix marker becomes a valid ready lower-worker contract", () => {
       "  max_auto_hotfix_rounds: 1",
       "  previous_hotfix_rounds: 0",
       "  allowed_write_paths:",
-      "    - ${LOCAL_WORKSPACE}",
+      "    - [LOCAL_WORKSPACE]",
     ].join("\n"))],
     parentContractFields: parentFields,
     workItem: { sequence_id: 999 },
@@ -106,7 +106,7 @@ test("security audit marker becomes a valid read-only audit contract", () => {
       "controller.audit-followup:",
       "  state: AUDIT_REQUESTED",
       "  worker_class: security-auditor",
-      "  report_path: ${LOCAL_WORKSPACE}",
+      "  report_path: [LOCAL_WORKSPACE]",
     ].join("\n"))],
     parentContractFields: parentFields,
     workspaceRoot,
@@ -135,7 +135,7 @@ test("hotfix marker fails closed at loop limit", () => {
       "  max_auto_hotfix_rounds: 1",
       "  previous_hotfix_rounds: 1",
       "  allowed_write_paths:",
-      "    - ${LOCAL_WORKSPACE}",
+      "    - [LOCAL_WORKSPACE]",
     ].join("\n"))],
     parentContractFields: parentFields,
     workspaceRoot,

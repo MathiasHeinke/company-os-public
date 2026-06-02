@@ -10,7 +10,7 @@ import {
 
 function parseArgs(argv) {
   const options = {
-    workspaceRoot: "${LOCAL_WORKSPACE}",
+    workspaceRoot: "[LOCAL_WORKSPACE]",
     pipeline: "editorial",
     date: "latest",
     stages: "manifest,source,final,images,eval,scheduler,provenance,freshness",
@@ -56,7 +56,7 @@ function printHelp() {
       "Usage: verify-artifact-truth.mjs [options]",
       "",
       "Options:",
-      "  --workspace-root PATH      ARES website root. Default: ${LOCAL_WORKSPACE}",
+      "  --workspace-root PATH      ARES website root. Default: [LOCAL_WORKSPACE]",
       "  --pipeline editorial|product",
       "  --date YYYY-MM-DD|latest",
       "  --stages csv               manifest,source,final,images,eval,scheduler,provenance,freshness",

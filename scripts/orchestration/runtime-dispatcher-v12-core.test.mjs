@@ -62,7 +62,7 @@ test("resolveRuntimeMaxTurns prefers contract MaxTurns and clamps unsafe values"
 });
 
 test("resolveRuntimeWorkspacePath maps company registry aliases", () => {
-  assert.equal(resolveRuntimeWorkspacePath("registry:company-os"), "${LOCAL_WORKSPACE}");
+  assert.equal(resolveRuntimeWorkspacePath("registry:company-os"), "[LOCAL_WORKSPACE]");
   assert.equal(resolveRuntimeWorkspacePath("/tmp/example"), "/tmp/example");
   assert.equal(resolveRuntimeWorkspacePath("unknown"), "");
 });
@@ -117,12 +117,12 @@ test("resolveEffectiveAllowedReadPaths always includes runtime workspace for san
 
 test("detectRuntimeToolScopeViolations allows Claude project memory for allowed workspace roots only", () => {
   const previousHome = process.env.HOME;
-  process.env.HOME = "${LOCAL_WORKSPACE}";
+  process.env.HOME = "[LOCAL_WORKSPACE]";
   try {
-    const companyRoot = "${LOCAL_WORKSPACE}";
-    const sandboxRoot = "${LOCAL_WORKSPACE}";
-    const companyMemory = "${LOCAL_WORKSPACE}";
-    const otherMemory = "${LOCAL_WORKSPACE}";
+    const companyRoot = "[LOCAL_WORKSPACE]";
+    const sandboxRoot = "[LOCAL_WORKSPACE]";
+    const companyMemory = "[LOCAL_WORKSPACE]";
+    const otherMemory = "[LOCAL_WORKSPACE]";
     assert.equal(isAllowedClaudeProjectMemoryReadPath(companyMemory, [companyRoot]), true);
     assert.equal(isAllowedClaudeProjectMemoryReadPath(otherMemory, [companyRoot]), false);
 
@@ -191,13 +191,13 @@ test("detectRuntimeToolScopeViolations blocks streamed tool reads outside Allowe
         type: "tool_use",
         name: "Bash",
         input: {
-          command: "grep -rlI 'BEGIN PRIVATE KEY' ~/Downloads ${LOCAL_WORKSPACE}",
+          command: "grep -rlI 'BEGIN PRIVATE KEY' ~/Downloads [LOCAL_WORKSPACE]",
         },
       },
     },
   });
   const streamLine = JSON.stringify({ type: "stream", text: toolUse });
-  const violations = detectRuntimeToolScopeViolations(streamLine, ["${LOCAL_WORKSPACE}"]);
+  const violations = detectRuntimeToolScopeViolations(streamLine, ["[LOCAL_WORKSPACE]"]);
 
   assert.equal(violations.length, 1);
   assert.equal(violations[0].reason, "runtime.bash-read-path-out-of-scope");
@@ -214,13 +214,13 @@ test("detectRuntimeToolScopeViolations does not treat absolute executable path a
         type: "tool_use",
         name: "Bash",
         input: {
-          command: "${LOCAL_WORKSPACE} detect-changes --repo company-os --scope unstaged",
+          command: "[LOCAL_WORKSPACE] detect-changes --repo company-os --scope unstaged",
         },
       },
     },
   });
   const streamLine = JSON.stringify({ type: "stream", text: toolUse });
-  const violations = detectRuntimeToolScopeViolations(streamLine, ["${LOCAL_WORKSPACE}"]);
+  const violations = detectRuntimeToolScopeViolations(streamLine, ["[LOCAL_WORKSPACE]"]);
 
   assert.deepEqual(violations, []);
 });
@@ -240,7 +240,7 @@ test("detectRuntimeToolScopeViolations does not treat grep path-looking regex as
     },
   });
   const streamLine = JSON.stringify({ type: "stream", text: toolUse });
-  const violations = detectRuntimeToolScopeViolations(streamLine, ["${LOCAL_WORKSPACE}"]);
+  const violations = detectRuntimeToolScopeViolations(streamLine, ["[LOCAL_WORKSPACE]"]);
 
   assert.deepEqual(violations, []);
 });
@@ -260,7 +260,7 @@ test("detectRuntimeToolScopeViolations ignores POSIX null-device redirection", (
     },
   });
   const streamLine = JSON.stringify({ type: "stream", text: toolUse });
-  const violations = detectRuntimeToolScopeViolations(streamLine, ["${LOCAL_WORKSPACE}"]);
+  const violations = detectRuntimeToolScopeViolations(streamLine, ["[LOCAL_WORKSPACE]"]);
 
   assert.deepEqual(violations, []);
 });
@@ -274,17 +274,17 @@ test("detectRuntimeToolScopeViolations still blocks quoted grep file paths outsi
         type: "tool_use",
         name: "Bash",
         input: {
-          command: "grep -n TODO '${LOCAL_WORKSPACE}'",
+          command: "grep -n TODO '[LOCAL_WORKSPACE]'",
         },
       },
     },
   });
   const streamLine = JSON.stringify({ type: "stream", text: toolUse });
-  const violations = detectRuntimeToolScopeViolations(streamLine, ["${LOCAL_WORKSPACE}"]);
+  const violations = detectRuntimeToolScopeViolations(streamLine, ["[LOCAL_WORKSPACE]"]);
 
   assert.equal(violations.length, 1);
   assert.equal(violations[0].reason, "runtime.bash-read-path-out-of-scope");
-  assert.ok(violations[0].paths.includes("${LOCAL_WORKSPACE}"));
+  assert.ok(violations[0].paths.includes("[LOCAL_WORKSPACE]"));
 });
 
 test("detectRuntimeToolScopeViolations ignores write tools; write guard owns them", () => {
@@ -296,21 +296,21 @@ test("detectRuntimeToolScopeViolations ignores write tools; write guard owns the
         type: "tool_use",
         name: "Write",
         input: {
-          file_path: "${LOCAL_WORKSPACE}",
+          file_path: "[LOCAL_WORKSPACE]",
         },
       },
     },
   });
   const streamLine = JSON.stringify({ type: "stream", text: toolUse });
-  const violations = detectRuntimeToolScopeViolations(streamLine, ["${LOCAL_WORKSPACE}"]);
+  const violations = detectRuntimeToolScopeViolations(streamLine, ["[LOCAL_WORKSPACE]"]);
 
   assert.deepEqual(violations, []);
 });
 
 test("detectRuntimeToolScopeViolations allows current Claude project tool-result reads", () => {
-  const workspacePath = "${LOCAL_WORKSPACE}";
+  const workspacePath = "[LOCAL_WORKSPACE]";
   const toolResultPath = join(
-    process.env.HOME || "${LOCAL_WORKSPACE}",
+    process.env.HOME || "[LOCAL_WORKSPACE]",
     ".claude",
     "projects",
     claudeProjectSlugForWorkspace(workspacePath),
@@ -338,7 +338,7 @@ test("detectRuntimeToolScopeViolations allows current Claude project tool-result
 });
 
 test("claudeProjectSlugCandidatesForWorkspace pins legacy and current slug formats", () => {
-  const workspacePath = "${LOCAL_WORKSPACE}";
+  const workspacePath = "[LOCAL_WORKSPACE]";
 
   assert.deepEqual(claudeProjectSlugCandidatesForWorkspace(workspacePath), [
     "-Users-mathiasheinke-Developer-agent-sandboxes-company-os-pub06-persona-doctrine",
@@ -347,11 +347,11 @@ test("claudeProjectSlugCandidatesForWorkspace pins legacy and current slug forma
 });
 
 test("detectRuntimeToolScopeViolations allows Claude v2 session tool-result reads", () => {
-  const workspacePath = "${LOCAL_WORKSPACE}";
+  const workspacePath = "[LOCAL_WORKSPACE]";
   const currentSlug = "-Users-mathiasheinke-Developer--agent-sandboxes-company-os-pub06-persona-doctrine";
   assert.equal(claudeProjectSlugCandidatesForWorkspace(workspacePath).includes(currentSlug), true);
   const toolResultPath = join(
-    process.env.HOME || "${LOCAL_WORKSPACE}",
+    process.env.HOME || "[LOCAL_WORKSPACE]",
     ".claude",
     "projects",
     currentSlug,
@@ -380,10 +380,10 @@ test("detectRuntimeToolScopeViolations allows Claude v2 session tool-result read
 });
 
 test("detectRuntimeToolScopeViolations blocks Claude tool-result reads for other workspaces", () => {
-  const workspacePath = "${LOCAL_WORKSPACE}";
-  const otherWorkspacePath = "${LOCAL_WORKSPACE}";
+  const workspacePath = "[LOCAL_WORKSPACE]";
+  const otherWorkspacePath = "[LOCAL_WORKSPACE]";
   const toolResultPath = join(
-    process.env.HOME || "${LOCAL_WORKSPACE}",
+    process.env.HOME || "[LOCAL_WORKSPACE]",
     ".claude",
     "projects",
     claudeProjectSlugForWorkspace(otherWorkspacePath),
@@ -412,9 +412,9 @@ test("detectRuntimeToolScopeViolations blocks Claude tool-result reads for other
 });
 
 test("detectRuntimeToolScopeViolations still blocks non-tool-result Claude reads", () => {
-  const workspacePath = "${LOCAL_WORKSPACE}";
+  const workspacePath = "[LOCAL_WORKSPACE]";
   const planPath = join(
-    process.env.HOME || "${LOCAL_WORKSPACE}",
+    process.env.HOME || "[LOCAL_WORKSPACE]",
     ".claude",
     "projects",
     claudeProjectSlugForWorkspace(workspacePath),
@@ -451,27 +451,27 @@ test("detectRuntimeToolWriteScopeViolations blocks worker-attributed writes outs
         type: "tool_use",
         name: "Write",
         input: {
-          file_path: "${LOCAL_WORKSPACE}",
+          file_path: "[LOCAL_WORKSPACE]",
         },
       },
     },
   });
   const streamLine = JSON.stringify({ type: "stream", text: toolUse });
   const violations = detectRuntimeToolWriteScopeViolations(streamLine, [
-    "${LOCAL_WORKSPACE}",
+    "[LOCAL_WORKSPACE]",
   ]);
 
   assert.equal(violations.length, 1);
   assert.equal(violations[0].reason, "runtime.tool-write-path-out-of-scope");
   assert.equal(
     violations[0].path,
-    "${LOCAL_WORKSPACE}",
+    "[LOCAL_WORKSPACE]",
   );
 });
 
 test("detectRuntimeToolWriteScopeViolations allows Claude plan-mode scratch writes", () => {
   const planPath = join(
-    process.env.HOME || "${LOCAL_WORKSPACE}",
+    process.env.HOME || "[LOCAL_WORKSPACE]",
     ".claude",
     "plans",
     "you-are-a-company-os-temporal-wilkinson.md",
@@ -497,7 +497,7 @@ test("detectRuntimeToolWriteScopeViolations allows Claude plan-mode scratch writ
 
 test("detectRuntimeToolWriteScopeViolations blocks non-markdown Claude scratch writes", () => {
   const planPath = join(
-    process.env.HOME || "${LOCAL_WORKSPACE}",
+    process.env.HOME || "[LOCAL_WORKSPACE]",
     ".claude",
     "plans",
     "raw-session.json",
@@ -873,7 +873,7 @@ test("resolveClaudeAllowedTools merges profile, contract and safe declared gate 
         "node scripts/page-index/generate-page-index.mjs --root . --output docs/page-index.md --check --json",
         "node scripts/release-gates/productization-readiness.mjs check --json",
         "node scripts/goal/goal.mjs run --parent [WORK_ITEM_ID] --dry-run --json",
-        "${LOCAL_WORKSPACE} detect-changes --repo company-os",
+        "[LOCAL_WORKSPACE] detect-changes --repo company-os",
         "pnpm deploy",
       ],
     },
@@ -887,7 +887,7 @@ test("resolveClaudeAllowedTools merges profile, contract and safe declared gate 
   assert.equal(tools.includes("Bash(node scripts/release-gates/productization-readiness.mjs*)"), true);
   assert.equal(tools.includes("Bash(node scripts/goal/goal.mjs run*)"), true);
   assert.equal(tools.some((tool) => tool === "Bash(node scripts/goal/goal.mjs*)"), false);
-  assert.equal(tools.includes("Bash(${LOCAL_WORKSPACE} detect-changes*)"), true);
+  assert.equal(tools.includes("Bash([LOCAL_WORKSPACE] detect-changes*)"), true);
   assert.equal(tools.some((tool) => tool.includes("deploy")), false);
 });
 
@@ -1231,7 +1231,7 @@ test("buildWorkerPrompt injects exact-read-roots-only guard when declared", () =
     },
     description: "desc",
     dryRun: false,
-    reportPath: "${LOCAL_WORKSPACE}",
+    reportPath: "[LOCAL_WORKSPACE]",
     runId: "run-guard-read-root",
     capabilityProfile: { name: "claude-clevel-worker/coo/runtime" },
   });
@@ -1499,7 +1499,7 @@ test("buildAgentEventRow emits a valid agent-event row", () => {
     runId: "run-1",
     workItem: { sequence_id: 12 },
     contractFields: { agent: "claude", mode: "implement", workspace: "registry:company-os", role: "role:cto", humangate: "HG-2.5" },
-    workspacePath: "${LOCAL_WORKSPACE}",
+    workspacePath: "[LOCAL_WORKSPACE]",
     artifactPaths: ["/tmp/report.md"],
     payload: { state: "PASS" },
     occurredAt: "2026-05-09T00:00:00.000Z",

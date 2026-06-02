@@ -16,7 +16,7 @@ import {
 import { validateContract } from "./worker-ledger-validator.mjs";
 
 const { registry } = loadPostWorkerQualityRegistry();
-const workspaceRoot = "${LOCAL_WORKSPACE}";
+const workspaceRoot = "[LOCAL_WORKSPACE]";
 
 function workItem(overrides = {}) {
   return {
@@ -33,7 +33,7 @@ function workItem(overrides = {}) {
       "workspace: registry:company-os\n",
       "dispatch: ready\n",
       "source_of_truth:\n",
-      "  - ${LOCAL_WORKSPACE}",
+      "  - [LOCAL_WORKSPACE]",
       "acceptance_criteria:\n",
       "  - Parent run reports done with gates.\n",
       "gates:\n",
@@ -92,7 +92,7 @@ test("buildPlaneQualitySchedulerHandoff turns hotfix Plane marker into candidate
       "  max_auto_hotfix_rounds: 1",
       "  previous_hotfix_rounds: 0",
       "  allowed_write_paths:",
-      "    - ${LOCAL_WORKSPACE}",
+      "    - [LOCAL_WORKSPACE]",
     ].join("\n"))],
     workspaceRoot,
     projectIdentifier: "COMPA",

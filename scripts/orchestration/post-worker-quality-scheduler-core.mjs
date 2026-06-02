@@ -188,7 +188,7 @@ function defaultGates(workerClass) {
     "node scripts/orchestration/post-worker-quality-loop-core.mjs --json",
   ];
   if (workerClass !== "quality-auditor") {
-    gates.push("${LOCAL_WORKSPACE} detect-changes");
+    gates.push("[LOCAL_WORKSPACE] detect-changes");
   }
   return gates;
 }

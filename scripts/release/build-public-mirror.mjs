@@ -301,6 +301,7 @@ const MIRROR_TEXT_REWRITE_EXTENSIONS = new Set([
   ".yaml",
   ".yml",
 ]);
+const CODE_TEXT_REWRITE_EXTENSIONS = new Set([".cjs", ".js", ".jsx", ".mjs", ".ts", ".tsx"]);
 
 const PUBLIC_MIRROR_TEXT_REWRITES = [
   {
@@ -330,7 +331,10 @@ const PUBLIC_MIRROR_TEXT_REWRITES = [
   {
     id: "private-home-path",
     regex: /\/Users\/[a-zA-Z][-a-zA-Z0-9]+(?:\/[^\s"'`)>,}]*)?/g,
-    replacement: "${LOCAL_WORKSPACE}",
+    replacement: ({ relativePath }) =>
+      CODE_TEXT_REWRITE_EXTENSIONS.has(path.extname(relativePath).toLowerCase())
+        ? "[LOCAL_WORKSPACE]"
+        : "${LOCAL_WORKSPACE}",
     appliesTo: () => true,
   },
   {
@@ -365,7 +369,10 @@ export function sanitizePublicMirrorText(relativePath, content) {
   let sanitized = content;
   for (const rule of PUBLIC_MIRROR_TEXT_REWRITES) {
     if (!rule.appliesTo(relativePath)) continue;
-    sanitized = sanitized.replace(rule.regex, rule.replacement);
+    const replacement = typeof rule.replacement === "function"
+      ? (...args) => rule.replacement({ relativePath, match: args[0] })
+      : rule.replacement;
+    sanitized = sanitized.replace(rule.regex, replacement);
   }
   return sanitized;
 }

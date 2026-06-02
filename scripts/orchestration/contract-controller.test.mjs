@@ -56,25 +56,25 @@ workspace: registry:company-os
 dispatch: ready
 depends_on:
 source_of_truth:
-  - ${LOCAL_WORKSPACE}
+  - [LOCAL_WORKSPACE]
 scope:
   - include scripts/orchestration/contract-controller.mjs
   - exclude production systems
 sandbox: required
 allowedreadpaths:
-  - ${LOCAL_WORKSPACE}
+  - [LOCAL_WORKSPACE]
 allowedwritepaths:
-  - ${LOCAL_WORKSPACE}
+  - [LOCAL_WORKSPACE]
 capabilityprofile: claude-clevel-worker/cto/runtime
 outcomespec: Runtime executable contract can be preflighted before lock.
 outcomerubric: Unknown capabilities, pseudo dependencies, missing artifacts, read-scope drift, and Claude tool-result sources reject.
 acceptance_criteria:
   - Runtime-ready gate emits PASS for executable contracts and REJECT for runtime-invalid contracts.
 gates:
-  - node --test ${LOCAL_WORKSPACE}
+  - node --test [LOCAL_WORKSPACE]
 human_gate: HG-2.5
 reporting:
-  - ${LOCAL_WORKSPACE}
+  - [LOCAL_WORKSPACE]
 blockedactions: never print secrets; do not deploy, publish, write Linear, mark Done, or touch production.
 runtimeauth: claude max local auth present
 runtimepermissionmode: acceptEdits
@@ -91,7 +91,7 @@ const RUNTIME_CAPABILITY_REGISTRY = {
       role: "role:cto",
       agents: ["claude"],
       modes: ["implement", "audit"],
-      workspaces: ["company-os", "registry:company-os", "${LOCAL_WORKSPACE}"],
+      workspaces: ["company-os", "registry:company-os", "[LOCAL_WORKSPACE]"],
     },
   ],
 };
@@ -264,7 +264,7 @@ test("runtime executability PASS for registered, path-covered runtime contract",
 
 test("runtime executability treats relative gate paths as repo-local, not absolute drift", () => {
   const relativeGate = RUNTIME_READY_CONTRACT.replace(
-    "  - node --test ${LOCAL_WORKSPACE}",
+    "  - node --test [LOCAL_WORKSPACE]",
     "  - node --test scripts/orchestration/contract-controller.test.mjs",
   );
   const executability = evaluateRuntimeExecutability({
@@ -327,11 +327,11 @@ test("runtime executability rejects Claude plan mode when a report artifact must
 
 test("runtime executability rejects absolute source paths outside AllowedReadPaths", () => {
   const uncoveredSource = RUNTIME_READY_CONTRACT.replace(
-    "  - ${LOCAL_WORKSPACE}",
-    "  - ${LOCAL_WORKSPACE}",
+    "  - [LOCAL_WORKSPACE]",
+    "  - [LOCAL_WORKSPACE]",
   ).replace(
-    "  - node --test ${LOCAL_WORKSPACE}",
-    "  - node --test ${LOCAL_WORKSPACE}",
+    "  - node --test [LOCAL_WORKSPACE]",
+    "  - node --test [LOCAL_WORKSPACE]",
   );
   const executability = evaluateRuntimeExecutability({
     item: item(uncoveredSource),
@@ -345,7 +345,7 @@ test("runtime executability rejects absolute source paths outside AllowedReadPat
 
 test("runtime executability rejects Claude internal tool-result source references", () => {
   const claudeInternalSource = RUNTIME_READY_CONTRACT.replace(
-    "  - ${LOCAL_WORKSPACE}",
+    "  - [LOCAL_WORKSPACE]",
     "  - ~/.claude/projects/private/tool-results/raw.txt",
   );
   const executability = evaluateRuntimeExecutability({

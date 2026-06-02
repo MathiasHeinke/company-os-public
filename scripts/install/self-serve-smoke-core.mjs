@@ -11,6 +11,9 @@ import {
 } from "../update/company-os-update-core.mjs";
 
 export const SELF_SERVE_SMOKE_VERSION = "self-serve-smoke/v0";
+const EXPECTED_PACKET_TEMPLATE_OVERWRITES = new Set([
+  ".company-os/company-discovery-brief.md",
+]);
 
 function compact(value) {
   return String(value ?? "").trim();
@@ -225,6 +228,7 @@ export function runSelfServeSmoke({
     target: resolvedTarget,
     packet,
     force: true,
+    allowedCollisions: [...EXPECTED_PACKET_TEMPLATE_OVERWRITES],
   });
   stages.push(stageFromResult("onboarding.packet", packetWrite, {
     files: packetWrite.files || [],

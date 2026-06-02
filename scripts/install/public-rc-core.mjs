@@ -424,6 +424,7 @@ export function runPublicRcInstall({
     target: resolvedTarget,
     packet,
     force: true,
+    allowedCollisions: [...EXPECTED_PACKET_TEMPLATE_OVERWRITES],
   });
   const expectedPacketOverwrites = (packetWrite.collisions || [])
     .filter((file) => EXPECTED_PACKET_TEMPLATE_OVERWRITES.has(file));

@@ -145,8 +145,8 @@ test("collectCmoMorningBriefSignals finds Company.OS reports and dated website o
   assert.match(brief.linkedin_creator_export_action.export_anchor_url, /Exportieren/);
   assert.match(brief.linkedin_creator_export_action.manual_file_command, /--file ~\/Downloads\/linkedin-posts\.xlsx/);
   assert.match(brief.linkedin_creator_export_action.manual_file_command, /--mh-dev-output-root \/Users\/mathiasheinke\/Developer\/[SOURCE_WORKSPACE]\/domains\/marketing\/linkedin/);
-  assert.equal(brief.linkedin_creator_export_action.mh_dev_report, "${LOCAL_WORKSPACE}");
-  assert.equal(brief.linkedin_creator_export_action.mh_dev_raw_archive_dir, "${LOCAL_WORKSPACE}");
+  assert.equal(brief.linkedin_creator_export_action.mh_dev_report, "[LOCAL_WORKSPACE]");
+  assert.equal(brief.linkedin_creator_export_action.mh_dev_raw_archive_dir, "[LOCAL_WORKSPACE]");
   assert.equal(brief.linkedin_creator_export_action.max_download_age_minutes, 720);
   assert.match(brief.linkedin_creator_export_action.follow_up_command, /marketing:post-metrics/);
   assert.match(brief.linkedin_creator_export_action.follow_up_command, /--max-targets 100/);

@@ -192,16 +192,16 @@ test("renderPageIndex scrubs private home paths from extracted table text", () =
     "AGENTS.md": [
       "# Agents",
       "",
-      "Report lives at ${LOCAL_WORKSPACE}",
+      "Report lives at [LOCAL_WORKSPACE]",
       "",
-      "## Path ${LOCAL_WORKSPACE}",
+      "## Path [LOCAL_WORKSPACE]",
       "",
     ].join("\n"),
     "docs/system-index.md": "# System\n",
   });
   const markdown = renderPageIndex(buildPageIndex(root));
 
-  assert.equal(scrubPrivatePathsInString("${LOCAL_WORKSPACE}"), "~/Developer/Company.OS");
+  assert.equal(scrubPrivatePathsInString("[LOCAL_WORKSPACE]"), "~/Developer/Company.OS");
   assert.doesNotMatch(markdown, /\/Users\/[a-zA-Z][-a-zA-Z0-9]+/);
   assert.match(markdown, /~\/\.claude\/plans\/example\.md/);
   assert.match(markdown, /Path ~\/Developer\/Company\.OS/);

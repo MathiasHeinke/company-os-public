@@ -15,9 +15,9 @@ test("buildContextComment emits headless boot-pack fields needed by fresh CLI wo
     contractFields: {
       agent: "claude",
       mode: "audit",
-      workspace: "${LOCAL_WORKSPACE}",
+      workspace: "[LOCAL_WORKSPACE]",
       dispatch: "ready",
-      source_of_truth: ["${LOCAL_WORKSPACE}"],
+      source_of_truth: ["[LOCAL_WORKSPACE]"],
       acceptance_criteria: ["boot proof present"],
       gates: ["no edits"],
       human_gate: "HG-1",

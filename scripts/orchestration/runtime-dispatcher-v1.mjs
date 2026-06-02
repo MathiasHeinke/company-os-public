@@ -165,7 +165,7 @@ export const PREFLIGHT_REASONS = Object.freeze({
 });
 
 const KNOWN_RUNTIMES = new Set(["claude", "codex", "gemini", "human"]);
-const DEFAULT_COMPANY_OS_PATH = "${LOCAL_WORKSPACE}";
+const DEFAULT_COMPANY_OS_PATH = "[LOCAL_WORKSPACE]";
 const RUNTIME_BROWSER_AUTH_VALUES = new Set([
   "none",
   "forbidden",
@@ -185,7 +185,7 @@ const SECRET_PATTERNS = [
   /\bghp_[A-Za-z0-9]{20,}\b/, // GitHub PAT
 ];
 
-const DEFAULT_CLAUDE_COMMAND = process.env.CLAUDE_BIN || "${LOCAL_WORKSPACE}";
+const DEFAULT_CLAUDE_COMMAND = process.env.CLAUDE_BIN || "[LOCAL_WORKSPACE]";
 
 // ---------- Pure preflight functions ----------
 
@@ -384,7 +384,7 @@ export function preflightWorkspace({ contractFields, workspaceHealthChecker }) {
 }
 
 const APPROVED_SANDBOX_ROOT_PREFIXES = [
-  "${LOCAL_WORKSPACE}",
+  "[LOCAL_WORKSPACE]",
 ];
 
 function isApprovedSandboxWorkspacePath(workspace) {

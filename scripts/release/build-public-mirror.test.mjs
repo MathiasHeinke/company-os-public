@@ -430,6 +430,7 @@ test("sanitizePublicMirrorText scrubs safe public mirror fixture tokens and work
   const githubPatFixture = `ghp_${"A".repeat(20)}`;
   const githubFineGrainedPatFixture = `github_pat_${"A".repeat(24)}`;
   const slackBotFixture = `xoxb-${"1".repeat(20)}`;
+  const privateHomePathFixture = ["/Users", "mathiasheinke", "Developer", "Company.OS"].join("/");
   assert.equal(
     sanitizePublicMirrorText("scripts/orchestration/example.test.mjs", `const token = '${githubPatFixture}';\nconst fine = '${githubFineGrainedPatFixture}';\nconst slack = '${slackBotFixture}';\n`),
     "const token = '[GITHUB_PAT_EXAMPLE]';\nconst fine = '[GITHUB_FINE_GRAINED_PAT_EXAMPLE]';\nconst slack = '[SLACK_BOT_TOKEN_EXAMPLE]';\n",
@@ -445,9 +446,16 @@ test("sanitizePublicMirrorText scrubs safe public mirror fixture tokens and work
   assert.equal(
     sanitizePublicMirrorText(
       "scripts/runtime/example.mjs",
-      "const root = '${LOCAL_WORKSPACE}';\n",
+      `const root = '${privateHomePathFixture}';\n`,
     ),
-    "const root = '${LOCAL_WORKSPACE}';\n",
+    "const root = '[LOCAL_WORKSPACE]';\n",
+  );
+  assert.equal(
+    sanitizePublicMirrorText(
+      "docs/operations/example.md",
+      `Workspace root: ${privateHomePathFixture}\n`,
+    ),
+    "Workspace root: ${LOCAL_WORKSPACE}\n",
   );
   assert.equal(
     sanitizePublicMirrorText(
@@ -466,12 +474,13 @@ test("runBuildPublicMirror scrubs fixture tokens and work item ids in output onl
   const sourceRoot = fixtureRoot();
   const githubPatFixture = `ghp_${"A".repeat(20)}`;
   const slackBotFixture = `xoxb-${"1".repeat(20)}`;
+  const privateHomePathFixture = ["/Users", "mathiasheinke", "Developer", "Company.OS"].join("/");
   writeMinimalIncludeTree(sourceRoot);
   writeFixtures(sourceRoot);
   write(
     sourceRoot,
     "scripts/orchestration/example.test.mjs",
-    `const github = '${githubPatFixture}';\nconst slack = '${slackBotFixture}';\nconst issue = '[WORK_ITEM_ID]';\nconst root = '${LOCAL_WORKSPACE}';\n`,
+    `const github = '${githubPatFixture}';\nconst slack = '${slackBotFixture}';\nconst issue = '[WORK_ITEM_ID]';\nconst root = '${privateHomePathFixture}';\n`,
   );
   write(sourceRoot, "docs/example/intro.md", "Follow [WORK_ITEM_ID] then [WORK_ITEM_ID].\n");
 
