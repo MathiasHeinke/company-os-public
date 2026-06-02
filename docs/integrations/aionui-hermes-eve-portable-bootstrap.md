@@ -87,6 +87,27 @@ Use `--session-class auto` to let the router classify a custom message, or
 `--session-class SC0-fresh-task` when the first run should explicitly start
 fresh.
 
+The same preflight writes a local/private workstream session registry:
+
+```text
+${COMPANY_OS_PRIVATE_ROOT}/aion-companyos-context/EVE_WORKSTREAM_SESSIONS.json
+```
+
+This registry contains the route receipt, generation and hygiene state. Runtime
+session id fields stay empty until a later live resume adapter exists. Inspect
+or close it with:
+
+```bash
+node "${COMPANY_OS_ROOT}/scripts/operator-shell/eve-session-registry.mjs" inspect \
+  --company-os-root "${COMPANY_OS_ROOT}" \
+  --json
+
+node "${COMPANY_OS_ROOT}/scripts/operator-shell/eve-session-registry.mjs" close \
+  --company-os-root "${COMPANY_OS_ROOT}" \
+  --reason "operator close" \
+  --json
+```
+
 For a read-only check that does not apply the AionUI overlay, omit
 `--apply-overlay`.
 

@@ -32,6 +32,8 @@ function parseArgs(argv) {
     sessionClass: "SC2-workstream-continuity",
     sessionMessage: "",
     sessionFields: {},
+    sessionRegistryPath: "",
+    sessionRegistryDryRun: false,
   };
   for (let index = 0; index < rest.length; index += 1) {
     const arg = rest[index];
@@ -58,6 +60,8 @@ function parseArgs(argv) {
     if (arg === "--model") { args.model = nextValue(); continue; }
     if (arg === "--session-class") { args.sessionClass = nextValue(); continue; }
     if (arg === "--session-message") { args.sessionMessage = nextValue(); continue; }
+    if (arg === "--session-registry-path") { args.sessionRegistryPath = nextValue(); continue; }
+    if (arg === "--session-registry-dry-run") { args.sessionRegistryDryRun = true; continue; }
     if (arg === "--session-field") {
       const raw = nextValue();
       const equals = raw.indexOf("=");
@@ -81,6 +85,7 @@ What it checks:
   3. Hermes default model/provider, ACP dependency and EVE soul preflight pass
   4. Optional Hermes auth/model smoke returns non-empty output
   5. Session-continuity route receipt is generated for the initial EVE workstream
+  6. Local/private EVE workstream session registry is updated with hygiene state
 
 Version: ${START_EVE_VERSION}
 `;
@@ -104,6 +109,8 @@ function optionsFromArgs(args) {
     sessionClass: args.sessionClass,
     sessionMessage: args.sessionMessage,
     sessionFields: args.sessionFields,
+    sessionRegistryPath: args.sessionRegistryPath || undefined,
+    sessionRegistryDryRun: args.sessionRegistryDryRun,
   };
 }
 

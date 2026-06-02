@@ -154,6 +154,7 @@ test("runStartEve passes when overlay, sidecar preflight and start command are r
       ["eve.prepare", "pass"],
       ["eve.preflight", "pass"],
       ["eve.session_continuity", "pass"],
+      ["eve.session_registry", "pass"],
       ["hermes.auth_model_smoke", "skipped"],
     ],
   );
@@ -167,7 +168,12 @@ test("runStartEve passes when overlay, sidecar preflight and start command are r
   assert.equal(result.summary.session_policy, "workstream-continuity");
   assert.equal(result.summary.session_reuse_allowed, true);
   assert.equal(result.summary.session_human_gate, "HG-2.5");
+  assert.equal(result.summary.session_registry_status, "pass");
+  assert.equal(result.summary.session_registry_hygiene, "pass");
   assert.equal(result.session_continuity.route_receipt.required_registry_state, "open-workstream-session");
+  assert.equal(result.session_registry.session.runtime_sessions.eve_hermes.session_id, "");
+  assert.equal(result.session_registry.session.runtime_sessions.eve_hermes.session_id_status, "not-yet-captured");
+  assert.ok(fs.existsSync(result.session_registry.registry_path));
   assert.match(result.start_command.join("\n"), /COMMAND_EVE_RUNTIME_POLICY_PATH/);
   assert.match(result.start_command.join("\n"), /AIONUI_COMMAND_EVE_DISABLE_NATIVE_AUTONOMY="1"/);
 });
@@ -225,6 +231,44 @@ test("runStartEve blocks high-risk session-continuity startup classes", () => {
   assert.equal(stage.route_class, "SC4-continuity-blocked");
 });
 
+test("runStartEve blocks when the local EVE session registry is polluted", () => {
+  const fixture = makeFixture();
+  const registryPath = path.join(fixture.privateRoot, "polluted-registry.json");
+  writeFile(registryPath, JSON.stringify({
+    version: "eve-workstream-session-registry/v0",
+    generated_by: "test",
+    created_at: "2026-05-26T00:00:00.000Z",
+    updated_at: "2026-05-26T00:00:00.000Z",
+    default_workstream_id: "eve-founder-companion",
+    sessions: {
+      "eve-founder-companion": {
+        id: "eve-founder-companion",
+        status: "polluted",
+        updated_at: "2026-05-26T00:00:00.000Z",
+        hygiene: {
+          stale_after_days: 14,
+          pollution: { detected: true, reason: "secret pasted" },
+          pollution_markers_found: ["secret"],
+        },
+      },
+    },
+    events: [],
+  }));
+  const result = runStartEve({
+    companyOsRoot: fixture.companyOsRoot,
+    privateRoot: fixture.privateRoot,
+    date: "2026-05-26",
+    sessionRegistryPath: registryPath,
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.failed_stage, "eve.session_registry");
+  assert.ok(result.failures.includes("eve-session-registry.polluted-session"));
+  const stage = result.stages.find((row) => row.id === "eve.session_registry");
+  assert.equal(stage.status, "blocked");
+  assert.equal(stage.hygiene_status, "blocked_polluted");
+});
+
 test("runStartEve includes Hermes model/auth smoke when requested", () => {
   const fixture = makeFixture({ hermesOutputsArgs: true });
   const result = runStartEve({
@@ -262,8 +306,10 @@ test("writeStartEveReport writes markdown and json evidence", () => {
   assert.match(fs.readFileSync(report.markdown, "utf8"), /# Start EVE Preflight/);
   assert.match(fs.readFileSync(report.markdown, "utf8"), /Runtime policy: command-eve-073-proposal-only/);
   assert.match(fs.readFileSync(report.markdown, "utf8"), /Session policy: workstream-continuity/);
+  assert.match(fs.readFileSync(report.markdown, "utf8"), /Session registry hygiene: pass/);
   assert.equal(JSON.parse(fs.readFileSync(report.json, "utf8")).status, "ready");
   assert.equal(JSON.parse(fs.readFileSync(report.json, "utf8")).summary.session_route_class, "SC2-workstream-continuity");
+  assert.equal(JSON.parse(fs.readFileSync(report.json, "utf8")).session_registry.hygiene.status, "pass");
 });
 
 test("start_eve CLI emits JSON preflight for a prepared fixture", () => {
@@ -285,5 +331,6 @@ test("start_eve CLI emits JSON preflight for a prepared fixture", () => {
   assert.equal(parsed.summary.default_agent, "EVE via Hermes");
   assert.equal(parsed.summary.runtime_policy_profile, "command-eve-073-proposal-only");
   assert.equal(parsed.summary.session_policy, "workstream-continuity");
+  assert.equal(parsed.summary.session_registry_hygiene, "pass");
   assert.equal(parsed.session_continuity.route_receipt.route_class, "SC2-workstream-continuity");
 });

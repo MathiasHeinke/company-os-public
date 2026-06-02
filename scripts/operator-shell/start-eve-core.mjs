@@ -13,6 +13,9 @@ import {
   runHermesEveSmoke,
 } from "./eve-sidecar-core.mjs";
 import {
+  registerStartEveSession,
+} from "./eve-session-registry-core.mjs";
+import {
   DEFAULT_SESSION_CONTINUITY_REGISTRY_PATH,
   routeSessionContinuity,
   loadSessionContinuityRegistry,
@@ -47,7 +50,7 @@ function stage(id, result = {}, extra = {}) {
   };
 }
 
-function blocked({ stages, failedStage, failures, nextActions, overlay, prepare, preflight, sessionContinuity, smoke, startCommand }) {
+function blocked({ stages, failedStage, failures, nextActions, overlay, prepare, preflight, sessionContinuity, sessionRegistry, smoke, startCommand }) {
   return {
     version: START_EVE_VERSION,
     sidecar_version: EVE_SIDECAR_VERSION,
@@ -60,6 +63,7 @@ function blocked({ stages, failedStage, failures, nextActions, overlay, prepare,
     prepare,
     preflight,
     session_continuity: sessionContinuity,
+    session_registry: sessionRegistry,
     smoke,
     start_command: startCommand,
     next_actions: nextActions,
@@ -67,7 +71,7 @@ function blocked({ stages, failedStage, failures, nextActions, overlay, prepare,
   };
 }
 
-function summarize({ overlay, preflight, sessionContinuity } = {}) {
+function summarize({ overlay, preflight, sessionContinuity, sessionRegistry } = {}) {
   const modelConfig = preflight?.hermes?.model_config || {};
   const runtimePolicy = preflight?.eve?.runtime_policy || {};
   const routeReceipt = sessionContinuity?.route_receipt || {};
@@ -84,6 +88,8 @@ function summarize({ overlay, preflight, sessionContinuity } = {}) {
     session_policy: routeReceipt.session_policy || "",
     session_reuse_allowed: routeReceipt.reuse_allowed === true,
     session_human_gate: routeReceipt.human_gate || "",
+    session_registry_status: sessionRegistry?.status || "",
+    session_registry_hygiene: sessionRegistry?.hygiene?.status || "",
   };
 }
 
@@ -233,6 +239,40 @@ export function runStartEve(options = {}) {
     });
   }
 
+  const sessionRegistry = registerStartEveSession({
+    route: sessionContinuity,
+    preflight,
+    paths: preflight.paths,
+    registryPath: options.sessionRegistryPath,
+    now: options.now || new Date(),
+    dryRun: options.sessionRegistryDryRun === true,
+  });
+  stages.push(stage("eve.session_registry", sessionRegistry, {
+    status: sessionRegistry.status || (sessionRegistry.ok ? "pass" : "blocked"),
+    registry_path: sessionRegistry.registry_path || "",
+    hygiene_status: sessionRegistry.hygiene?.status || "",
+    generation: sessionRegistry.session?.generation || 0,
+    written: sessionRegistry.written === true,
+  }));
+  if (!sessionRegistry.ok) {
+    return blocked({
+      stages,
+      failedStage: "eve.session_registry",
+      failures: [sessionRegistry.reason || "eve_session_registry_failed", ...(sessionRegistry.errors || [])],
+      nextActions: [
+        "Inspect the local EVE session registry and close or reset polluted continuity state.",
+        "Run scripts/operator-shell/eve-session-registry.mjs inspect --json.",
+        "If safe, close the stale/polluted workstream with eve-session-registry.mjs close --reason <reason>.",
+      ],
+      overlay,
+      prepare,
+      preflight,
+      sessionContinuity,
+      sessionRegistry,
+      startCommand,
+    });
+  }
+
   let smoke = null;
   if (options.authCheck) {
     smoke = runHermesEveSmoke({
@@ -281,6 +321,7 @@ export function runStartEve(options = {}) {
     prepare,
     preflight,
     session_continuity: sessionContinuity,
+    session_registry: sessionRegistry,
     smoke,
     start_command: startCommand,
     next_actions: [
@@ -288,7 +329,7 @@ export function runStartEve(options = {}) {
       "Open the local URL and verify the first screen shows EVE with Hermes hidden behind the default agent path.",
       "Ask EVE what she already knows; she should load the boot packet before asking for broad setup data.",
     ],
-    summary: summarize({ overlay, preflight, sessionContinuity }),
+    summary: summarize({ overlay, preflight, sessionContinuity, sessionRegistry }),
   };
 }
 
@@ -315,6 +356,8 @@ export function renderStartEveReport(result = {}) {
     `Session policy: ${result.summary?.session_policy || ""}`,
     `Session reuse allowed: ${result.summary?.session_reuse_allowed === true}`,
     `Session HumanGate: ${result.summary?.session_human_gate || ""}`,
+    `Session registry status: ${result.summary?.session_registry_status || ""}`,
+    `Session registry hygiene: ${result.summary?.session_registry_hygiene || ""}`,
     "",
     "## Session Continuity",
     "",
@@ -324,6 +367,14 @@ export function renderStartEveReport(result = {}) {
     `Required registry state: ${result.session_continuity?.route_receipt?.required_registry_state || ""}`,
     "Blocked actions:",
     ...((result.session_continuity?.route_receipt?.blocked_actions || []).map((row) => `- ${row}`)),
+    "",
+    "## Local Session Registry",
+    "",
+    `Registry: ${result.session_registry?.registry_path || ""}`,
+    `Status: ${result.session_registry?.status || ""}`,
+    `Hygiene: ${result.session_registry?.hygiene?.status || ""}`,
+    `Generation: ${result.session_registry?.session?.generation || ""}`,
+    `Written: ${result.session_registry?.written === true}`,
     "",
     "## Stages",
     "",
