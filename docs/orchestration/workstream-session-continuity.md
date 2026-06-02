@@ -188,7 +188,8 @@ When in doubt, start fresh and load a bounded context slice.
 This policy can be documented in `0.9.0-rc.0` because it changes architecture
 truth and public setup expectations. Live continuity is a later product layer:
 
-1. `0.9.x`: policy, public registry, dry-run router and route receipts.
+1. `0.9.x`: policy, public registry, dry-run router, `/start_eve` route
+   receipts and report visibility.
 2. `1.0`: local workstream session registry and close-session hygiene.
 3. `1.2`: EVE/Command Center displays continuity sessions and receipts.
 4. `1.3+`: first live continuity pilot, preferably book or brand work.

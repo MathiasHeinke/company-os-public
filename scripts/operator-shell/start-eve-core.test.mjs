@@ -17,6 +17,7 @@ import {
   START_EVE_VERSION,
   writeStartEveReport,
 } from "./start-eve-core.mjs";
+import { DEFAULT_SESSION_CONTINUITY_REGISTRY_PATH } from "../orchestration/session-continuity-router.mjs";
 
 const THIS_DIR = path.dirname(fileURLToPath(import.meta.url));
 const START_EVE_CLI = path.join(THIS_DIR, "start_eve.mjs");
@@ -55,6 +56,10 @@ function makeFixture({ overlayApplied = true, hermesOutputsArgs = false } = {}) 
   writeFile(
     path.join(companyOsRoot, DEFAULT_EVE_RUNTIME_POLICY_FILE),
     fs.readFileSync(path.resolve(DEFAULT_EVE_RUNTIME_POLICY_FILE), "utf8"),
+  );
+  writeFile(
+    path.join(companyOsRoot, DEFAULT_SESSION_CONTINUITY_REGISTRY_PATH),
+    fs.readFileSync(path.resolve(DEFAULT_SESSION_CONTINUITY_REGISTRY_PATH), "utf8"),
   );
   for (const asset of AIONUI_COMMAND_EVE_ASSETS) {
     writeFile(path.join(companyOsRoot, asset.source), `asset:${asset.target}\n`);
@@ -148,6 +153,7 @@ test("runStartEve passes when overlay, sidecar preflight and start command are r
       ["aionui.default_agent_overlay", "already-applied"],
       ["eve.prepare", "pass"],
       ["eve.preflight", "pass"],
+      ["eve.session_continuity", "pass"],
       ["hermes.auth_model_smoke", "skipped"],
     ],
   );
@@ -157,6 +163,11 @@ test("runStartEve passes when overlay, sidecar preflight and start command are r
   assert.equal(result.summary.hermes_provider, "openrouter");
   assert.equal(result.summary.runtime_policy_profile, "command-eve-073-proposal-only");
   assert.equal(result.summary.runtime_policy_mode, "proposal_only");
+  assert.equal(result.summary.session_route_class, "SC2-workstream-continuity");
+  assert.equal(result.summary.session_policy, "workstream-continuity");
+  assert.equal(result.summary.session_reuse_allowed, true);
+  assert.equal(result.summary.session_human_gate, "HG-2.5");
+  assert.equal(result.session_continuity.route_receipt.required_registry_state, "open-workstream-session");
   assert.match(result.start_command.join("\n"), /COMMAND_EVE_RUNTIME_POLICY_PATH/);
   assert.match(result.start_command.join("\n"), /AIONUI_COMMAND_EVE_DISABLE_NATIVE_AUTONOMY="1"/);
 });
@@ -192,6 +203,26 @@ test("runStartEve can apply the Command EVE overlay before preflight", () => {
   assert.equal(result.stages[0].status, "pass");
   assert.equal(result.stages[0].overlay_applied, true);
   assert.ok(fs.existsSync(path.join(fixture.aionuiRoot, "public/command-eve-logo.svg")));
+});
+
+test("runStartEve blocks high-risk session-continuity startup classes", () => {
+  const fixture = makeFixture();
+  const result = runStartEve({
+    companyOsRoot: fixture.companyOsRoot,
+    privateRoot: fixture.privateRoot,
+    date: "2026-05-26",
+    sessionClass: "SC4-continuity-blocked",
+    sessionMessage: "Keep session open for a production write and legal commitment.",
+    sessionFields: { human_gate: "HG-4" },
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.status, "blocked");
+  assert.equal(result.failed_stage, "eve.session_continuity");
+  assert.ok(result.failures.includes("session-continuity.reuse-blocked"));
+  const stage = result.stages.find((row) => row.id === "eve.session_continuity");
+  assert.equal(stage.status, "blocked");
+  assert.equal(stage.route_class, "SC4-continuity-blocked");
 });
 
 test("runStartEve includes Hermes model/auth smoke when requested", () => {
@@ -230,7 +261,9 @@ test("writeStartEveReport writes markdown and json evidence", () => {
   assert.ok(fs.existsSync(report.json));
   assert.match(fs.readFileSync(report.markdown, "utf8"), /# Start EVE Preflight/);
   assert.match(fs.readFileSync(report.markdown, "utf8"), /Runtime policy: command-eve-073-proposal-only/);
+  assert.match(fs.readFileSync(report.markdown, "utf8"), /Session policy: workstream-continuity/);
   assert.equal(JSON.parse(fs.readFileSync(report.json, "utf8")).status, "ready");
+  assert.equal(JSON.parse(fs.readFileSync(report.json, "utf8")).summary.session_route_class, "SC2-workstream-continuity");
 });
 
 test("start_eve CLI emits JSON preflight for a prepared fixture", () => {
@@ -251,4 +284,6 @@ test("start_eve CLI emits JSON preflight for a prepared fixture", () => {
   assert.equal(parsed.status, "ready");
   assert.equal(parsed.summary.default_agent, "EVE via Hermes");
   assert.equal(parsed.summary.runtime_policy_profile, "command-eve-073-proposal-only");
+  assert.equal(parsed.summary.session_policy, "workstream-continuity");
+  assert.equal(parsed.session_continuity.route_receipt.route_class, "SC2-workstream-continuity");
 });

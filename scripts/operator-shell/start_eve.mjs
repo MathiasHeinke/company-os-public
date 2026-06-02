@@ -29,6 +29,9 @@ function parseArgs(argv) {
     timeoutMs: 180_000,
     provider: "",
     model: "",
+    sessionClass: "SC2-workstream-continuity",
+    sessionMessage: "",
+    sessionFields: {},
   };
   for (let index = 0; index < rest.length; index += 1) {
     const arg = rest[index];
@@ -53,6 +56,15 @@ function parseArgs(argv) {
     if (arg === "--timeout-ms") { args.timeoutMs = Number(nextValue()); continue; }
     if (arg === "--provider") { args.provider = nextValue(); continue; }
     if (arg === "--model") { args.model = nextValue(); continue; }
+    if (arg === "--session-class") { args.sessionClass = nextValue(); continue; }
+    if (arg === "--session-message") { args.sessionMessage = nextValue(); continue; }
+    if (arg === "--session-field") {
+      const raw = nextValue();
+      const equals = raw.indexOf("=");
+      if (equals === -1) throw new Error("--session-field expects key=value");
+      args.sessionFields[raw.slice(0, equals)] = raw.slice(equals + 1);
+      continue;
+    }
     throw new Error(`Unknown argument: ${arg}`);
   }
   return args;
@@ -68,6 +80,7 @@ What it checks:
   2. EVE sidecar context, SOUL.md, shims and private overlays are prepared
   3. Hermes default model/provider, ACP dependency and EVE soul preflight pass
   4. Optional Hermes auth/model smoke returns non-empty output
+  5. Session-continuity route receipt is generated for the initial EVE workstream
 
 Version: ${START_EVE_VERSION}
 `;
@@ -88,6 +101,9 @@ function optionsFromArgs(args) {
     timeoutMs: args.timeoutMs,
     provider: args.provider || undefined,
     model: args.model || undefined,
+    sessionClass: args.sessionClass,
+    sessionMessage: args.sessionMessage,
+    sessionFields: args.sessionFields,
   };
 }
 

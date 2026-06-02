@@ -71,8 +71,21 @@ node "${COMPANY_OS_ROOT}/scripts/operator-shell/start_eve.mjs" check \
 
 This runs the practical `/start_eve` preflight: Command EVE AionUI
 default-agent overlay, EVE sidecar prepare, EVE/Hermes preflight and optional
-Hermes model/auth smoke. It prints the local AionUI start command only after
-the chain is ready.
+Hermes model/auth smoke. It also generates the initial session-continuity route
+receipt for the EVE founder-companion workstream. It prints the local AionUI
+start command only after the chain is ready.
+
+Default `/start_eve` session policy:
+
+```text
+SC2-workstream-continuity
+```
+
+That keeps EVE/CEO planning continuity available for iterative setup work while
+production writes, external sends, customer data and Plane Done remain blocked.
+Use `--session-class auto` to let the router classify a custom message, or
+`--session-class SC0-fresh-task` when the first run should explicitly start
+fresh.
 
 For a read-only check that does not apply the AionUI overlay, omit
 `--apply-overlay`.

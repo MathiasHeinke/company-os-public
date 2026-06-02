@@ -12,8 +12,19 @@ import {
   preflightEveSidecar,
   runHermesEveSmoke,
 } from "./eve-sidecar-core.mjs";
+import {
+  DEFAULT_SESSION_CONTINUITY_REGISTRY_PATH,
+  routeSessionContinuity,
+  loadSessionContinuityRegistry,
+} from "../orchestration/session-continuity-router.mjs";
 
 export const START_EVE_VERSION = "start-eve/v0";
+export const DEFAULT_START_EVE_SESSION_CLASS = "SC2-workstream-continuity";
+export const DEFAULT_START_EVE_SESSION_MESSAGE = [
+  "Start Command EVE as the founder companion and Chief-of-Staff workstream.",
+  "Keep long-context EVE/CEO planning continuity available for iterative company setup.",
+  "Production writes, external sends, customer data and Plane Done remain blocked.",
+].join(" ");
 
 function compact(value) {
   return String(value ?? "").trim();
@@ -36,7 +47,7 @@ function stage(id, result = {}, extra = {}) {
   };
 }
 
-function blocked({ stages, failedStage, failures, nextActions, overlay, prepare, preflight, smoke, startCommand }) {
+function blocked({ stages, failedStage, failures, nextActions, overlay, prepare, preflight, sessionContinuity, smoke, startCommand }) {
   return {
     version: START_EVE_VERSION,
     sidecar_version: EVE_SIDECAR_VERSION,
@@ -48,16 +59,18 @@ function blocked({ stages, failedStage, failures, nextActions, overlay, prepare,
     overlay,
     prepare,
     preflight,
+    session_continuity: sessionContinuity,
     smoke,
     start_command: startCommand,
     next_actions: nextActions,
-    summary: summarize({ overlay, preflight }),
+    summary: summarize({ overlay, preflight, sessionContinuity }),
   };
 }
 
-function summarize({ overlay, preflight } = {}) {
+function summarize({ overlay, preflight, sessionContinuity } = {}) {
   const modelConfig = preflight?.hermes?.model_config || {};
   const runtimePolicy = preflight?.eve?.runtime_policy || {};
+  const routeReceipt = sessionContinuity?.route_receipt || {};
   return {
     default_agent: overlay?.overlay_applied || overlay?.overlay_applied_after ? "EVE via Hermes" : "not verified",
     aionui_version: preflight?.aionui?.version || "",
@@ -67,6 +80,59 @@ function summarize({ overlay, preflight } = {}) {
     soul_status: preflight?.hermes?.soul_location?.status || "",
     runtime_policy_profile: runtimePolicy.profile || "",
     runtime_policy_mode: runtimePolicy.default_mode || "",
+    session_route_class: routeReceipt.route_class || "",
+    session_policy: routeReceipt.session_policy || "",
+    session_reuse_allowed: routeReceipt.reuse_allowed === true,
+    session_human_gate: routeReceipt.human_gate || "",
+  };
+}
+
+function normalizeSessionClass(value) {
+  const text = compact(value);
+  if (!text) return DEFAULT_START_EVE_SESSION_CLASS;
+  if (text.toLowerCase() === "auto") return "";
+  return text;
+}
+
+export function routeStartEveSessionContinuity(options = {}) {
+  const companyOsRoot = path.resolve(options.companyOsRoot || process.cwd());
+  const registryPath = path.resolve(
+    options.sessionRegistry || path.join(companyOsRoot, DEFAULT_SESSION_CONTINUITY_REGISTRY_PATH),
+  );
+  const loaded = loadSessionContinuityRegistry(registryPath);
+  if (!loaded.ok) {
+    return {
+      ok: false,
+      status: "blocked",
+      registry_path: registryPath,
+      reason_codes: loaded.reason_codes || [],
+      evidence: loaded.evidence || {},
+      route_receipt: null,
+    };
+  }
+  const explicitClass = normalizeSessionClass(options.sessionClass);
+  const message = compact(options.sessionMessage) || DEFAULT_START_EVE_SESSION_MESSAGE;
+  const fields = {
+    source: "start_eve",
+    intent: "Command EVE operator-shell startup",
+    human_gate: "HG-2.5",
+    session_policy: "workstream-continuity",
+    scope: "EVE companion setup continuity; production writes remain blocked; external sends remain blocked; Plane Done remains blocked",
+    ...(options.sessionFields || {}),
+  };
+  const route = routeSessionContinuity({
+    registry: loaded.registry,
+    message,
+    fields,
+    explicitClass,
+  });
+  return {
+    ...route,
+    status: route.ok ? "pass" : "blocked",
+    registry_path: registryPath,
+    message,
+    requested_class: explicitClass || "auto",
+    fields,
   };
 }
 
@@ -140,6 +206,33 @@ export function runStartEve(options = {}) {
     });
   }
 
+  const sessionContinuity = routeStartEveSessionContinuity(options);
+  stages.push(stage("eve.session_continuity", sessionContinuity, {
+    status: sessionContinuity.ok ? "pass" : "blocked",
+    route_class: sessionContinuity.route_class || "",
+    session_policy: sessionContinuity.route_receipt?.session_policy || "",
+    reuse_allowed: sessionContinuity.route_receipt?.reuse_allowed === true,
+    human_gate: sessionContinuity.route_receipt?.human_gate || "",
+    reason_codes: sessionContinuity.reason_codes || [],
+  }));
+  if (!sessionContinuity.ok) {
+    return blocked({
+      stages,
+      failedStage: "eve.session_continuity",
+      failures: sessionContinuity.reason_codes || ["eve_session_continuity_route_failed"],
+      nextActions: [
+        "Fix the session-continuity registry or choose a lower-risk session class.",
+        "For normal EVE startup use --session-class SC2-workstream-continuity.",
+        "For high-risk/HG-4 work start fresh and prepare a Founder decision card instead.",
+      ],
+      overlay,
+      prepare,
+      preflight,
+      sessionContinuity,
+      startCommand,
+    });
+  }
+
   let smoke = null;
   if (options.authCheck) {
     smoke = runHermesEveSmoke({
@@ -187,6 +280,7 @@ export function runStartEve(options = {}) {
     overlay,
     prepare,
     preflight,
+    session_continuity: sessionContinuity,
     smoke,
     start_command: startCommand,
     next_actions: [
@@ -194,7 +288,7 @@ export function runStartEve(options = {}) {
       "Open the local URL and verify the first screen shows EVE with Hermes hidden behind the default agent path.",
       "Ask EVE what she already knows; she should load the boot packet before asking for broad setup data.",
     ],
-    summary: summarize({ overlay, preflight }),
+    summary: summarize({ overlay, preflight, sessionContinuity }),
   };
 }
 
@@ -217,6 +311,19 @@ export function renderStartEveReport(result = {}) {
     `Soul status: ${result.summary?.soul_status || ""}`,
     `Runtime policy: ${result.summary?.runtime_policy_profile || ""}`,
     `Runtime policy mode: ${result.summary?.runtime_policy_mode || ""}`,
+    `Session route class: ${result.summary?.session_route_class || ""}`,
+    `Session policy: ${result.summary?.session_policy || ""}`,
+    `Session reuse allowed: ${result.summary?.session_reuse_allowed === true}`,
+    `Session HumanGate: ${result.summary?.session_human_gate || ""}`,
+    "",
+    "## Session Continuity",
+    "",
+    `Registry: ${result.session_continuity?.registry_path || ""}`,
+    `Requested class: ${result.session_continuity?.requested_class || ""}`,
+    `Route reason: ${result.session_continuity?.route_receipt?.route_reason || ""}`,
+    `Required registry state: ${result.session_continuity?.route_receipt?.required_registry_state || ""}`,
+    "Blocked actions:",
+    ...((result.session_continuity?.route_receipt?.blocked_actions || []).map((row) => `- ${row}`)),
     "",
     "## Stages",
     "",
