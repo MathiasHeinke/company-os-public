@@ -1,0 +1,534 @@
+/* The toggle exists in the DOM because the runtime patch observes all EVE
+   bubbles, but it must only become visible in the mobile composition. */
+.mobile-eve-note-toggle {
+  display: none;
+}
+
+/* Closed quickbar links must never contribute layout size. The bundled CSS
+   only collapses width, which can leave an invisible wrapped nav making the
+   EVE pill tall on laptop-width viewports. */
+.command-topbar:not(:hover):not(:focus-within):not(.command-topbar-open) {
+  width: auto;
+}
+
+.command-topbar:not(:hover):not(:focus-within):not(.command-topbar-open) .quickbar-panel {
+  flex: 0 0 0 !important;
+  width: 0 !important;
+  max-width: 0 !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+@media (min-width: 681px) and (max-width: 1100px) {
+  .command-topbar {
+    height: 54px;
+    min-height: 54px;
+    align-items: center;
+  }
+
+  .command-topbar:hover .quickbar-panel,
+  .command-topbar:focus-within .quickbar-panel,
+  .command-topbar-open .quickbar-panel {
+    flex-wrap: nowrap;
+    width: min(620px, calc(100vw - 260px));
+    max-width: min(620px, calc(100vw - 260px));
+    height: 52px;
+    min-height: 52px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+  }
+
+  .command-topbar:hover .quickbar-panel::-webkit-scrollbar,
+  .command-topbar:focus-within .quickbar-panel::-webkit-scrollbar,
+  .command-topbar-open .quickbar-panel::-webkit-scrollbar {
+    display: none;
+  }
+
+  .quickbar-panel .quickbar-link {
+    min-height: 52px;
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 680px) {
+  .command-topbar {
+    top: 18px !important;
+    left: 18px !important;
+    z-index: 70;
+    width: auto !important;
+    min-height: 52px !important;
+    height: 52px !important;
+    max-width: calc(100vw - 112px);
+    overflow: visible !important;
+    border-color: rgba(17, 19, 25, .08) !important;
+    background: linear-gradient(135deg, rgba(255, 255, 255, .9), rgba(255, 255, 255, .62)) !important;
+    box-shadow: 0 18px 52px rgba(31, 36, 46, .14) !important;
+  }
+
+  .command-topbar::before {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(0, 184, 223, .18), transparent 34%),
+      radial-gradient(circle at 88% 82%, rgba(242, 165, 31, .14), transparent 34%),
+      rgba(250, 253, 253, .7);
+    content: "";
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .24s ease;
+    -webkit-backdrop-filter: blur(0) saturate(1);
+    backdrop-filter: blur(0) saturate(1);
+  }
+
+  .command-topbar.command-topbar-open {
+    position: fixed !important;
+    inset: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-width: none !important;
+    overflow: visible !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .command-topbar.command-topbar-open::before {
+    position: absolute;
+  }
+
+  .command-topbar.command-topbar-open::before {
+    opacity: 1;
+    pointer-events: auto;
+    -webkit-backdrop-filter: blur(20px) saturate(1.12);
+    backdrop-filter: blur(20px) saturate(1.12);
+  }
+
+  .brand-plate {
+    min-height: 50px !important;
+    padding: 8px 10px 8px 10px !important;
+    gap: 10px !important;
+    font-size: 13px;
+  }
+
+  .brand-glyph {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 11px !important;
+    font-size: 22px !important;
+  }
+
+  .command-nav-chevron {
+    width: 42px !important;
+    min-height: 50px !important;
+  }
+
+  .command-nav-chevron span {
+    font-size: 26px !important;
+  }
+
+  .command-topbar.command-topbar-open .brand-plate {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, .9), rgba(255, 255, 255, .62)) !important;
+    box-shadow: 0 18px 52px rgba(31, 36, 46, .14);
+  }
+
+  .command-topbar.command-topbar-open .command-nav-chevron {
+    position: absolute;
+    top: 18px;
+    left: 111px;
+    border: 1px solid rgba(17, 19, 25, .08);
+    background: linear-gradient(135deg, rgba(255, 255, 255, .9), rgba(255, 255, 255, .62));
+    box-shadow: 0 18px 52px rgba(31, 36, 46, .14);
+  }
+
+  .command-topbar:not(.command-topbar-open) .quickbar-panel,
+  .command-topbar:hover:not(.command-topbar-open) .quickbar-panel,
+  .command-topbar:focus-within:not(.command-topbar-open) .quickbar-panel {
+    position: fixed !important;
+    flex: none !important;
+    width: auto !important;
+    max-width: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateY(-10px) scale(.98) !important;
+  }
+
+  .command-topbar.command-topbar-open .quickbar-panel {
+    position: absolute !important;
+    top: 86px !important;
+    right: 16px !important;
+    bottom: 16px !important;
+    left: 16px !important;
+    z-index: 2;
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: auto !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    height: auto !important;
+    padding: 28px 18px !important;
+    overflow: auto !important;
+    border: 1px solid rgba(255, 255, 255, .55);
+    border-radius: 30px;
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, .82), rgba(255, 255, 255, .56)),
+      rgba(243, 251, 252, .72);
+    box-shadow: 0 30px 90px rgba(31, 36, 46, .2), inset 0 1px rgba(255, 255, 255, .72);
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transform: translateY(0) scale(1) !important;
+    -webkit-backdrop-filter: blur(28px) saturate(1.16);
+    backdrop-filter: blur(28px) saturate(1.16);
+  }
+
+  .command-topbar.command-topbar-open .quickbar-link {
+    width: min(300px, 76vw);
+    min-height: 52px !important;
+    padding: 0 18px !important;
+    border: 1px solid rgba(17, 19, 25, .08) !important;
+    border-radius: 18px !important;
+    background: rgba(255, 255, 255, .56) !important;
+    box-shadow: 0 12px 34px rgba(31, 36, 46, .08);
+    color: #141a21;
+    font-size: 14px !important;
+    letter-spacing: .13em;
+    text-align: center;
+  }
+
+  .command-topbar.command-topbar-open .quickbar-link:hover,
+  .command-topbar.command-topbar-open .quickbar-link:focus-visible {
+    border-color: rgba(0, 184, 223, .28) !important;
+    background: rgba(255, 255, 255, .78) !important;
+    color: var(--cyan-dark);
+    outline: none;
+  }
+
+  .command-topbar.command-topbar-open .quickbar-link span::after {
+    bottom: -7px;
+  }
+
+  .command-eve-nav-open body,
+  body.command-eve-nav-open {
+    overflow: hidden;
+  }
+
+  .stage {
+    overflow: hidden;
+  }
+
+  .caption-block {
+    left: 7vw !important;
+    top: 88px !important;
+    width: 86vw !important;
+    max-width: 86vw !important;
+    filter: none !important;
+    transform: none !important;
+  }
+
+  .caption-block .micro-caption {
+    margin-bottom: 10px;
+    font-size: 11px;
+    letter-spacing: .2em;
+  }
+
+  .caption-block h1 {
+    max-width: 86vw !important;
+    font-size: clamp(40px, 11.6vw, 54px) !important;
+    line-height: .98;
+    text-shadow:
+      0 1px 0 rgba(255, 255, 255, .82),
+      0 18px 48px rgba(255, 255, 255, .72),
+      0 0 30px rgba(255, 255, 255, .72);
+  }
+
+  .caption-block .scene-subline {
+    max-width: 84vw !important;
+    margin-top: 14px;
+    font-size: clamp(17px, 4.5vw, 20px) !important;
+    line-height: 1.34;
+    text-shadow:
+      0 1px 0 rgba(255, 255, 255, .9),
+      0 10px 30px rgba(255, 255, 255, .9),
+      0 0 22px rgba(255, 255, 255, .82);
+  }
+
+  .caption-accent {
+    padding: .04em .18em .13em;
+  }
+
+  .scene-explainer {
+    display: none !important;
+  }
+
+  .actor,
+  .actor-left,
+  .actor-right,
+  .actor-center {
+    left: 5vw !important;
+    top: clamp(318px, 42vh, 370px) !important;
+    width: 90vw !important;
+    height: clamp(280px, 38vh, 340px) !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    z-index: 12;
+  }
+
+  .actor-media-frame {
+    border-radius: clamp(30px, 9vw, 46px) !important;
+  }
+
+  .actor-frame-notch {
+    top: 58% !important;
+  }
+
+  .actor-still,
+  .companion-video {
+    object-fit: cover;
+    object-position: center 24%;
+  }
+
+  .actor-scene-appear .actor-still,
+  .actor-scene-appear .companion-video,
+  .actor-scene-intent .actor-still,
+  .actor-scene-intent .companion-video,
+  .actor-scene-universe .actor-still,
+  .actor-scene-universe .companion-video {
+    object-position: center 18%;
+  }
+
+  .actor-scene-review .actor-still,
+  .actor-scene-review .companion-video,
+  .actor-scene-brief .actor-still,
+  .actor-scene-brief .companion-video {
+    object-position: center 32%;
+  }
+
+  .eve-bubble {
+    left: 6.5vw !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: 92px !important;
+    width: 87vw !important;
+    max-width: none !important;
+    padding: 16px;
+    border-radius: 24px 24px 24px 9px;
+    filter: none !important;
+    transform: none !important;
+  }
+
+  .mobile-eve-note-toggle {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    font: inherit;
+    padding: 0;
+    text-align: left;
+  }
+
+  .mobile-eve-note-copy {
+    display: grid;
+    gap: 2px;
+  }
+
+  .mobile-eve-note-copy b {
+    color: var(--cyan-dark);
+    font-size: 11px;
+    font-weight: 950;
+    letter-spacing: .16em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .mobile-eve-note-copy span {
+    margin: 0;
+    color: #111319;
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 1.05;
+    text-transform: none;
+  }
+
+  .mobile-eve-note-icon {
+    display: grid;
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+    place-items: center;
+    border: 1px solid rgba(0, 184, 223, .2);
+    border-radius: 999px;
+    background: #ffffffb8;
+    color: var(--cyan-dark);
+    font-size: 20px;
+    font-weight: 950;
+    line-height: 1;
+    transition: transform .2s ease, background .2s ease;
+  }
+
+  .mobile-note-ready.mobile-note-collapsed {
+    min-height: 62px;
+    max-height: 62px;
+    overflow: hidden;
+    padding: 11px 13px;
+    border-radius: 999px;
+  }
+
+  .mobile-note-ready.mobile-note-collapsed > :not(.mobile-eve-note-toggle) {
+    display: none !important;
+  }
+
+  .mobile-note-ready.mobile-note-expanded {
+    max-height: calc(100vh - 178px);
+    overflow: auto;
+    padding: 14px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mobile-note-ready.mobile-note-expanded .mobile-eve-note-toggle {
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(17, 19, 25, .1);
+  }
+
+  .mobile-note-ready.mobile-note-expanded .mobile-eve-note-copy {
+    display: block;
+  }
+
+  .mobile-note-ready.mobile-note-expanded .mobile-eve-note-copy span {
+    display: none;
+  }
+
+  .mobile-note-ready.mobile-note-expanded .mobile-eve-note-icon {
+    background: #00b8df14;
+    transform: rotate(180deg);
+  }
+
+  .mobile-note-ready.mobile-note-expanded > strong {
+    font-size: clamp(21px, 5.8vw, 24px);
+  }
+
+  .mobile-note-ready.mobile-note-expanded .intake-field {
+    margin-top: 10px;
+  }
+
+  .mobile-note-ready.mobile-note-expanded .intake-field input {
+    min-height: 42px;
+  }
+
+  .mobile-note-ready.mobile-note-expanded .intake-control button {
+    top: 5px;
+    width: 32px;
+    height: 32px;
+  }
+
+  .eve-bubble strong {
+    font-size: clamp(22px, 6.5vw, 27px);
+    line-height: 1.02;
+  }
+
+  .eve-bubble:after {
+    width: 21px;
+    height: 21px;
+  }
+
+  .callout-tail-left:after,
+  .callout-tail-right:after,
+  .callout-tail-up:after,
+  .callout-tail-down:after {
+    top: -10px;
+    right: auto;
+    bottom: auto;
+    left: 50%;
+    transform: translate(-50%) rotate(225deg);
+  }
+
+  .eve-bubble.scene-universe {
+    top: auto !important;
+    bottom: 92px !important;
+    max-height: calc(100vh - 92px - 88px);
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .intake-field {
+    margin-top: 14px;
+  }
+
+  .intake-disclosure {
+    margin-top: 12px;
+  }
+
+  .scene-strip {
+    right: 12px;
+    bottom: 10px;
+    left: 12px;
+    grid-template-columns: repeat(7, 74px);
+    gap: 6px;
+    padding: 8px;
+    border-radius: 18px;
+  }
+
+  .scene-strip a {
+    min-height: 44px;
+    padding: 7px 8px;
+  }
+
+  .scene-strip span {
+    font-size: 10px;
+  }
+
+  .scene-strip b {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 420px) and (max-height: 760px) {
+  .caption-block {
+    top: 82px !important;
+  }
+
+  .caption-block h1 {
+    font-size: clamp(36px, 10.8vw, 48px) !important;
+  }
+
+  .caption-block .scene-subline {
+    font-size: 16px !important;
+    line-height: 1.3;
+  }
+
+  .actor,
+  .actor-left,
+  .actor-right,
+  .actor-center {
+    top: clamp(290px, 41vh, 330px) !important;
+    height: clamp(250px, 36vh, 292px) !important;
+  }
+
+  .eve-bubble {
+    bottom: 82px !important;
+  }
+}

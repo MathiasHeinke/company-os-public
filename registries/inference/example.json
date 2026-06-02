@@ -1,0 +1,36 @@
+{
+  "version": "inference-registry/example-v1",
+  "generated_at": "2026-01-01",
+  "routes": [
+    {
+      "task_class": "P0-trivial",
+      "label": "Small documentation or formatting task",
+      "agent": "claude",
+      "model_alias": "fast",
+      "max_runtime": "300s",
+      "permission_mode": "plan"
+    },
+    {
+      "task_class": "P1-docs-code-local",
+      "label": "Bounded docs or local code task",
+      "agent": "claude",
+      "model_alias": "balanced",
+      "max_runtime": "900s",
+      "permission_mode": "acceptEdits"
+    },
+    {
+      "task_class": "P2-code-shared",
+      "label": "Shared runtime, parser, controller or registry code",
+      "agent": "claude",
+      "model_alias": "deep",
+      "max_runtime": "1500s",
+      "permission_mode": "acceptEdits",
+      "controller_required": true
+    }
+  ],
+  "model_aliases": {
+    "fast": "[FAST_MODEL]",
+    "balanced": "[BALANCED_MODEL]",
+    "deep": "[DEEP_MODEL]"
+  }
+}

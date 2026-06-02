@@ -1,0 +1,13 @@
+# Local Company.OS installation state for this target workspace.
+# These files can contain company-specific paths, Plane IDs, gate owners and
+# pilot decisions. Keep examples/templates versioned; keep active state local.
+
+/install-record.md
+/company-discovery-brief.md
+/first-run-checklist.md
+/onboarding/intake-record.json
+/onboarding/first-plane-parent-draft.md
+/operations/workspace-registry.json
+/operations/software-stack.md
+/operations/human-gates.md
+/operations/automation-registry.md

@@ -1,0 +1,444 @@
+diff --git a/packages/desktop/src/renderer/components/layout/Layout.tsx b/packages/desktop/src/renderer/components/layout/Layout.tsx
+index 6558cd7..41abc7f 100644
+--- a/packages/desktop/src/renderer/components/layout/Layout.tsx
++++ b/packages/desktop/src/renderer/components/layout/Layout.tsx
+@@ -113,0 +114,4 @@ const Layout: React.FC<{
++  useEffect(() => {
++    document.title = 'EVE';
++  }, []);
++
+@@ -450 +454 @@ const Layout: React.FC<{
+-                  className={classNames('bg-black shrink-0 size-32px relative rd-0.5rem', {
++                  className={classNames('shrink-0 size-32px relative rd-0.5rem overflow-hidden', {
+@@ -455,22 +459,5 @@ const Layout: React.FC<{
+-                  <svg
+-                    className={classNames('w-5.5 h-5.5 absolute inset-0 m-auto', {
+-                      'scale-140': !collapsed,
+-                    })}
+-                    viewBox='0 0 80 80'
+-                    fill='none'
+-                  >
+-                    <path
+-                      key='logo-path-1'
+-                      d='M40 20 Q38 22 25 40 Q23 42 26 42 L30 42 Q32 40 40 30 Q48 40 50 42 L54 42 Q57 42 55 40 Q42 22 40 20'
+-                      fill='white'
+-                    ></path>
+-                    <circle key='logo-circle' cx='40' cy='46' r='3' fill='white'></circle>
+-                    <path
+-                      key='logo-path-2'
+-                      d='M18 50 Q40 70 62 50'
+-                      stroke='white'
+-                      strokeWidth='3.5'
+-                      fill='none'
+-                      strokeLinecap='round'
+-                    ></path>
+-                  </svg>
++                  <img
++                    src='/command-eve-logo.svg?v=command-eve-20260526'
++                    alt='Command EVE'
++                    className='absolute inset-0 size-full object-cover'
++                  />
+@@ -478 +465 @@ const Layout: React.FC<{
+-                <div className='text-16px text-t-primary collapsed-hidden font-semibold'>AionUi</div>
++                <div className='text-16px text-t-primary collapsed-hidden font-semibold'>EVE</div>
+diff --git a/packages/desktop/src/renderer/components/layout/Titlebar/index.tsx b/packages/desktop/src/renderer/components/layout/Titlebar/index.tsx
+index dd4f6ce..2eab7b4 100644
+--- a/packages/desktop/src/renderer/components/layout/Titlebar/index.tsx
++++ b/packages/desktop/src/renderer/components/layout/Titlebar/index.tsx
+@@ -61 +61 @@ const Titlebar: React.FC<TitlebarProps> = ({ workspaceAvailable }) => {
+-  const appTitle = useMemo(() => 'AionUi', []);
++  const appTitle = useMemo(() => 'EVE', []);
+diff --git a/packages/desktop/src/renderer/index.html b/packages/desktop/src/renderer/index.html
+index 70e64f3..4fb6214 100644
+--- a/packages/desktop/src/renderer/index.html
++++ b/packages/desktop/src/renderer/index.html
+@@ -6 +6 @@
+-    <meta name="application-name" content="AionUi" />
++    <meta name="application-name" content="EVE" />
+@@ -9 +9 @@
+-    <meta name="apple-mobile-web-app-title" content="AionUi" />
++    <meta name="apple-mobile-web-app-title" content="EVE" />
+@@ -15 +15 @@
+-    <title>AionUi</title>
++    <title>EVE</title>
+diff --git a/packages/desktop/src/renderer/pages/conversation/Messages/components/MessageAgentStatus.tsx b/packages/desktop/src/renderer/pages/conversation/Messages/components/MessageAgentStatus.tsx
+index 5c0c467..450a9ed 100644
+--- a/packages/desktop/src/renderer/pages/conversation/Messages/components/MessageAgentStatus.tsx
++++ b/packages/desktop/src/renderer/pages/conversation/Messages/components/MessageAgentStatus.tsx
+@@ -14,0 +15,2 @@ const { Text } = Typography;
++const COMMAND_EVE_AGENT_BACKEND = 'hermes';
++const COMMAND_EVE_DISPLAY_NAME = 'EVE';
+@@ -30,3 +32,5 @@ const MessageAgentStatus: React.FC<MessageAgentStatusProps> = ({ message }) => {
+-    agent_name ||
+-    cliAgents.find((a) => a.backend === backend || a.agent_type === backend)?.name ||
+-    backend.charAt(0).toUpperCase() + backend.slice(1);
++    backend === COMMAND_EVE_AGENT_BACKEND
++      ? COMMAND_EVE_DISPLAY_NAME
++      : agent_name ||
++        cliAgents.find((a) => a.backend === backend || a.agent_type === backend)?.name ||
++        backend.charAt(0).toUpperCase() + backend.slice(1);
+diff --git a/packages/desktop/src/renderer/pages/conversation/components/ChatConversation.tsx b/packages/desktop/src/renderer/pages/conversation/components/ChatConversation.tsx
+index 1a5a891..2359e78 100644
+--- a/packages/desktop/src/renderer/pages/conversation/components/ChatConversation.tsx
++++ b/packages/desktop/src/renderer/pages/conversation/components/ChatConversation.tsx
+@@ -35,0 +36,3 @@ import StarOfficeMonitorCard from '../platforms/openclaw/StarOfficeMonitorCard.t
++const COMMAND_EVE_AGENT_BACKEND = 'hermes';
++const COMMAND_EVE_DISPLAY_NAME = 'EVE';
++
+@@ -203,0 +207,2 @@ const ChatConversation: React.FC<{
++  const isCommandEveConversation =
++    conversation?.type === 'acp' && conversation.extra?.backend === COMMAND_EVE_AGENT_BACKEND;
+@@ -212 +217,3 @@ const ChatConversation: React.FC<{
+-  const assistantDisplayName = presetAssistantInfo?.name || conversationAgentName;
++  const assistantDisplayName = isCommandEveConversation
++    ? COMMAND_EVE_DISPLAY_NAME
++    : presetAssistantInfo?.name || conversationAgentName;
+@@ -310,0 +318 @@ const ChatConversation: React.FC<{
++      if (extra.backend === COMMAND_EVE_AGENT_BACKEND) return undefined;
+@@ -349 +357 @@ const ChatConversation: React.FC<{
+-          agent_name: conversationAgentName,
++          agent_name: isCommandEveConversation ? COMMAND_EVE_DISPLAY_NAME : conversationAgentName,
+diff --git a/packages/desktop/src/renderer/pages/conversation/platforms/acp/AcpSendBox.tsx b/packages/desktop/src/renderer/pages/conversation/platforms/acp/AcpSendBox.tsx
+index fa331b4..02a71e4 100644
+--- a/packages/desktop/src/renderer/pages/conversation/platforms/acp/AcpSendBox.tsx
++++ b/packages/desktop/src/renderer/pages/conversation/platforms/acp/AcpSendBox.tsx
+@@ -45,0 +46,2 @@ const EMPTY_UPLOAD_FILES: string[] = [];
++const COMMAND_EVE_AGENT_BACKEND = 'hermes';
++const COMMAND_EVE_DISPLAY_NAME = 'EVE';
+@@ -103,0 +106 @@ const AcpSendBox: React.FC<{
++  const displayBackendName = backend === COMMAND_EVE_AGENT_BACKEND ? COMMAND_EVE_DISPLAY_NAME : agent_name || backend;
+@@ -369 +372 @@ Please check your local CLI tool authentication status`,
+-          backend: agent_name || backend,
++          backend: displayBackendName,
+diff --git a/packages/desktop/src/renderer/pages/guid/GuidPage.tsx b/packages/desktop/src/renderer/pages/guid/GuidPage.tsx
+index e42475c..e609d8a 100644
+--- a/packages/desktop/src/renderer/pages/guid/GuidPage.tsx
++++ b/packages/desktop/src/renderer/pages/guid/GuidPage.tsx
+@@ -37,0 +38,26 @@ import styles from './index.module.css';
++const COMMAND_EVE_GUID_ENABLED = true;
++const COMMAND_EVE_AGENT_BACKEND = 'hermes';
++const COMMAND_EVE_DISPLAY_NAME = 'EVE';
++const COMMAND_EVE_WAIT_VIDEO_OPTIONS = [
++  {
++    src: '/eve-intent-wait.mp4?v=command-eve-wait-20260526b',
++    poster: '/eve-intent-wait-anchor.png?v=command-eve-wait-20260526b',
++  },
++  {
++    src: '/eve-wait-focus.mp4?v=command-eve-wait-20260526b',
++    poster: '/eve-wait-focus-anchor.png?v=command-eve-wait-20260526b',
++  },
++  {
++    src: '/eve-wait-companion.mp4?v=command-eve-wait-20260526b',
++    poster: '/eve-wait-companion-anchor.png?v=command-eve-wait-20260526b',
++  },
++  {
++    src: '/eve-wait-review.mp4?v=command-eve-wait-20260526b',
++    poster: '/eve-wait-review-anchor.png?v=command-eve-wait-20260526b',
++  },
++  {
++    src: '/eve-wait-call.mp4?v=command-eve-wait-20260526b',
++    poster: '/eve-wait-call-anchor.png?v=command-eve-wait-20260526b',
++  },
++] as const;
++
+@@ -48,0 +75,4 @@ const GuidPage: React.FC = () => {
++  const [commandEveWaitVideoIndex, setCommandEveWaitVideoIndex] = useState(() =>
++    Math.floor(Math.random() * COMMAND_EVE_WAIT_VIDEO_OPTIONS.length)
++  );
++  const commandEveWaitVideo = COMMAND_EVE_WAIT_VIDEO_OPTIONS[commandEveWaitVideoIndex];
+@@ -113,0 +144,16 @@ const GuidPage: React.FC = () => {
++  const commandEveAgentKey = useMemo(() => {
++    if (!COMMAND_EVE_GUID_ENABLED || !agentSelection.availableAgents) return undefined;
++    const hermesAgent = agentSelection.availableAgents.find(
++      (agent) =>
++        !agent.is_preset &&
++        (agent.backend === COMMAND_EVE_AGENT_BACKEND || agent.agent_type === COMMAND_EVE_AGENT_BACKEND)
++    );
++    return hermesAgent ? agentSelection.getAgentKey(hermesAgent) : undefined;
++  }, [agentSelection.availableAgents, agentSelection.getAgentKey]);
++
++  useEffect(() => {
++    if (!COMMAND_EVE_GUID_ENABLED || !commandEveAgentKey) return;
++    if (agentSelection.selectedAgentKey === commandEveAgentKey) return;
++    agentSelection.setSelectedAgentKey(commandEveAgentKey);
++  }, [agentSelection, commandEveAgentKey]);
++
+@@ -297,0 +344 @@ const GuidPage: React.FC = () => {
++  const commandEvePrompt = t('guid.commandEve.prompt');
+@@ -546 +593 @@ const GuidPage: React.FC = () => {
+-      modelSelectorNode={modelSelectorNode}
++      modelSelectorNode={COMMAND_EVE_GUID_ENABLED ? null : modelSelectorNode}
+@@ -581 +628,18 @@ const GuidPage: React.FC = () => {
+-            {agentSelection.is_presetAgent ? (
++            {COMMAND_EVE_GUID_ENABLED ? (
++              <div className={styles.commandEveHero} data-testid='command-eve-hero'>
++                <video
++                  key={commandEveWaitVideo.src}
++                  src={commandEveWaitVideo.src}
++                  poster={commandEveWaitVideo.poster}
++                  className={styles.commandEveWaitVideo}
++                  aria-hidden='true'
++                  autoPlay
++                  muted
++                  playsInline
++                  onEnded={() => {
++                    setCommandEveWaitVideoIndex((index) => (index + 1) % COMMAND_EVE_WAIT_VIDEO_OPTIONS.length);
++                  }}
++                />
++                <p className={styles.commandEvePrompt}>{commandEvePrompt}</p>
++              </div>
++            ) : agentSelection.is_presetAgent ? (
+@@ -689 +753 @@ const GuidPage: React.FC = () => {
+-          {agentSelection.is_presetAgent && selectedAssistantDescription ? (
++          {COMMAND_EVE_GUID_ENABLED ? null : agentSelection.is_presetAgent && selectedAssistantDescription ? (
+@@ -741 +805,3 @@ const GuidPage: React.FC = () => {
+-            placeholder={`${mention.selectedAgentLabel}, ${typewriterPlaceholder || t('conversation.welcome.placeholder')}`}
++            placeholder={`${
++              COMMAND_EVE_GUID_ENABLED ? COMMAND_EVE_DISPLAY_NAME : mention.selectedAgentLabel
++            }, ${typewriterPlaceholder || t('conversation.welcome.placeholder')}`}
+@@ -768,13 +834,15 @@ const GuidPage: React.FC = () => {
+-          <AssistantSelectionArea
+-            is_presetAgent={agentSelection.is_presetAgent}
+-            selectedAgentInfo={agentSelection.selectedAgentInfo}
+-            assistants={agentSelection.assistants}
+-            localeKey={localeKey}
+-            currentEffectiveAgentInfo={agentSelection.currentEffectiveAgentInfo}
+-            onSelectAssistant={handleSelectAssistant}
+-            onSetInput={guidInput.setInput}
+-            onFocusInput={guidInput.handleTextareaFocus}
+-            onRegisterOpenDetails={(openDetails) => {
+-              openAssistantDetailsRef.current = openDetails;
+-            }}
+-          />
++          {!COMMAND_EVE_GUID_ENABLED && (
++            <AssistantSelectionArea
++              is_presetAgent={agentSelection.is_presetAgent}
++              selectedAgentInfo={agentSelection.selectedAgentInfo}
++              assistants={agentSelection.assistants}
++              localeKey={localeKey}
++              currentEffectiveAgentInfo={agentSelection.currentEffectiveAgentInfo}
++              onSelectAssistant={handleSelectAssistant}
++              onSetInput={guidInput.setInput}
++              onFocusInput={guidInput.handleTextareaFocus}
++              onRegisterOpenDetails={(openDetails) => {
++                openAssistantDetailsRef.current = openDetails;
++              }}
++            />
++          )}
+@@ -783,6 +851,8 @@ const GuidPage: React.FC = () => {
+-        <QuickActionButtons
+-          onOpenLink={openLink}
+-          onOpenBugReport={() => setShowFeedbackModal(true)}
+-          inactiveBorderColor={inactiveBorderColor}
+-          activeShadow={activeShadow}
+-        />
++        {!COMMAND_EVE_GUID_ENABLED && (
++          <QuickActionButtons
++            onOpenLink={openLink}
++            onOpenBugReport={() => setShowFeedbackModal(true)}
++            inactiveBorderColor={inactiveBorderColor}
++            activeShadow={activeShadow}
++          />
++        )}
+diff --git a/packages/desktop/src/renderer/pages/guid/index.module.css b/packages/desktop/src/renderer/pages/guid/index.module.css
+index b36938d..35068c0 100644
+--- a/packages/desktop/src/renderer/pages/guid/index.module.css
++++ b/packages/desktop/src/renderer/pages/guid/index.module.css
+@@ -15 +15,31 @@
+-  margin-bottom: 16px;
++  margin-bottom: 24px;
++}
++
++.commandEveHero {
++  width: 100%;
++  display: flex;
++  flex-direction: column;
++  align-items: center;
++  gap: 18px;
++  text-align: center;
++}
++
++.commandEveWaitVideo {
++  width: clamp(132px, 12vw, 164px);
++  aspect-ratio: 1 / 1;
++  flex: 0 0 auto;
++  border-radius: 30px;
++  object-fit: cover;
++  object-position: center center;
++  display: block;
++  background: var(--color-fill-2);
++  box-shadow: 0 14px 34px color-mix(in srgb, var(--color-text-1) 16%, transparent);
++}
++
++.commandEvePrompt {
++  margin: 0;
++  color: var(--color-text-1);
++  font-size: 28px;
++  line-height: 34px;
++  font-weight: 700;
++  letter-spacing: 0;
+@@ -647 +677,3 @@
+-    width: clamp(var(--app-min-width, 360px), calc(100% - 24px), 100%);
++    width: 100%;
++    min-width: 0;
++    max-width: 100%;
+@@ -656,0 +689,18 @@
++  .heroHeader {
++    margin-bottom: 18px;
++  }
++
++  .commandEveHero {
++    gap: 12px;
++  }
++
++  .commandEveWaitVideo {
++    width: 112px;
++    border-radius: 24px;
++  }
++
++  .commandEvePrompt {
++    font-size: 23px;
++    line-height: 30px;
++  }
++
+diff --git a/packages/desktop/src/renderer/pages/login/index.tsx b/packages/desktop/src/renderer/pages/login/index.tsx
+index b856259..503ebce 100644
+--- a/packages/desktop/src/renderer/pages/login/index.tsx
++++ b/packages/desktop/src/renderer/pages/login/index.tsx
+@@ -1 +0,0 @@
+-import loginLogo from '@renderer/assets/logos/brand/app.png';
+@@ -17,0 +17 @@ const REMEMBERED_PASSWORD_KEY = 'rememberedPassword';
++const loginLogo = '/command-eve-logo.svg?v=command-eve-20260526';
+diff --git a/packages/desktop/src/renderer/services/i18n/i18n-keys.d.ts b/packages/desktop/src/renderer/services/i18n/i18n-keys.d.ts
+index 73d8737..7166c7d 100644
+--- a/packages/desktop/src/renderer/services/i18n/i18n-keys.d.ts
++++ b/packages/desktop/src/renderer/services/i18n/i18n-keys.d.ts
+@@ -624,0 +625 @@ export type I18nKey =
++  | 'guid.commandEve.prompt'
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/en-US/guid.json b/packages/desktop/src/renderer/services/i18n/locales/en-US/guid.json
+index 0a9e582..0121854 100644
+--- a/packages/desktop/src/renderer/services/i18n/locales/en-US/guid.json
++++ b/packages/desktop/src/renderer/services/i18n/locales/en-US/guid.json
+@@ -11,0 +12,3 @@
++  "commandEve": {
++    "prompt": "Hi, what's your plan for today?"
++  },
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/en-US/login.json b/packages/desktop/src/renderer/services/i18n/locales/en-US/login.json
+index 558b796..b846b86 100644
+--- a/packages/desktop/src/renderer/services/i18n/locales/en-US/login.json
++++ b/packages/desktop/src/renderer/services/i18n/locales/en-US/login.json
+@@ -2,2 +2,2 @@
+-  "pageTitle": "AionUi - Sign In",
+-  "brand": "AionUi",
++  "pageTitle": "EVE - Sign In",
++  "brand": "EVE",
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/ja-JP/guid.json b/packages/desktop/src/renderer/services/i18n/locales/ja-JP/guid.json
+index f81768a..772225a 100644
+--- a/packages/desktop/src/renderer/services/i18n/locales/ja-JP/guid.json
++++ b/packages/desktop/src/renderer/services/i18n/locales/ja-JP/guid.json
+@@ -11,0 +12,3 @@
++  "commandEve": {
++    "prompt": "今日は何を進めますか？"
++  },
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/ja-JP/login.json b/packages/desktop/src/renderer/services/i18n/locales/ja-JP/login.json
+index 133723d..7871dd9 100644
+--- a/packages/desktop/src/renderer/services/i18n/locales/ja-JP/login.json
++++ b/packages/desktop/src/renderer/services/i18n/locales/ja-JP/login.json
+@@ -2,2 +2,2 @@
+-  "pageTitle": "AionUi - ログイン",
+-  "brand": "AionUi",
++  "pageTitle": "EVE - ログイン",
++  "brand": "EVE",
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/ko-KR/guid.json b/packages/desktop/src/renderer/services/i18n/locales/ko-KR/guid.json
+index 8e6a14a..acef3fb 100644
+--- a/packages/desktop/src/renderer/services/i18n/locales/ko-KR/guid.json
++++ b/packages/desktop/src/renderer/services/i18n/locales/ko-KR/guid.json
+@@ -11,0 +12,3 @@
++  "commandEve": {
++    "prompt": "오늘은 무엇을 진행할까요?"
++  },
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/ko-KR/login.json b/packages/desktop/src/renderer/services/i18n/locales/ko-KR/login.json
+index 41d8b76..1c281b8 100644
+--- a/packages/desktop/src/renderer/services/i18n/locales/ko-KR/login.json
++++ b/packages/desktop/src/renderer/services/i18n/locales/ko-KR/login.json
+@@ -2,2 +2,2 @@
+-  "pageTitle": "AionUi - 로그인",
+-  "brand": "AionUi",
++  "pageTitle": "EVE - 로그인",
++  "brand": "EVE",
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/ru-RU/guid.json b/packages/desktop/src/renderer/services/i18n/locales/ru-RU/guid.json
+index 2d8470f..042fb52 100644
+--- a/packages/desktop/src/renderer/services/i18n/locales/ru-RU/guid.json
++++ b/packages/desktop/src/renderer/services/i18n/locales/ru-RU/guid.json
+@@ -11,0 +12,3 @@
++  "commandEve": {
++    "prompt": "Что планируем сегодня?"
++  },
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/tr-TR/guid.json b/packages/desktop/src/renderer/services/i18n/locales/tr-TR/guid.json
+index 379c63e..a8ea053 100644
+--- a/packages/desktop/src/renderer/services/i18n/locales/tr-TR/guid.json
++++ b/packages/desktop/src/renderer/services/i18n/locales/tr-TR/guid.json
+@@ -11,0 +12,3 @@
++  "commandEve": {
++    "prompt": "Bugün planın ne?"
++  },
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/tr-TR/login.json b/packages/desktop/src/renderer/services/i18n/locales/tr-TR/login.json
+index aa83f00..ae7bc50 100644
+--- a/packages/desktop/src/renderer/services/i18n/locales/tr-TR/login.json
++++ b/packages/desktop/src/renderer/services/i18n/locales/tr-TR/login.json
+@@ -2,2 +2,2 @@
+-  "pageTitle": "AionUi - Giriş Yap",
+-  "brand": "AionUi",
++  "pageTitle": "EVE - Giriş Yap",
++  "brand": "EVE",
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/uk-UA/guid.json b/packages/desktop/src/renderer/services/i18n/locales/uk-UA/guid.json
+index d6fe955..7e87167 100644
+--- a/packages/desktop/src/renderer/services/i18n/locales/uk-UA/guid.json
++++ b/packages/desktop/src/renderer/services/i18n/locales/uk-UA/guid.json
+@@ -11,0 +12,3 @@
++  "commandEve": {
++    "prompt": "Який план на сьогодні?"
++  },
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/uk-UA/login.json b/packages/desktop/src/renderer/services/i18n/locales/uk-UA/login.json
+index d2dc649..d05a10d 100644
+--- a/packages/desktop/src/renderer/services/i18n/locales/uk-UA/login.json
++++ b/packages/desktop/src/renderer/services/i18n/locales/uk-UA/login.json
+@@ -2,2 +2,2 @@
+-  "pageTitle": "AionUi — Вхід",
+-  "brand": "AionUi",
++  "pageTitle": "EVE — Вхід",
++  "brand": "EVE",
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/zh-CN/guid.json b/packages/desktop/src/renderer/services/i18n/locales/zh-CN/guid.json
+index 74b5fc5..7e466ef 100644
+--- a/packages/desktop/src/renderer/services/i18n/locales/zh-CN/guid.json
++++ b/packages/desktop/src/renderer/services/i18n/locales/zh-CN/guid.json
+@@ -11,0 +12,3 @@
++  "commandEve": {
++    "prompt": "今天你想推进什么？"
++  },
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/zh-CN/login.json b/packages/desktop/src/renderer/services/i18n/locales/zh-CN/login.json
+index ebcf68e..815703f 100644
+--- a/packages/desktop/src/renderer/services/i18n/locales/zh-CN/login.json
++++ b/packages/desktop/src/renderer/services/i18n/locales/zh-CN/login.json
+@@ -2,2 +2,2 @@
+-  "pageTitle": "AionUi - 登录",
+-  "brand": "AionUi",
++  "pageTitle": "EVE - 登录",
++  "brand": "EVE",
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/zh-TW/guid.json b/packages/desktop/src/renderer/services/i18n/locales/zh-TW/guid.json
+index 017eb2a..c5739e1 100644
+--- a/packages/desktop/src/renderer/services/i18n/locales/zh-TW/guid.json
++++ b/packages/desktop/src/renderer/services/i18n/locales/zh-TW/guid.json
+@@ -11,0 +12,3 @@
++  "commandEve": {
++    "prompt": "今天你想推進什麼？"
++  },
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/zh-TW/login.json b/packages/desktop/src/renderer/services/i18n/locales/zh-TW/login.json
+index 0cd09f5..9216428 100644
+--- a/packages/desktop/src/renderer/services/i18n/locales/zh-TW/login.json
++++ b/packages/desktop/src/renderer/services/i18n/locales/zh-TW/login.json
+@@ -2,2 +2,2 @@
+-  "pageTitle": "AionUi - 登入",
+-  "brand": "AionUi",
++  "pageTitle": "EVE - 登入",
++  "brand": "EVE",

@@ -1,0 +1,16 @@
+{
+  "name": "command-eve-site",
+  "version": "0.6.8-preview",
+  "private": true,
+  "description": "Command EVE public preview landing page.",
+  "scripts": {
+    "build": "node ./scripts/build-static.mjs",
+    "verify": "node ./scripts/verify-static-site.mjs",
+    "preview": "npx --yes serve ./dist -l 8791",
+    "deploy:preview": "npm run build && vercel deploy --yes --archive=tgz",
+    "deploy:production": "npm run build && vercel deploy --yes --prod --archive=tgz"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

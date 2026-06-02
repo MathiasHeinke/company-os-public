@@ -1,0 +1,145 @@
+{
+  "version": "eve-boot-packet/v0",
+  "generated_at": "2026-05-25T00:00:00.000Z",
+  "source_of_truth": [
+    ".company-os/onboarding/intake-record.json",
+    ".company-os/company-discovery-brief.md",
+    "reports/company-discovery/YYYY-MM-DD/first-company-packet.md",
+    ".company-os/eve/SOUL.md",
+    "docs/operations/eve-first-run-founder-onboarding.md",
+    "docs/operations/eve-soul-boot-contract.md",
+    "docs/operations/eve-founder-intent-operating-layer.md",
+    "docs/operations/command-eve-founder-offline-readiness.md"
+  ],
+  "north_star": {
+    "id": "founder-offline-test",
+    "name": "Founder Offline Test",
+    "mission": "Move the company toward a state where the Founder can turn off phone and laptop for 14 days while the company continues to earn, operate, ship, support customers, monitor risks, prepare decisions and protect the Founder's body and life.",
+    "decision_filter": "Does this move the company closer to the Founder Offline Test without bypassing Founder authority, HumanGates or the company safety model?",
+    "target_state": [
+      "recurring operating work continues without constant Founder attention",
+      "revenue, sales, support, content, bugfixing, follow-ups, monitoring, reporting and preparation keep moving through Company.OS",
+      "Founder sees crisp review packets instead of raw operational noise",
+      "health/life protection prevents the Founder from becoming the company's hidden battery"
+    ],
+    "hard_boundaries": [
+      "HG-4 remains Founder-owned",
+      "no strategic, non-restorable, legal, capital, public-voice, medical or major reputation decision executes autonomously",
+      "EVE reduces Founder dependency without replacing Founder authority"
+    ]
+  },
+  "account_seed": {
+    "user_name": "Founder Name",
+    "company_name": "Example Company",
+    "website": "https://example.com",
+    "domain": "https://example.com",
+    "primary_offer": "What the company sells",
+    "buyer": "Who buys and approves",
+    "why_now": "Why this buyer needs help now",
+    "first_department": "marketing-outreach",
+    "initial_report_context": "Optional summary from signup, landing-page report or AI Business Blueprint.",
+    "confidence": "operator_confirmed_input_required"
+  },
+  "runtime_probe": {
+    "aionui_status": "unknown_until_preflight",
+    "hermes_profile_status": "unknown_until_preflight",
+    "model_provider_status": "unknown_until_preflight",
+    "memory_status": "memory_sources_pending",
+    "filesystem_scope": "client_workspace_only",
+    "connected_tools": [],
+    "already_available": [],
+    "missing_or_blocked": []
+  },
+  "capability_matrix": [
+    {
+      "tier": "T0",
+      "name": "Talk, confirm seed and remember allowed local context",
+      "status": "available_after_model_auth",
+      "requires": ["account_seed", "EVE soul", "model provider", "local workspace"],
+      "not_required": ["Honcho", "GitHub", "Supabase", "Plane worker dispatch"]
+    },
+    {
+      "tier": "T1",
+      "name": "Company understanding and setup continuity",
+      "status": "available_after_intake_confirmation",
+      "requires": [".company-os/onboarding/intake-record.json", ".company-os/company-discovery-brief.md"],
+      "not_required": ["public actions", "scheduled autonomy"]
+    },
+    {
+      "tier": "T2",
+      "name": "Existing-system inventory",
+      "status": "needs_read_only_review",
+      "requires": ["execution ledger or declared task sources", "roles and people sources", "operator approval"],
+      "not_required": ["migration", "duplication"]
+    },
+    {
+      "tier": "T3",
+      "name": "Company.OS-native work planning",
+      "status": "manual_draft_only",
+      "requires": ["Plane parent draft", "role labels", "worker contracts with dispatch: manual"],
+      "not_required": ["dispatch: ready", "Plane Done"]
+    }
+  ],
+  "first_greeting_protocol": {
+    "posture": "chief_of_staff_not_setup_bot",
+    "must_start_with_known_context": true,
+    "ask_for_confirmation_before_saving": true,
+    "max_initial_questions": 3,
+    "first_choice_set": [
+      "confirm company model",
+      "inspect existing tools and task sources",
+      "define first operating goal"
+    ]
+  },
+  "progressive_setup_queue": {
+    "now": [
+      "confirm account seed",
+      "confirm memory boundaries",
+      "inventory existing ledgers, task sources, roles and owners",
+      "choose first department wedge"
+    ],
+    "soon": [
+      "connect only the tools needed for the first wedge",
+      "draft Founder Intent Packet",
+      "draft CEO Delegation Packet",
+      "draft first Plane parent and child contracts with dispatch: manual"
+    ],
+    "later": [
+      "Honcho durable memory split",
+      "GitHub/GitNexus codegraph work",
+      "department-specific connectors",
+      "scheduled routines after CAO/controller evidence"
+    ]
+  },
+  "operating_boundaries": {
+    "required_core_for_company_os_native": [
+      "Git remote",
+      "Company.OS Kit",
+      "Plane",
+      "local memory bank",
+      "install record",
+      "software stack",
+      "human gates"
+    ],
+    "required_for_autonomy": ["Honcho", "Codex", "Claude Code", "GitNexus", "Capability Registry", "Runtime Dispatcher"],
+    "optional_connectors": [
+      "AionUI",
+      "Hermes Agent",
+      "Supabase",
+      "Upload-Post",
+      "Google Analytics/Search Console",
+      "Stripe",
+      "Google Calendar",
+      "Google Drive"
+    ],
+    "adapt_existing_systems_first": true,
+    "create_new_ledger_only_if_missing": true,
+    "blocked_actions": ["public publishing", "external outreach", "new spend"],
+    "no_go_zones": ["production writes", "public publishing"]
+  },
+  "memory_policy": {
+    "allowed_sources": [".company-os/company-discovery-brief.md", ".company-os/onboarding/intake-record.json"],
+    "forbidden_sources": [".env", "browser cookies", "raw private chat logs"],
+    "save_requires_confirmation": true
+  }
+}

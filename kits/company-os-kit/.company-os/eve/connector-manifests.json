@@ -1,0 +1,238 @@
+{
+  "version": "eve-connector-manifest/v0",
+  "updated_at": "2026-05-28",
+  "policy": {
+    "default_mode": "read_only_first",
+    "setup_order": "need_driven",
+    "secret_rule": "Never ask for passwords, cookies, recovery codes, payment details, raw tokens or .env contents in chat.",
+    "write_rule": "Write-capable connectors require CEO/Codex review and the matching HumanGate before use.",
+    "state_authority": "local-preflight-result-files-only",
+    "ui_state_model": {
+      "manifest_state_source": "tier and setup_mode fields in this file — policy only, not proof of live connectivity",
+      "evidence_state_source": ".company-os/operations/preflight-results/<connector-id>-latest.json written by the verify_command or guided setup wizard",
+      "connected_requires": "evidence file must exist and contain ok:true; gated connectors require the declared HumanGate release evidence regardless of any evidence file",
+      "gated_override_rule": "gated and optional_gated connectors never transition to connected via an evidence file alone; the declared HumanGate must be released first",
+      "card_states": ["installed", "available", "needs_auth", "unverified", "gated", "connected", "blocked"]
+    }
+  },
+  "connectors": [
+    {
+      "id": "local-company-os-workspace",
+      "name": "Local Company.OS Workspace",
+      "tier": "core",
+      "purpose": "Find onboarding packets, local memory, install state, workspace registry and source-of-truth docs.",
+      "required_for": ["T0", "T1", "T2"],
+      "auth_method": "local filesystem",
+      "auth_surface": "installed Company.OS workspace",
+      "setup_mode": "bootstrap",
+      "safe_preflight": [
+        "Check .company-os/onboarding/eve-boot-packet.json",
+        "Check .company-os/onboarding/intake-record.json",
+        "Check .company-os/company-discovery-brief.md",
+        "Check reports/company-discovery/YYYY-MM-DD/first-company-packet.md"
+      ],
+      "verify_command": "node scripts/operator-shell/eve-sidecar.mjs preflight --company-os-root ${COMPANY_OS_ROOT}",
+      "allowed_actions": ["read onboarding artifacts", "read install record", "read workspace registry"],
+      "blocked_actions": ["overwrite local memory", "rewrite intake seed without confirmation"],
+      "human_gate": "HG-1 before persisting corrected company facts",
+      "memory_policy": "local-first; persist only confirmed facts",
+      "preflight_result_file": ".company-os/operations/preflight-results/local-company-os-workspace-latest.json"
+    },
+    {
+      "id": "aionui-hermes-runtime",
+      "name": "AionUI + Hermes Runtime",
+      "tier": "core",
+      "purpose": "Provide the operator shell, EVE runtime soul, default model route and sidecar-local context bundle.",
+      "required_for": ["T0"],
+      "auth_method": "local profile plus configured model provider",
+      "auth_surface": "AionUI session and HERMES_HOME",
+      "setup_mode": "operator_shell_prepare",
+      "safe_preflight": [
+        "Check AionUI package",
+        "Check Hermes executable",
+        "Check HERMES_HOME/SOUL.md",
+        "Check model.default/provider",
+        "Check ACP dependency"
+      ],
+      "verify_command": "node scripts/operator-shell/eve-sidecar.mjs smoke --company-os-root ${COMPANY_OS_ROOT} --write-report",
+      "allowed_actions": ["start local chat", "load generated EVE context", "draft packets"],
+      "blocked_actions": ["browser credential scraping", "hidden model/provider switching", "sidecar self-update without explicit step"],
+      "human_gate": "HG-2 before changing runtime auth/model defaults for a client",
+      "memory_policy": "runtime cache only unless the install packet permits persistence",
+      "preflight_result_file": ".company-os/operations/preflight-results/aionui-hermes-runtime-latest.json"
+    },
+    {
+      "id": "execution-ledger-plane",
+      "name": "Plane Execution Ledger",
+      "tier": "core",
+      "purpose": "Hold Company.OS parent contracts, child worker contracts, status, blockers and review gates.",
+      "required_for": ["T3", "T4", "T6"],
+      "auth_method": "Plane App connector preferred; app-token bridge fallback",
+      "auth_surface": "Plane workspace",
+      "setup_mode": "guided_connector",
+      "safe_preflight": [
+        "Discover Plane connector",
+        "Fallback to scripts/plane/plane-app-token-rotation.mjs --mode ensure",
+        "Run scripts/plane/plane-api-sanity.mjs --workspace companyos --auth app-token --json"
+      ],
+      "verify_command": "node scripts/plane/plane-api-sanity.mjs --workspace companyos --auth app-token --json",
+      "allowed_actions": ["read projects", "read work items", "draft worker contracts"],
+      "blocked_actions": ["mark Done", "dispatch workers", "migrate or duplicate existing ledgers without review"],
+      "human_gate": "HG-3 before write-capable ledger changes; Done stays Founder/CEO authority",
+      "memory_policy": "execution truth only; do not store private raw memory in Plane",
+      "preflight_result_file": ".company-os/operations/preflight-results/execution-ledger-plane-latest.json"
+    },
+    {
+      "id": "memory-honcho",
+      "name": "Honcho Memory",
+      "tier": "autonomy_core",
+      "purpose": "Provide durable cross-session memory once the founder approves persistence boundaries.",
+      "required_for": ["T1", "T6"],
+      "auth_method": "configured Honcho MCP or scoped workspace token",
+      "auth_surface": "Honcho workspace",
+      "setup_mode": "guided_connector",
+      "safe_preflight": [
+        "Confirm correct Honcho workspace",
+        "Confirm peer/session routing",
+        "Confirm memory boundary rules"
+      ],
+      "verify_command": "manual connector preflight: query/create test conclusion in the approved workspace only",
+      "allowed_actions": ["read approved conclusions", "write confirmed decisions", "write session summaries"],
+      "blocked_actions": ["persist private facts without consent", "mix personal, app-user and developer workspaces"],
+      "human_gate": "HG-2 before first durable memory write",
+      "memory_policy": "explicit consent per workspace; never raw secrets or private raw chats",
+      "preflight_result_file": ".company-os/operations/preflight-results/memory-honcho-latest.json"
+    },
+    {
+      "id": "obsidian-brain-interface",
+      "name": "Obsidian Brain Interface",
+      "tier": "optional",
+      "purpose": "Provide a local visual cockpit over existing Company.OS Markdown truth without creating a second memory or execution ledger.",
+      "required_for": ["operator_preference_only"],
+      "auth_method": "local filesystem",
+      "auth_surface": "Obsidian desktop app and local workspace folder",
+      "setup_mode": "deferred_optional_connector",
+      "safe_preflight": [
+        "Confirm Obsidian mode: disabled, read_cockpit, dashboard_bases or activity_log_spike",
+        "Confirm local vault path",
+        "Confirm .obsidian state remains local-only unless reviewed",
+        "Confirm community plugins are disabled for baseline",
+        "Confirm Web Viewer is disabled or public-only"
+      ],
+      "verify_command": "manual: open the existing workspace root as local vault and complete .company-os/operations/obsidian-brain-interface.md",
+      "allowed_actions": ["read local Markdown", "create local dashboard views", "propose selected note properties"],
+      "blocked_actions": ["commit .obsidian state by default", "enable community plugins by default", "use Web Viewer for sensitive apps", "copy Plane or Honcho state as a second ledger"],
+      "human_gate": "HG-1 for local read cockpit; HG-2 before activity-log hooks; HG-3 before team-wide settings or custom plugins",
+      "memory_policy": "interface only; durable memory remains in approved Company.OS memory layers",
+      "preflight_result_file": ".company-os/operations/preflight-results/obsidian-brain-interface-latest.json"
+    },
+    {
+      "id": "github-gitnexus",
+      "name": "GitHub + GitNexus",
+      "tier": "autonomy_core",
+      "purpose": "Support code delegation, repo discovery, codegraph impact analysis, PRs and update paths.",
+      "required_for": ["T4", "T5", "T6"],
+      "auth_method": "GitHub CLI/OAuth plus local GitNexus index",
+      "auth_surface": "GitHub account/org and local repos",
+      "setup_mode": "guided_connector",
+      "safe_preflight": [
+        "Run gh auth status",
+        "Run git status in target repos",
+        "Run gitnexus status",
+        "Run gitnexus impact before symbol edits"
+      ],
+      "verify_command": "gh auth status && gitnexus status",
+      "allowed_actions": ["read repos", "inspect PRs", "draft PR descriptions", "run codegraph checks"],
+      "blocked_actions": ["push or merge without approval", "grant broad repo scopes by default", "send private repo content to external workers without redaction"],
+      "human_gate": "HG-3 before write-capable GitHub actions; HG-4 for public release positioning",
+      "memory_policy": "store repo metadata and decisions, not secrets or raw private prompts",
+      "preflight_result_file": ".company-os/operations/preflight-results/github-gitnexus-latest.json"
+    },
+    {
+      "id": "google-calendar-drive",
+      "name": "Google Calendar + Drive",
+      "tier": "recommended",
+      "purpose": "Use calendar as attention layer and Drive/Docs as source documents for company setup and reporting.",
+      "required_for": ["T2", "T5"],
+      "auth_method": "Google OAuth through connector",
+      "auth_surface": "Calendar, Drive, Docs, Sheets, Slides",
+      "setup_mode": "guided_connector",
+      "safe_preflight": [
+        "Confirm account identity",
+        "Confirm read/write scopes separately",
+        "List calendars or Drive files read-only before writes"
+      ],
+      "verify_command": "connector-specific: list calendars or search Drive read-only",
+      "allowed_actions": ["read calendar availability", "read approved docs", "create approved attention blocks"],
+      "blocked_actions": ["mass calendar writes", "sharing docs externally", "reading unrelated personal Drive without scope"],
+      "human_gate": "HG-2 for read scopes; HG-3 for write/share actions",
+      "memory_policy": "summaries only; preserve document links and access boundaries",
+      "preflight_result_file": ".company-os/operations/preflight-results/google-calendar-drive-latest.json"
+    },
+    {
+      "id": "google-mail",
+      "name": "Google Mail",
+      "tier": "gated",
+      "purpose": "Optional communication connector for later reply queues, outreach and stakeholder follow-up.",
+      "required_for": ["department_wedge_only"],
+      "auth_method": "Google OAuth with explicit mail scopes",
+      "auth_surface": "Gmail",
+      "setup_mode": "deferred_gated_connector",
+      "safe_preflight": [
+        "Confirm the exact mailbox",
+        "Confirm read vs send scope",
+        "Confirm legal/comms owner",
+        "Run read-only label/search test before any draft"
+      ],
+      "verify_command": "connector-specific: read-only mailbox label/search test",
+      "allowed_actions": ["read approved labels", "draft emails for review"],
+      "blocked_actions": ["send mail", "mass outreach", "read private inbox broadly", "store sensitive message bodies"],
+      "human_gate": "HG-4 before sending or public/stakeholder communication",
+      "memory_policy": "do not persist raw email bodies unless explicitly approved",
+      "preflight_result_file": ".company-os/operations/preflight-results/google-mail-latest.json"
+    },
+    {
+      "id": "product-backend-stack",
+      "name": "Supabase + Vercel + Stripe",
+      "tier": "gated",
+      "purpose": "Operate product backend, deploy surface and payment rails only after the relevant release gates exist.",
+      "required_for": ["product_wedge_only"],
+      "auth_method": "provider connectors or scoped CLI auth",
+      "auth_surface": "Supabase, Vercel, Stripe",
+      "setup_mode": "deferred_gated_connector",
+      "safe_preflight": [
+        "Confirm project/org/team",
+        "Confirm environment",
+        "Confirm read-only vs write scope",
+        "Check rollback and evidence paths"
+      ],
+      "verify_command": "provider-specific read-only sanity checks",
+      "allowed_actions": ["read config", "inspect deployments", "inspect non-sensitive payment metadata"],
+      "blocked_actions": ["service-role writes", "schema/RLS changes", "production deploys", "refunds/charges/subscription changes"],
+      "human_gate": "HG-3 for backend/deploy/payment writes; HG-4 for customer-impacting changes",
+      "memory_policy": "never store service-role keys, payment details or customer secrets",
+      "preflight_result_file": ".company-os/operations/preflight-results/product-backend-stack-latest.json"
+    },
+    {
+      "id": "marketing-publishing-stack",
+      "name": "Upload-Post + Social + Analytics",
+      "tier": "optional_gated",
+      "purpose": "Support marketing attribution, publishing, social analytics and department-specific growth loops.",
+      "required_for": ["marketing_wedge_only"],
+      "auth_method": "tool-specific OAuth/API connection",
+      "auth_surface": "Upload-Post, LinkedIn, analytics, CRM and social tools",
+      "setup_mode": "deferred_gated_connector",
+      "safe_preflight": [
+        "Confirm brand/account owner",
+        "Read recent history/analytics first",
+        "Classify publishing vs analytics scopes separately"
+      ],
+      "verify_command": "tool-specific read-only history/analytics pull",
+      "allowed_actions": ["read history", "read analytics exports", "draft campaign packets"],
+      "blocked_actions": ["publish", "schedule posts", "start paid spend", "scrape credentials"],
+      "human_gate": "HG-4 before public publishing or brand voice changes",
+      "memory_policy": "archive exports in approved raw folders; do not persist private cookies or session storage",
+      "preflight_result_file": ".company-os/operations/preflight-results/marketing-publishing-stack-latest.json"
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "schema_version": "company-os-workspace-registry/v1",
+  "company": {
+    "name": "Example Company",
+    "timezone": "Europe/Berlin",
+    "developer_root": "${DEVELOPER_ROOT}"
+  },
+  "defaults": {
+    "controller": "codex",
+    "execution_ledger": "plane",
+    "plane_workspace_slug": "<plane-workspace-slug>",
+    "plane_default_project_id": "<plane-project-uuid>",
+    "linear_bridge_enabled": false,
+    "event_ledger": "metrics/agent-events.jsonl",
+    "cost_ledger": "metrics/ai-cost-ledger.jsonl",
+    "report_root": "reports/work-orders",
+    "sandbox_roots": [
+      "${SANDBOX_ROOT}"
+    ],
+    "default_branches": [
+      "main",
+      "master"
+    ],
+    "integration_branch": "main",
+    "max_worktrees": 1,
+    "allow_stashes": false,
+    "allow_no_upstream": false,
+    "human_gate_owner": "Founder",
+    "autonomy_ceiling": "L2"
+  },
+  "workspaces": {
+    "company-os": {
+      "path": "${COMPANY_OS_ROOT}",
+      "type": "operating-system",
+      "department": "Governance",
+      "plane_project_id": "<plane-project-uuid>",
+      "linear_bridge": {
+        "enabled": false,
+        "team": "",
+        "project": ""
+      },
+      "default_controller": "codex",
+      "gitnexus_required": false,
+      "sensitive_data_class": "internal",
+      "autonomy_ceiling": "L2",
+      "build_commands": [],
+      "test_commands": [
+        "node scripts/agent-events/validate-agent-events.mjs --file metrics/agent-events.jsonl --soft"
+      ]
+    },
+    "product": {
+      "path": "${DEVELOPER_ROOT}/product",
+      "type": "product",
+      "department": "Engineering",
+      "plane_project_id": "<plane-project-uuid>",
+      "linear_bridge": {
+        "enabled": false,
+        "team": "",
+        "project": ""
+      },
+      "default_controller": "codex",
+      "gitnexus_required": true,
+      "sensitive_data_class": "internal",
+      "autonomy_ceiling": "L2",
+      "build_commands": [
+        "npm run build"
+      ],
+      "test_commands": [
+        "npm test"
+      ]
+    },
+    "website": {
+      "path": "${DEVELOPER_ROOT}/website",
+      "type": "marketing-website",
+      "department": "Growth",
+      "plane_project_id": "<plane-project-uuid>",
+      "linear_bridge": {
+        "enabled": false,
+        "team": "",
+        "project": ""
+      },
+      "default_controller": "codex",
+      "gitnexus_required": true,
+      "sensitive_data_class": "public-content",
+      "autonomy_ceiling": "L2",
+      "build_commands": [
+        "npm run build"
+      ],
+      "test_commands": [
+        "npm test"
+      ]
+    }
+  },
+  "doctrine": {
+    "execution_ledger_note": "Plane is the canonical execution ledger for new Company.OS work. Linear is legacy/bridge-only; populate per-workspace linear_bridge.enabled=true plus team/project only if your install is still inside the migration cohort defined in docs/orchestration/plane-first-linear-bridge.md.",
+    "plane_doctrine_refs": [
+      "docs/orchestration/plane-first-linear-bridge.md",
+      "docs/orchestration/plane-role-routing.md",
+      "docs/orchestration/plane-worker-dispatcher-v0.md",
+      "docs/templates/worker-issue-contract.md"
+    ]
+  },
+  "blocked_actions": [
+    "production_write",
+    "deploy",
+    "schema_rls_auth_change",
+    "service_role_change",
+    "public_publish",
+    "external_outreach",
+    "unbudgeted_spend",
+    "direct_done_transition",
+    "worker_memory_write",
+    "new_linear_issue_outside_bridge"
+  ]
+}

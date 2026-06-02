@@ -1,0 +1,141 @@
+name: Agent Worker Issue
+description: Bounded Company.OS worker issue for Codex, Claude, Gemini, a human, or another agent.
+title: "[Agent Worker]: "
+labels:
+  - agent-worker
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for concrete execution work. Do not use it for raw ideas, memory dumps, or vague reminders.
+  - type: input
+    id: agent
+    attributes:
+      label: Agent
+      description: codex, claude, gemini, human, or another named worker.
+      placeholder: claude
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Mode
+      options:
+        - audit
+        - plan
+        - implement
+        - verify
+        - research
+        - report
+    validations:
+      required: true
+  - type: input
+    id: workspace
+    attributes:
+      label: Workspace
+      description: Absolute path, repo name, or registry key.
+      placeholder: product-repo
+    validations:
+      required: true
+  - type: dropdown
+    id: dispatch
+    attributes:
+      label: Dispatch
+      options:
+        - manual
+        - scheduled
+    validations:
+      required: true
+  - type: input
+    id: run_at
+    attributes:
+      label: RunAt
+      description: Local datetime and timezone when scheduled. Leave blank for manual.
+      placeholder: "2026-05-07 22:10 Europe/Berlin"
+  - type: input
+    id: depends_on
+    attributes:
+      label: DependsOn
+      description: Issues, PRs, milestones, reports, or gates this depends on.
+      placeholder: "#123, #124"
+  - type: textarea
+    id: source_of_truth
+    attributes:
+      label: SourceOfTruth
+      description: Docs, code paths, issues, dashboards, reports or data sources to read first.
+      placeholder: |
+        - docs/operations/autonomous-ops-loop.md
+        - docs/templates/worker-issue-contract.md
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: Include and exclude boundaries.
+      placeholder: |
+        Include:
+        - ...
+
+        Exclude:
+        - ...
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: Verifiable output required before the issue can be closed.
+      placeholder: |
+        - Report written to reports/...
+        - Controller review complete
+        - Tests pass
+    validations:
+      required: true
+  - type: textarea
+    id: gates
+    attributes:
+      label: Gates
+      description: Commands, reviews, or checks required.
+      placeholder: |
+        - git status --short
+        - test/build command
+        - controller review
+    validations:
+      required: true
+  - type: textarea
+    id: always_allow
+    attributes:
+      label: AlwaysAllow
+      description: Routine in-scope actions the scheduler may execute without another human click.
+      placeholder: |
+        Always allow reading source docs/issues, posting lock/heartbeat/outcome comments, writing private reports, appending ledger rows, and running bounded read-only worker commands inside this issue's approved scope.
+    validations:
+      required: true
+  - type: textarea
+    id: runtime_auth
+    attributes:
+      label: RuntimeAuth
+      description: CLI/connector auth checks required before dispatch.
+      placeholder: |
+        For Claude: run `claude -p "Return exactly: CLAUDE_AUTH_OK" --model 'claude-opus-4-7[1m]' --permission-mode plan --output-format text --max-turns 1` and require `CLAUDE_AUTH_OK`.
+    validations:
+      required: true
+  - type: textarea
+    id: human_gate
+    attributes:
+      label: HumanGate
+      description: Stop conditions requiring explicit human approval.
+      placeholder: |
+        Stop before production writes, public publishing, money movement, medical/legal claims, schema/RLS changes, or direct Done transitions.
+    validations:
+      required: true
+  - type: textarea
+    id: reporting
+    attributes:
+      label: Reporting
+      description: Where the worker should report results.
+      placeholder: |
+        Comment back with report path, changed files, commands/results, blockers, and exact approval needed.
+    validations:
+      required: true

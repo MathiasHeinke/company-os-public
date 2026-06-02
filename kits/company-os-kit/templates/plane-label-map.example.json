@@ -1,0 +1,25 @@
+{
+  "version": "plane-label-map/v0",
+  "workspace": "<plane-workspace-slug>",
+  "project_id": "<plane-project-uuid>",
+  "generated_at": "1970-01-01T00:00:00.000Z",
+  "generated_by": "plane-role-labels-bootstrap.mjs --auth api-key --write-label-map",
+  "_doctrine": {
+    "purpose": "Plane App bot tokens currently lack projects.labels:read scope. The dispatcher resolves a work item's label UUIDs to role:* names through this map, generated once per project with the legacy API key. The map carries no secrets.",
+    "regenerate_when": [
+      "a new role:* label is added to the project",
+      "an existing role:* label is renamed",
+      "a label is recreated (UUID changes)"
+    ],
+    "store_at": "runtime/plane-label-map/<workspace>-<project_id>.json (gitignored)",
+    "env_override": "PLANE_LABEL_MAP_PATH"
+  },
+  "labels": [
+    { "id": "<label-uuid-1>", "name": "role:cto" },
+    { "id": "<label-uuid-2>", "name": "role:cpo" },
+    { "id": "<label-uuid-3>", "name": "role:cmo" },
+    { "id": "<label-uuid-4>", "name": "role:coo" },
+    { "id": "<label-uuid-5>", "name": "role:cfo" },
+    { "id": "<label-uuid-6>", "name": "role:cao" }
+  ]
+}

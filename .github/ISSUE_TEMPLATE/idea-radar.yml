@@ -1,0 +1,60 @@
+name: Idea Radar Candidate
+description: Capture a non-urgent idea without making it active execution work.
+title: "[Idea Radar]: "
+labels:
+  - idea-radar
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this when an idea may be useful but is not yet committed work.
+  - type: textarea
+    id: idea
+    attributes:
+      label: Idea
+      description: What is the idea?
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why It Might Matter
+      description: What could improve if this is pursued?
+    validations:
+      required: true
+  - type: dropdown
+    id: horizon
+    attributes:
+      label: Horizon
+      options:
+        - now
+        - next
+        - later
+        - research
+        - trash
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence Or Source Pointer
+      description: Link to report, issue, session note, customer signal, metric, or code path.
+    validations:
+      required: true
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks / Distraction Cost
+      description: Why might this be a bad idea right now?
+  - type: dropdown
+    id: decision
+    attributes:
+      label: CEO Decision Needed
+      options:
+        - decide now
+        - park
+        - kill
+        - schedule exploration
+        - no decision yet
+    validations:
+      required: true

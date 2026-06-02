@@ -1,0 +1,130 @@
+{
+  "version": "eve-runtime-policy/v0",
+  "updated_at": "2026-05-29",
+  "profile": "command-eve-073-proposal-only",
+  "release_band": "0.7.3",
+  "default_mode": "proposal_only",
+  "north_star": "founder-offline-test",
+  "policy_summary": "Command EVE may act as the founder-facing AionUI/Hermes Chief-of-Staff layer, but native AionUI/Hermes autonomy remains disabled or gated until Company.OS CEO/CAO/HumanGate evidence promotes it.",
+  "human_gates": {
+    "durable_memory_write": "HG-2",
+    "runtime_auth_or_model_default_change": "HG-2",
+    "worker_dispatch": "HG-2.5",
+    "public_publish_send_schedule_spend": "HG-4",
+    "founder_offline_claim": "HG-4"
+  },
+  "surfaces": {
+    "aionui": {
+      "mode": "founder_shell_only",
+      "allowed_actions": [
+        "show Command EVE as the default founder-facing shell",
+        "send chat messages to the configured Hermes runtime",
+        "upload local files only for user-selected chat context",
+        "open local project folders selected by the user",
+        "show proposal cards and read-only evidence"
+      ],
+      "disabled_features": [
+        {
+          "id": "native-scheduled-tasks",
+          "name": "AionUI Scheduled Tasks / Cron",
+          "reason": "Company.OS scheduler, hard-cron wrapper and controller gates are the only released recurring execution path."
+        },
+        {
+          "id": "team-mode",
+          "name": "AionUI Team Mode",
+          "reason": "Team/agent collaboration must be modeled as Plane parent/child contracts first."
+        },
+        {
+          "id": "assistant-switching",
+          "name": "Visible assistant/runtime switching",
+          "reason": "0.7.3 presents EVE over Hermes as the default shell; other runtimes remain backend routes, not founder-facing choices."
+        },
+        {
+          "id": "yolo-full-auto",
+          "name": "YOLO / full-auto permission mode",
+          "reason": "EVE is proposal-only until CEO/Codex and CAO promote a bounded lane."
+        },
+        {
+          "id": "direct-plane-writes",
+          "name": "Direct Plane writes from AionUI",
+          "reason": "Plane writes route through Company.OS controller/scheduler paths, not the UI shell."
+        }
+      ],
+      "env": {
+        "AIONUI_COMMAND_EVE_PROFILE": "command-eve-073-proposal-only",
+        "AIONUI_COMMAND_EVE_DEFAULT_AGENT": "hermes",
+        "AIONUI_COMMAND_EVE_DISABLE_NATIVE_AUTONOMY": "1",
+        "AIONUI_COMMAND_EVE_DISABLE_SCHEDULED_TASKS": "1",
+        "AIONUI_COMMAND_EVE_DISABLE_TEAM_MODE": "1",
+        "AIONUI_COMMAND_EVE_DISABLE_ASSISTANT_SWITCHING": "1"
+      }
+    },
+    "hermes": {
+      "mode": "proposal_only_runtime",
+      "allowed_actions": [
+        "load SOUL.md and runtime boot packet",
+        "answer from approved Company.OS context",
+        "draft Founder Intent Packets",
+        "draft CEO Delegation Packets",
+        "draft Plane worker contracts with dispatch: manual",
+        "propose Honcho memory candidates"
+      ],
+      "disabled_features": [
+        {
+          "id": "native-cronjob",
+          "name": "Hermes native cronjob execution",
+          "reason": "Recurring execution must use Company.OS hard-cron/scheduler gates."
+        },
+        {
+          "id": "delegate-task-spawn",
+          "name": "Hermes direct task delegation/spawn",
+          "reason": "Worker dispatch requires CEO/Codex review, Stage 0.5/0.65 and Plane contracts."
+        },
+        {
+          "id": "kanban-mutation",
+          "name": "Hermes direct kanban mutation",
+          "reason": "Execution ledger writes require Plane-first controller authority."
+        },
+        {
+          "id": "broad-toolsets",
+          "name": "Broad native toolset activation",
+          "reason": "Tool capabilities must be scoped through Company.OS connector manifests and CapabilityProfiles."
+        }
+      ],
+      "gated_features": [
+        {
+          "id": "durable-memory-writes",
+          "name": "Honcho durable memory writes",
+          "human_gate": "HG-2",
+          "reason": "Memory writes are proposal-only until the correct Honcho workspace, peer and persistence boundary are confirmed."
+        },
+        {
+          "id": "model-default-change",
+          "name": "Hermes default model/provider change",
+          "human_gate": "HG-2",
+          "reason": "Runtime auth/model changes affect client cost, privacy and reliability."
+        }
+      ],
+      "env": {
+        "COMMAND_EVE_RUNTIME_PROFILE": "command-eve-073-proposal-only",
+        "COMMAND_EVE_PROPOSAL_ONLY": "1",
+        "HERMES_COMMAND_EVE_DISABLE_NATIVE_CRON": "1",
+        "HERMES_COMMAND_EVE_DISABLE_DELEGATION": "1",
+        "HERMES_COMMAND_EVE_DISABLE_KANBAN_MUTATION": "1",
+        "HERMES_COMMAND_EVE_MEMORY_POLICY": "proposal-only"
+      }
+    }
+  },
+  "blocked_actions": [
+    "no Plane writes from AionUI",
+    "no Plane Done",
+    "no dispatch: ready",
+    "no worker dispatch from EVE/Hermes/AionUI",
+    "no deploy, publish, send, schedule or spend",
+    "no native AionUI/Hermes cron or team autonomy",
+    "no raw secrets, cookies, browser storage or private raw memory",
+    "no durable Honcho memory writes before HG-2 setup",
+    "no HG-4 approval"
+  ],
+  "promotion_rule": "A disabled or gated native feature may move only through a Plane child contract, CAO/controller review, evidence report and the declared HumanGate. Configuration alone is not promotion evidence."
+}

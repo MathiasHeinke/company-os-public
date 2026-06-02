@@ -1,0 +1,105 @@
+{
+  "version": "post-worker-quality-loop/v0",
+  "generated_at": "2026-05-27",
+  "purpose": "Decide the deterministic post-worker quality follow-up after a worker.reported and CAO/controller signal, without letting the controller spawn workers directly.",
+  "defaults": {
+    "controller_may_spawn_workers": false,
+    "scheduler_may_spawn_from_markers_only": true,
+    "max_auto_hotfix_rounds": 1,
+    "hotfix_requires_fresh_audit_afterward": true
+  },
+  "worker_classes": [
+    {
+      "id": "quality-auditor",
+      "agent": "codex",
+      "mode": "audit",
+      "capability_profile": "codex-lower-worker/cto/quality-auditor",
+      "writes": ["reports/audits/**", "Plane controller.audit-followup comment"],
+      "blocked_actions": ["source-code-write", "merge", "push", "deploy", "production-write", "plane-done"]
+    },
+    {
+      "id": "security-auditor",
+      "agent": "claude",
+      "mode": "audit",
+      "capability_profile": "claude-lower-worker/cto/security-auditor",
+      "writes": ["reports/audits/**", "Plane controller.audit-followup comment"],
+      "blocked_actions": ["source-code-write", "merge", "push", "deploy", "production-write", "secret-print", "plane-done"]
+    },
+    {
+      "id": "bug-regression-auditor",
+      "agent": "claude",
+      "mode": "audit",
+      "capability_profile": "claude-lower-worker/cto/bug-regression-auditor",
+      "writes": ["reports/audits/**", "Plane controller.audit-followup comment"],
+      "blocked_actions": ["source-code-write", "merge", "push", "deploy", "production-write", "plane-done"]
+    },
+    {
+      "id": "deep-audit-worker",
+      "agent": "claude",
+      "mode": "audit",
+      "capability_profile": "claude-lower-worker/cto/deep-audit",
+      "writes": ["reports/audits/**", "Plane controller.audit-followup comment"],
+      "blocked_actions": ["source-code-write", "merge", "push", "deploy", "production-write", "plane-done"],
+      "runtime_note": "Opus/max-context audits must not be duplicated before the declared silent window expires."
+    },
+    {
+      "id": "hotfix-worker",
+      "agent": "claude",
+      "mode": "implement",
+      "capability_profile": "claude-lower-worker/cto/hotfix",
+      "writes": ["declared AllowedWritePaths only", "reports/runs/**", "Plane worker.hotfix-reported comment"],
+      "blocked_actions": ["merge", "push", "deploy", "production-write", "schema/RLS/auth", "public-publish", "plane-done"]
+    }
+  ],
+  "matrix": {
+    "P0-doc-small": {
+      "mandatory_followups": ["controller-rerun-gates"],
+      "audit_on_fail": ["quality-auditor"],
+      "auto_hotfix_allowed": false
+    },
+    "P1-code-bounded": {
+      "mandatory_followups": ["controller-rerun-gates"],
+      "audit_on_fail": ["bug-regression-auditor"],
+      "security_audit_on_security_signal": true,
+      "auto_hotfix_allowed": true,
+      "max_auto_hotfix_rounds": 1
+    },
+    "P2-code-shared": {
+      "mandatory_followups": ["quality-auditor"],
+      "audit_on_fail": ["quality-auditor", "security-auditor"],
+      "security_audit_on_security_signal": true,
+      "auto_hotfix_allowed": false,
+      "requires_ceo_delegate_for_hotfix": true
+    },
+    "P3-cross-repo": {
+      "mandatory_followups": ["quality-auditor", "deep-audit-worker"],
+      "audit_on_fail": ["quality-auditor", "deep-audit-worker", "security-auditor"],
+      "auto_hotfix_allowed": false,
+      "requires_ceo_delegate_for_hotfix": true
+    },
+    "P4-high-risk": {
+      "mandatory_followups": [],
+      "audit_on_fail": ["security-auditor", "deep-audit-worker"],
+      "auto_hotfix_allowed": false,
+      "autonomous_spawn_allowed": false,
+      "requires_human_gate": true
+    }
+  },
+  "stop_gates": [
+    "secret-or-credential-exposure",
+    "schema-rls-auth-change",
+    "production-write",
+    "public-publish",
+    "material-spend",
+    "legal-or-regulated-claim",
+    "high-severity-finding",
+    "hg3-or-higher-without-release-card",
+    "hotfix-round-limit-exceeded"
+  ],
+  "plane_markers": {
+    "audit_request": "controller.audit-followup",
+    "hotfix_request": "controller.hotfix-request",
+    "hotfix_report": "worker.hotfix-reported",
+    "self_fix_acceptance": "controller.self-fix-accepted"
+  }
+}

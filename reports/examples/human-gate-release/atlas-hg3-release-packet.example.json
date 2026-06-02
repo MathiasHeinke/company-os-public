@@ -1,0 +1,74 @@
+{
+  "generated_at": "2026-05-24T10:00:00.000Z",
+  "human_gate_release": {
+    "level": "HG-3",
+    "released_by": "Codex-GPT-5.5-xhigh",
+    "release_authority": "CEO_CRITICAL",
+    "founder_prediction_confidence": 0.97,
+    "decision": "CEO_CRITICAL_RELEASE",
+    "requested_actions": [
+      "merge ATLAS desktop MVP release branch",
+      "deploy private beta control plane",
+      "run reversible production configuration promotion"
+    ],
+    "conditions": [
+      "Private beta only",
+      "Rollback proof remains valid",
+      "No HG-4 strategic or public-launch action is included"
+    ],
+    "blocked_actions_still_forbidden": [
+      "HG-4 strategic direction",
+      "non-restorable deletion",
+      "public launch",
+      "founder-voice outreach",
+      "material spend"
+    ],
+    "rollback_path": "Restore the previous private beta artifact, revert the configuration promotion and replay the rollback checklist.",
+    "rollback_verification": {
+      "status": "pass",
+      "restore_path": "private-beta-snapshot-2026-05-24"
+    },
+    "blast_radius": {
+      "level": "staged",
+      "surface": "private beta desktop control plane"
+    },
+    "cao_verdict": {
+      "verdict": "PASS",
+      "report_path": "https://company-os.example/evidence/atlas-hg3-cao-pass.md"
+    }
+  },
+  "source_of_truth": [
+    "https://company-os.example/docs/atlas/desktop-mvp-hg3-release-source.md"
+  ],
+  "gates": [
+    {
+      "id": "focused-tests",
+      "status": "pass",
+      "evidence_path": "https://company-os.example/evidence/atlas-hg3-focused-tests.md"
+    },
+    {
+      "id": "rollback-drill",
+      "status": "pass",
+      "evidence_path": "https://company-os.example/evidence/atlas-hg3-rollback-drill.md"
+    },
+    {
+      "id": "artifact-truth",
+      "status": "pass",
+      "evidence_path": "https://company-os.example/evidence/atlas-hg3-artifact-truth.md"
+    }
+  ],
+  "artifact_truth": [
+    {
+      "pipeline": "atlas-desktop-mvp",
+      "status": "passed",
+      "ok": true,
+      "date": "2026-05-24",
+      "report_path": "https://company-os.example/evidence/atlas-hg3-artifact-truth.md"
+    }
+  ],
+  "budget": {
+    "status": "pass",
+    "estimated_usd": 0.12,
+    "limit_usd": 1
+  }
+}

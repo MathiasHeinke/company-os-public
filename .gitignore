@@ -1,0 +1,36 @@
+.DS_Store
+node_modules/
+dist/
+out/
+.vite/
+.env
+.env.*
+!.env.example
+tmp/
+reports/private/
+reports/model-router/
+# Raw worker streams and local debug pointers are retained locally but are not
+# publishable evidence artifacts. Commit compact reports such as .runtime.md.
+reports/**/*.stream.jsonl
+reports/**/latest
+marketing/performance/
+runtime/
+*.log
+test-results/
+metrics/locks/
+assets/brand/eve-command/cinematic/
+
+.gitnexus
+
+# Local Company.OS installation state. These files contain machine-specific
+# paths, auth/runtime proof artifacts, or operator-local setup decisions.
+.company-os/operations/workspace-registry.json
+.company-os/operations/automation-registry.md
+.company-os/operations/software-stack.md
+.company-os/operations/human-gates.md
+.company-os/install-record.md
+.company-os/company-discovery-brief.md
+.company-os/first-run-checklist.md
+.company-os/onboarding/intake-record.json
+.company-os/onboarding/eve-boot-packet.json
+.company-os/onboarding/first-plane-parent-draft.md

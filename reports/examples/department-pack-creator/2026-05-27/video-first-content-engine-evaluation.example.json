@@ -1,0 +1,655 @@
+{
+  "version": "company-os-department-pack-evaluator/v0",
+  "generated_at": "2026-05-27T00:00:00.000Z",
+  "date": "2026-05-27",
+  "root": "${COMPANY_OS_ROOT}",
+  "pack_id": "video-first-content-engine",
+  "status": "READY",
+  "paths": {
+    "department_pack": "${COMPANY_OS_ROOT}/docs/orchestration/company-os-video-first-content-engine-department-pack-v0.md",
+    "kit_setup": "${COMPANY_OS_ROOT}/kits/company-os-kit/.company-os/domain-packs/video-first-content-engine/setup.md",
+    "workflow": "${COMPANY_OS_ROOT}/kits/company-os-kit/.agents/workflows/video-first-content-engine-setup.md",
+    "eve_skill": "${COMPANY_OS_ROOT}/docs/integrations/aionui-hermes-video-first-content-engine-skill.md",
+    "parent_contract": "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-parent-worker-contract.md",
+    "research_contract": "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-research-worker-contract.md",
+    "draft_contract": "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-draft-worker-contract.md",
+    "scaffold_report": "${COMPANY_OS_ROOT}/reports/examples/video-first-content-engine-pack/README.example.md",
+    "evaluation_example": "${COMPANY_OS_ROOT}/reports/examples/department-pack-creator/video-first-content-engine-evaluation.example.md",
+    "capability_registry": "${COMPANY_OS_ROOT}/registries/capabilities/company-os.json",
+    "output_dir": "${COMPANY_OS_ROOT}/reports/examples/department-pack-creator/2026-05-27",
+    "markdown": "${COMPANY_OS_ROOT}/reports/examples/department-pack-creator/2026-05-27/video-first-content-engine-evaluation.example.md",
+    "json": "${COMPANY_OS_ROOT}/reports/examples/department-pack-creator/2026-05-27/video-first-content-engine-evaluation.example.json"
+  },
+  "checks": [
+    {
+      "status": "pass",
+      "id": "artifact.department_pack_missing",
+      "message": "Department pack SOP is present.",
+      "details": {
+        "key": "department_pack",
+        "path": "${COMPANY_OS_ROOT}/docs/orchestration/company-os-video-first-content-engine-department-pack-v0.md"
+      }
+    },
+    {
+      "status": "pass",
+      "id": "artifact.kit_setup_missing",
+      "message": "Kit setup runbook is present.",
+      "details": {
+        "key": "kit_setup",
+        "path": "${COMPANY_OS_ROOT}/kits/company-os-kit/.company-os/domain-packs/video-first-content-engine/setup.md"
+      }
+    },
+    {
+      "status": "pass",
+      "id": "artifact.workflow_missing",
+      "message": "Agent workflow is present.",
+      "details": {
+        "key": "workflow",
+        "path": "${COMPANY_OS_ROOT}/kits/company-os-kit/.agents/workflows/video-first-content-engine-setup.md"
+      }
+    },
+    {
+      "status": "pass",
+      "id": "artifact.eve_skill_missing",
+      "message": "EVE/Hermes skill is present.",
+      "details": {
+        "key": "eve_skill",
+        "path": "${COMPANY_OS_ROOT}/docs/integrations/aionui-hermes-video-first-content-engine-skill.md"
+      }
+    },
+    {
+      "status": "pass",
+      "id": "artifact.worker_contract_missing",
+      "message": "Parent worker contract is present.",
+      "details": {
+        "key": "parent_contract",
+        "path": "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-parent-worker-contract.md"
+      }
+    },
+    {
+      "status": "pass",
+      "id": "artifact.worker_contract_missing",
+      "message": "Research worker contract is present.",
+      "details": {
+        "key": "research_contract",
+        "path": "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-research-worker-contract.md"
+      }
+    },
+    {
+      "status": "pass",
+      "id": "artifact.worker_contract_missing",
+      "message": "Draft worker contract is present.",
+      "details": {
+        "key": "draft_contract",
+        "path": "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-draft-worker-contract.md"
+      }
+    },
+    {
+      "status": "pass",
+      "id": "artifact.scaffold_report_missing",
+      "message": "Scaffold report is present.",
+      "details": {
+        "key": "scaffold_report",
+        "path": "${COMPANY_OS_ROOT}/reports/examples/video-first-content-engine-pack/README.example.md"
+      }
+    },
+    {
+      "status": "pass",
+      "id": "contract.flat_yaml",
+      "message": "Contract contains a flat yaml fence with role.",
+      "details": {
+        "path": "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-parent-worker-contract.md"
+      }
+    },
+    {
+      "status": "pass",
+      "id": "contract.source_of_truth",
+      "message": "Contract declares source_of_truth.",
+      "details": {
+        "path": "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-parent-worker-contract.md"
+      }
+    },
+    {
+      "status": "pass",
+      "id": "contract.acceptance",
+      "message": "Contract declares acceptance_criteria.",
+      "details": {
+        "path": "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-parent-worker-contract.md"
+      }
+    },
+    {
+      "status": "pass",
+      "id": "contract.gates",
+      "message": "Contract declares gates.",
+      "details": {
+        "path": "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-parent-worker-contract.md"
+      }
+    },
+    {
+      "status": "pass",
+      "id": "contract.reflection",
+      "message": "Contract requires reflection.",
+      "details": {
+        "path": "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-parent-worker-contract.md"
+      }
+    },
+    {
+      "status": "pass",
+      "id": "contract.learning",
+      "message": "Contract requires learning proposals.",
+      "details": {
+        "path": "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-parent-worker-contract.md"
+      }
+    },
+    {
+      "status": "pass",
+      "id": "contract.flat_yaml",
+      "message": "Contract contains a flat yaml fence with role.",
+      "details": {
+        "path": "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-research-worker-contract.md"
+      }
+    },
+    {
+      "status": "pass",
+      "id": "contract.source_of_truth",
+      "message": "Contract declares source_of_truth.",
+      "details": {
+        "path": "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-research-worker-contract.md"
+      }
+    },
+    {
+      "status": "pass",
+      "id": "contract.acceptance",
+      "message": "Contract declares acceptance_criteria.",
+      "details": {
+        "path": "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-research-worker-contract.md"
+      }
+    },
+    {
+      "status": "pass",
+      "id": "contract.gates",
+      "message": "Contract declares gates.",
+      "details": {
+        "path": "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-research-worker-contract.md"
+      }
+    },
+    {
+      "status": "pass",
+      "id": "contract.reflection",
+      "message": "Contract requires reflection.",
+      "details": {
+        "path": "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-research-worker-contract.md"
+      }
+    },
+    {
+      "status": "pass",
+      "id": "contract.learning",
+      "message": "Contract requires learning proposals.",
+      "details": {
+        "path": "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-research-worker-contract.md"
+      }
+    },
+    {
+      "status": "pass",
+      "id": "contract.flat_yaml",
+      "message": "Contract contains a flat yaml fence with role.",
+      "details": {
+        "path": "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-draft-worker-contract.md"
+      }
+    },
+    {
+      "status": "pass",
+      "id": "contract.source_of_truth",
+      "message": "Contract declares source_of_truth.",
+      "details": {
+        "path": "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-draft-worker-contract.md"
+      }
+    },
+    {
+      "status": "pass",
+      "id": "contract.acceptance",
+      "message": "Contract declares acceptance_criteria.",
+      "details": {
+        "path": "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-draft-worker-contract.md"
+      }
+    },
+    {
+      "status": "pass",
+      "id": "contract.gates",
+      "message": "Contract declares gates.",
+      "details": {
+        "path": "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-draft-worker-contract.md"
+      }
+    },
+    {
+      "status": "pass",
+      "id": "contract.reflection",
+      "message": "Contract requires reflection.",
+      "details": {
+        "path": "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-draft-worker-contract.md"
+      }
+    },
+    {
+      "status": "pass",
+      "id": "contract.learning",
+      "message": "Contract requires learning proposals.",
+      "details": {
+        "path": "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-draft-worker-contract.md"
+      }
+    },
+    {
+      "status": "pass",
+      "id": "semantic.founder_intent",
+      "message": "Pack captures founder intent, trigger and CEO delegation shape.",
+      "details": {
+        "paths": [
+          "${COMPANY_OS_ROOT}/docs/orchestration/company-os-video-first-content-engine-department-pack-v0.md",
+          "${COMPANY_OS_ROOT}/kits/company-os-kit/.agents/workflows/video-first-content-engine-setup.md"
+        ],
+        "disciplines": [
+          "Founder Intent Fit"
+        ]
+      }
+    },
+    {
+      "status": "pass",
+      "id": "semantic.department_sop",
+      "message": "Pack includes department purpose, setup loop, boundaries and HumanGates.",
+      "details": {
+        "paths": [
+          "${COMPANY_OS_ROOT}/docs/orchestration/company-os-video-first-content-engine-department-pack-v0.md",
+          "${COMPANY_OS_ROOT}/kits/company-os-kit/.company-os/domain-packs/video-first-content-engine/setup.md"
+        ],
+        "disciplines": [
+          "Department SOP"
+        ]
+      }
+    },
+    {
+      "status": "pass",
+      "id": "semantic.parent_child_contracts",
+      "message": "Parent and child contracts carry seat, dispatch, source, acceptance and gate fields.",
+      "details": {
+        "paths": [
+          "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-parent-worker-contract.md",
+          "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-research-worker-contract.md",
+          "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-draft-worker-contract.md"
+        ],
+        "disciplines": [
+          "Parent/Child Contracts"
+        ]
+      }
+    },
+    {
+      "status": "pass",
+      "id": "semantic.capability_boundary",
+      "message": "CapabilityProfile and blocked surfaces are explicit in SOP and worker contracts.",
+      "details": {
+        "paths": [
+          "${COMPANY_OS_ROOT}/docs/orchestration/company-os-video-first-content-engine-department-pack-v0.md",
+          "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-parent-worker-contract.md",
+          "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-research-worker-contract.md",
+          "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-draft-worker-contract.md"
+        ],
+        "disciplines": [
+          "Capability Boundary"
+        ]
+      }
+    },
+    {
+      "status": "pass",
+      "id": "semantic.quality_gates",
+      "message": "Pack declares worker-contract validation, pack evaluator and 10/10 rubric gates.",
+      "details": {
+        "paths": [
+          "${COMPANY_OS_ROOT}/docs/orchestration/company-os-video-first-content-engine-department-pack-v0.md",
+          "${COMPANY_OS_ROOT}/kits/company-os-kit/.company-os/domain-packs/video-first-content-engine/setup.md",
+          "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-parent-worker-contract.md",
+          "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-research-worker-contract.md",
+          "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-draft-worker-contract.md"
+        ],
+        "disciplines": [
+          "Quality Gates"
+        ]
+      }
+    },
+    {
+      "status": "pass",
+      "id": "semantic.eve_ux",
+      "message": "EVE/Hermes skill defines behavior, output shape and challenge posture.",
+      "details": {
+        "paths": [
+          "${COMPANY_OS_ROOT}/docs/integrations/aionui-hermes-video-first-content-engine-skill.md"
+        ],
+        "disciplines": [
+          "EVE/AionUI/Hermes UX"
+        ]
+      }
+    },
+    {
+      "status": "pass",
+      "id": "semantic.learning_loop",
+      "message": "Pack requires reflection and learning proposals before doctrine or authority changes.",
+      "details": {
+        "paths": [
+          "${COMPANY_OS_ROOT}/docs/orchestration/company-os-video-first-content-engine-department-pack-v0.md",
+          "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-parent-worker-contract.md",
+          "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-research-worker-contract.md",
+          "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-draft-worker-contract.md"
+        ],
+        "disciplines": [
+          "Learning Loop"
+        ]
+      }
+    },
+    {
+      "status": "pass",
+      "id": "semantic.portability",
+      "message": "Pack uses portable root placeholders and no source-company literals.",
+      "details": {
+        "paths": [
+          "${COMPANY_OS_ROOT}/docs/orchestration/company-os-video-first-content-engine-department-pack-v0.md",
+          "${COMPANY_OS_ROOT}/kits/company-os-kit/.company-os/domain-packs/video-first-content-engine/setup.md",
+          "${COMPANY_OS_ROOT}/kits/company-os-kit/.agents/workflows/video-first-content-engine-setup.md",
+          "${COMPANY_OS_ROOT}/docs/integrations/aionui-hermes-video-first-content-engine-skill.md"
+        ],
+        "disciplines": [
+          "Portability"
+        ]
+      }
+    },
+    {
+      "status": "pass",
+      "id": "semantic.autonomy_promotion",
+      "message": "Autonomy path is staged and keeps generated contracts manual by default.",
+      "details": {
+        "paths": [
+          "${COMPANY_OS_ROOT}/docs/orchestration/company-os-video-first-content-engine-department-pack-v0.md",
+          "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-parent-worker-contract.md",
+          "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-research-worker-contract.md",
+          "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-draft-worker-contract.md"
+        ],
+        "disciplines": [
+          "Autonomy Promotion"
+        ]
+      }
+    },
+    {
+      "status": "pass",
+      "id": "semantic.evidence_completeness",
+      "message": "Pack declares evidence artifacts and has a scaffold evidence report.",
+      "details": {
+        "paths": [
+          "${COMPANY_OS_ROOT}/docs/orchestration/company-os-video-first-content-engine-department-pack-v0.md",
+          "${COMPANY_OS_ROOT}/reports/examples/video-first-content-engine-pack/README.example.md"
+        ],
+        "disciplines": [
+          "Evidence Completeness"
+        ]
+      }
+    },
+    {
+      "status": "pass",
+      "id": "capability_profile.declared",
+      "message": "Worker contracts declare at least one CapabilityProfile.",
+      "details": {
+        "declared_profile_ids": [
+          "claude-clevel-worker/cmo/video-first-content-engine"
+        ]
+      }
+    },
+    {
+      "status": "pass",
+      "id": "capability_profile.present",
+      "message": "Declared CapabilityProfiles are registered.",
+      "details": {
+        "declared_profile_ids": [
+          "claude-clevel-worker/cmo/video-first-content-engine"
+        ],
+        "missing": []
+      }
+    },
+    {
+      "status": "pass",
+      "id": "capability_profile.blocks_production",
+      "message": "CapabilityProfiles block production writes.",
+      "details": {
+        "declared_profile_ids": [
+          "claude-clevel-worker/cmo/video-first-content-engine"
+        ]
+      }
+    },
+    {
+      "status": "pass",
+      "id": "capability_profile.blocks_public_publish",
+      "message": "CapabilityProfiles block public publish.",
+      "details": {
+        "declared_profile_ids": [
+          "claude-clevel-worker/cmo/video-first-content-engine"
+        ]
+      }
+    },
+    {
+      "status": "pass",
+      "id": "capability_profile.blocks_secret_read",
+      "message": "CapabilityProfiles block secret reads.",
+      "details": {
+        "declared_profile_ids": [
+          "claude-clevel-worker/cmo/video-first-content-engine"
+        ]
+      }
+    },
+    {
+      "status": "pass",
+      "id": "capability_profile.blocks_done",
+      "message": "CapabilityProfiles block Plane Done by worker.",
+      "details": {
+        "declared_profile_ids": [
+          "claude-clevel-worker/cmo/video-first-content-engine"
+        ]
+      }
+    },
+    {
+      "status": "pass",
+      "id": "privacy.private_literal",
+      "message": "Pack contains no private path, source-product or token-shaped literals.",
+      "details": {
+        "hits": []
+      }
+    },
+    {
+      "status": "pass",
+      "id": "autonomy.unsafe_daily_claim",
+      "message": "Daily/autonomous action is not enabled from a single draft.",
+      "details": {}
+    }
+  ],
+  "blockers": [],
+  "disciplines": [
+    {
+      "name": "Founder Intent Fit",
+      "score": 10,
+      "status": "pass",
+      "ok": true,
+      "evidence_paths": [
+        "${COMPANY_OS_ROOT}/docs/orchestration/company-os-video-first-content-engine-department-pack-v0.md",
+        "${COMPANY_OS_ROOT}/kits/company-os-kit/.company-os/domain-packs/video-first-content-engine/setup.md",
+        "${COMPANY_OS_ROOT}/kits/company-os-kit/.agents/workflows/video-first-content-engine-setup.md",
+        "${COMPANY_OS_ROOT}/docs/integrations/aionui-hermes-video-first-content-engine-skill.md",
+        "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-parent-worker-contract.md",
+        "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-research-worker-contract.md",
+        "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-draft-worker-contract.md",
+        "${COMPANY_OS_ROOT}/reports/examples/video-first-content-engine-pack/README.example.md",
+        "${COMPANY_OS_ROOT}/reports/examples/department-pack-creator/video-first-content-engine-evaluation.example.md",
+        "${COMPANY_OS_ROOT}/registries/capabilities/company-os.json"
+      ]
+    },
+    {
+      "name": "Department SOP",
+      "score": 10,
+      "status": "pass",
+      "ok": true,
+      "evidence_paths": [
+        "${COMPANY_OS_ROOT}/docs/orchestration/company-os-video-first-content-engine-department-pack-v0.md",
+        "${COMPANY_OS_ROOT}/kits/company-os-kit/.company-os/domain-packs/video-first-content-engine/setup.md",
+        "${COMPANY_OS_ROOT}/kits/company-os-kit/.agents/workflows/video-first-content-engine-setup.md",
+        "${COMPANY_OS_ROOT}/docs/integrations/aionui-hermes-video-first-content-engine-skill.md",
+        "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-parent-worker-contract.md",
+        "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-research-worker-contract.md",
+        "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-draft-worker-contract.md",
+        "${COMPANY_OS_ROOT}/reports/examples/video-first-content-engine-pack/README.example.md",
+        "${COMPANY_OS_ROOT}/reports/examples/department-pack-creator/video-first-content-engine-evaluation.example.md",
+        "${COMPANY_OS_ROOT}/registries/capabilities/company-os.json"
+      ]
+    },
+    {
+      "name": "Parent/Child Contracts",
+      "score": 10,
+      "status": "pass",
+      "ok": true,
+      "evidence_paths": [
+        "${COMPANY_OS_ROOT}/docs/orchestration/company-os-video-first-content-engine-department-pack-v0.md",
+        "${COMPANY_OS_ROOT}/kits/company-os-kit/.company-os/domain-packs/video-first-content-engine/setup.md",
+        "${COMPANY_OS_ROOT}/kits/company-os-kit/.agents/workflows/video-first-content-engine-setup.md",
+        "${COMPANY_OS_ROOT}/docs/integrations/aionui-hermes-video-first-content-engine-skill.md",
+        "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-parent-worker-contract.md",
+        "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-research-worker-contract.md",
+        "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-draft-worker-contract.md",
+        "${COMPANY_OS_ROOT}/reports/examples/video-first-content-engine-pack/README.example.md",
+        "${COMPANY_OS_ROOT}/reports/examples/department-pack-creator/video-first-content-engine-evaluation.example.md",
+        "${COMPANY_OS_ROOT}/registries/capabilities/company-os.json"
+      ]
+    },
+    {
+      "name": "Capability Boundary",
+      "score": 10,
+      "status": "pass",
+      "ok": true,
+      "evidence_paths": [
+        "${COMPANY_OS_ROOT}/docs/orchestration/company-os-video-first-content-engine-department-pack-v0.md",
+        "${COMPANY_OS_ROOT}/kits/company-os-kit/.company-os/domain-packs/video-first-content-engine/setup.md",
+        "${COMPANY_OS_ROOT}/kits/company-os-kit/.agents/workflows/video-first-content-engine-setup.md",
+        "${COMPANY_OS_ROOT}/docs/integrations/aionui-hermes-video-first-content-engine-skill.md",
+        "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-parent-worker-contract.md",
+        "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-research-worker-contract.md",
+        "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-draft-worker-contract.md",
+        "${COMPANY_OS_ROOT}/reports/examples/video-first-content-engine-pack/README.example.md",
+        "${COMPANY_OS_ROOT}/reports/examples/department-pack-creator/video-first-content-engine-evaluation.example.md",
+        "${COMPANY_OS_ROOT}/registries/capabilities/company-os.json"
+      ]
+    },
+    {
+      "name": "Quality Gates",
+      "score": 10,
+      "status": "pass",
+      "ok": true,
+      "evidence_paths": [
+        "${COMPANY_OS_ROOT}/docs/orchestration/company-os-video-first-content-engine-department-pack-v0.md",
+        "${COMPANY_OS_ROOT}/kits/company-os-kit/.company-os/domain-packs/video-first-content-engine/setup.md",
+        "${COMPANY_OS_ROOT}/kits/company-os-kit/.agents/workflows/video-first-content-engine-setup.md",
+        "${COMPANY_OS_ROOT}/docs/integrations/aionui-hermes-video-first-content-engine-skill.md",
+        "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-parent-worker-contract.md",
+        "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-research-worker-contract.md",
+        "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-draft-worker-contract.md",
+        "${COMPANY_OS_ROOT}/reports/examples/video-first-content-engine-pack/README.example.md",
+        "${COMPANY_OS_ROOT}/reports/examples/department-pack-creator/video-first-content-engine-evaluation.example.md",
+        "${COMPANY_OS_ROOT}/registries/capabilities/company-os.json"
+      ]
+    },
+    {
+      "name": "EVE/AionUI/Hermes UX",
+      "score": 10,
+      "status": "pass",
+      "ok": true,
+      "evidence_paths": [
+        "${COMPANY_OS_ROOT}/docs/orchestration/company-os-video-first-content-engine-department-pack-v0.md",
+        "${COMPANY_OS_ROOT}/kits/company-os-kit/.company-os/domain-packs/video-first-content-engine/setup.md",
+        "${COMPANY_OS_ROOT}/kits/company-os-kit/.agents/workflows/video-first-content-engine-setup.md",
+        "${COMPANY_OS_ROOT}/docs/integrations/aionui-hermes-video-first-content-engine-skill.md",
+        "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-parent-worker-contract.md",
+        "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-research-worker-contract.md",
+        "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-draft-worker-contract.md",
+        "${COMPANY_OS_ROOT}/reports/examples/video-first-content-engine-pack/README.example.md",
+        "${COMPANY_OS_ROOT}/reports/examples/department-pack-creator/video-first-content-engine-evaluation.example.md",
+        "${COMPANY_OS_ROOT}/registries/capabilities/company-os.json"
+      ]
+    },
+    {
+      "name": "Learning Loop",
+      "score": 10,
+      "status": "pass",
+      "ok": true,
+      "evidence_paths": [
+        "${COMPANY_OS_ROOT}/docs/orchestration/company-os-video-first-content-engine-department-pack-v0.md",
+        "${COMPANY_OS_ROOT}/kits/company-os-kit/.company-os/domain-packs/video-first-content-engine/setup.md",
+        "${COMPANY_OS_ROOT}/kits/company-os-kit/.agents/workflows/video-first-content-engine-setup.md",
+        "${COMPANY_OS_ROOT}/docs/integrations/aionui-hermes-video-first-content-engine-skill.md",
+        "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-parent-worker-contract.md",
+        "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-research-worker-contract.md",
+        "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-draft-worker-contract.md",
+        "${COMPANY_OS_ROOT}/reports/examples/video-first-content-engine-pack/README.example.md",
+        "${COMPANY_OS_ROOT}/reports/examples/department-pack-creator/video-first-content-engine-evaluation.example.md",
+        "${COMPANY_OS_ROOT}/registries/capabilities/company-os.json"
+      ]
+    },
+    {
+      "name": "Portability",
+      "score": 10,
+      "status": "pass",
+      "ok": true,
+      "evidence_paths": [
+        "${COMPANY_OS_ROOT}/docs/orchestration/company-os-video-first-content-engine-department-pack-v0.md",
+        "${COMPANY_OS_ROOT}/kits/company-os-kit/.company-os/domain-packs/video-first-content-engine/setup.md",
+        "${COMPANY_OS_ROOT}/kits/company-os-kit/.agents/workflows/video-first-content-engine-setup.md",
+        "${COMPANY_OS_ROOT}/docs/integrations/aionui-hermes-video-first-content-engine-skill.md",
+        "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-parent-worker-contract.md",
+        "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-research-worker-contract.md",
+        "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-draft-worker-contract.md",
+        "${COMPANY_OS_ROOT}/reports/examples/video-first-content-engine-pack/README.example.md",
+        "${COMPANY_OS_ROOT}/reports/examples/department-pack-creator/video-first-content-engine-evaluation.example.md",
+        "${COMPANY_OS_ROOT}/registries/capabilities/company-os.json"
+      ]
+    },
+    {
+      "name": "Autonomy Promotion",
+      "score": 10,
+      "status": "pass",
+      "ok": true,
+      "evidence_paths": [
+        "${COMPANY_OS_ROOT}/docs/orchestration/company-os-video-first-content-engine-department-pack-v0.md",
+        "${COMPANY_OS_ROOT}/kits/company-os-kit/.company-os/domain-packs/video-first-content-engine/setup.md",
+        "${COMPANY_OS_ROOT}/kits/company-os-kit/.agents/workflows/video-first-content-engine-setup.md",
+        "${COMPANY_OS_ROOT}/docs/integrations/aionui-hermes-video-first-content-engine-skill.md",
+        "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-parent-worker-contract.md",
+        "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-research-worker-contract.md",
+        "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-draft-worker-contract.md",
+        "${COMPANY_OS_ROOT}/reports/examples/video-first-content-engine-pack/README.example.md",
+        "${COMPANY_OS_ROOT}/reports/examples/department-pack-creator/video-first-content-engine-evaluation.example.md",
+        "${COMPANY_OS_ROOT}/registries/capabilities/company-os.json"
+      ]
+    },
+    {
+      "name": "Evidence Completeness",
+      "score": 10,
+      "status": "pass",
+      "ok": true,
+      "evidence_paths": [
+        "${COMPANY_OS_ROOT}/docs/orchestration/company-os-video-first-content-engine-department-pack-v0.md",
+        "${COMPANY_OS_ROOT}/kits/company-os-kit/.company-os/domain-packs/video-first-content-engine/setup.md",
+        "${COMPANY_OS_ROOT}/kits/company-os-kit/.agents/workflows/video-first-content-engine-setup.md",
+        "${COMPANY_OS_ROOT}/docs/integrations/aionui-hermes-video-first-content-engine-skill.md",
+        "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-parent-worker-contract.md",
+        "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-research-worker-contract.md",
+        "${COMPANY_OS_ROOT}/docs/templates/company-os-video-first-content-engine-draft-worker-contract.md",
+        "${COMPANY_OS_ROOT}/reports/examples/video-first-content-engine-pack/README.example.md",
+        "${COMPANY_OS_ROOT}/reports/examples/department-pack-creator/video-first-content-engine-evaluation.example.md",
+        "${COMPANY_OS_ROOT}/registries/capabilities/company-os.json"
+      ]
+    }
+  ],
+  "score_summary": {
+    "average": 10,
+    "minimum": 10,
+    "justified_gaps": 0
+  }
+}

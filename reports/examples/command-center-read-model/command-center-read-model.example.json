@@ -1,0 +1,447 @@
+{
+  "schema_version": "command-center-read-model/v0",
+  "generated_at": "2026-05-20T12:00:00.000Z",
+  "read_only": true,
+  "source_policy": "artifact-linked-no-state-mutation",
+  "sources": {
+    "event_ledger": "reports/examples/command-center-read-model/agent-events.example.jsonl",
+    "reducer": "scripts/command-center/command-center-read-model-core.mjs"
+  },
+  "morning_brief": {
+    "headline": "5 run(s) visible; 1 blocked; 2 need decision-gate review; 0 need HG-4 human review; 1 HG-3 CEO release(s); 1 HG-3.5 packet(s); 3 trace card(s)",
+    "totals": {
+      "runs": 5,
+      "active": 0,
+      "blocked": 1,
+      "needs_gate_review": 2,
+      "needs_human": 0,
+      "hg3_ceo_releases": 1,
+      "hg35_packets": 1,
+      "trace_cards": 3
+    }
+  },
+  "worker_runs": [
+    {
+      "run_id": "run_example_904",
+      "issue_id": "[WORK_ITEM_ID]",
+      "parent_issue_id": "[WORK_ITEM_ID]",
+      "agent": "codex",
+      "mode": "verify",
+      "role_owner": "CEO",
+      "department": "ceo",
+      "worker_state": "idle",
+      "controller_state": "none",
+      "issue_state_recommendation": "needs_human",
+      "human_gate_state": "required",
+      "human_gate_level": "HG-3",
+      "decision_gate": {
+        "level": "HG-3",
+        "state": "required",
+        "source_event_id": "evt_example_904_hg3_hold",
+        "source_event_type": "human_gate.required",
+        "release_authority": "CEO_CRITICAL",
+        "released_by": "",
+        "founder_prediction_confidence": null,
+        "decision_mode": "CEO_CRITICAL_HOLD",
+        "decision": "Hold CEO critical release and route to EVE HG-3.5",
+        "next_action": "write simulated EVE / HG-3.5 decision packet",
+        "reason": "",
+        "release_validation": null,
+        "requested_actions": [],
+        "blocked_actions": [
+          "Plane Done",
+          "public launch",
+          "production promotion"
+        ],
+        "assumptions": [
+          "rollback proof passes but product-risk interpretation is ambiguous"
+        ],
+        "challenge_questions": [
+          "What changes if the private beta gate is wrong?",
+          "Which proof would make CEO release obvious?"
+        ],
+        "consequences": {
+          "if_go": "Private beta can proceed behind reversible controls.",
+          "if_no_go": "ATLAS desktop MVP remains gated until rework closes.",
+          "if_wrong": "Founder receives a compressed HG-4 dossier before strategic exposure."
+        },
+        "hg35_pause_artifact": "/example/company-os/reports/examples/command-center-read-model/hg35-eve-packet.json",
+        "eve_runtime": "simulated",
+        "routes_to_hg35": true,
+        "simulated": true,
+        "artifact_paths": [
+          "/example/company-os/reports/examples/command-center-read-model/hg35-eve-packet.json",
+          "/example/company-os/reports/releases/atlas-hg3-gate-evidence.example.md"
+        ]
+      },
+      "merge_state": "not_applicable",
+      "next_action": "Hold CEO critical release and route to EVE HG-3.5",
+      "blocking_reasons": [],
+      "event_count": 1,
+      "first_event_at": "2026-05-20T10:45:00.000Z",
+      "last_event_at": "2026-05-20T10:45:00.000Z",
+      "last_event_id": "evt_example_904_hg3_hold",
+      "source_event_ids": [
+        "evt_example_904_hg3_hold"
+      ],
+      "artifact_paths": [
+        "/example/company-os/reports/examples/command-center-read-model/hg35-eve-packet.json",
+        "/example/company-os/reports/releases/atlas-hg3-gate-evidence.example.md"
+      ],
+      "trace_cards": []
+    },
+    {
+      "run_id": "run_example_903",
+      "issue_id": "[WORK_ITEM_ID]",
+      "parent_issue_id": "[WORK_ITEM_ID]",
+      "agent": "codex",
+      "mode": "release-gate",
+      "role_owner": "CEO",
+      "department": "ceo",
+      "worker_state": "idle",
+      "controller_state": "none",
+      "issue_state_recommendation": "intake",
+      "human_gate_state": "released",
+      "human_gate_level": "HG-3",
+      "decision_gate": {
+        "level": "HG-3",
+        "state": "released",
+        "source_event_id": "evt_example_903_hg3_release",
+        "source_event_type": "human_gate.released",
+        "release_authority": "CEO_CRITICAL",
+        "released_by": "Codex-GPT-5.5-xhigh",
+        "founder_prediction_confidence": 0.98,
+        "decision_mode": "",
+        "decision": "CEO_CRITICAL_RELEASE",
+        "next_action": "private beta release may proceed with rollback verified",
+        "reason": "",
+        "release_validation": {
+          "schema_version": "human-gate-release/v1",
+          "status": "pass",
+          "check_count": 21,
+          "blocker_count": 0,
+          "decision_path": "/example/company-os/reports/releases/atlas-hg3-release-packet.example.json"
+        },
+        "requested_actions": [
+          "merge sandbox branch",
+          "deploy private beta"
+        ],
+        "blocked_actions": [
+          "HG-4 strategic direction",
+          "non-restorable deletion",
+          "public launch"
+        ],
+        "assumptions": [],
+        "challenge_questions": [],
+        "consequences": {
+          "if_go": "",
+          "if_no_go": "",
+          "if_wrong": ""
+        },
+        "hg35_pause_artifact": "",
+        "eve_runtime": "simulated",
+        "routes_to_hg35": false,
+        "simulated": false,
+        "artifact_paths": [
+          "/example/company-os/reports/releases/atlas-hg3-release-packet.example.json",
+          "/example/company-os/reports/releases/atlas-hg3-gate-evidence.example.md"
+        ]
+      },
+      "merge_state": "not_applicable",
+      "next_action": "private beta release may proceed with rollback verified",
+      "blocking_reasons": [],
+      "event_count": 1,
+      "first_event_at": "2026-05-20T10:30:00.000Z",
+      "last_event_at": "2026-05-20T10:30:00.000Z",
+      "last_event_id": "evt_example_903_hg3_release",
+      "source_event_ids": [
+        "evt_example_903_hg3_release"
+      ],
+      "artifact_paths": [
+        "/example/company-os/reports/releases/atlas-hg3-release-packet.example.json",
+        "/example/company-os/reports/releases/atlas-hg3-gate-evidence.example.md"
+      ],
+      "trace_cards": []
+    },
+    {
+      "run_id": "run_example_902",
+      "issue_id": "[WORK_ITEM_ID]",
+      "parent_issue_id": "[WORK_ITEM_ID]",
+      "agent": "claude",
+      "mode": "implement",
+      "role_owner": "role:cto",
+      "department": "cto",
+      "worker_state": "idle",
+      "controller_state": "blocked",
+      "issue_state_recommendation": "blocked",
+      "human_gate_state": "none",
+      "human_gate_level": "",
+      "decision_gate": null,
+      "merge_state": "not_applicable",
+      "next_action": "repair runtime auth",
+      "blocking_reasons": [
+        "plane-app-token-unavailable"
+      ],
+      "event_count": 1,
+      "first_event_at": "2026-05-20T10:00:00.000Z",
+      "last_event_at": "2026-05-20T10:00:00.000Z",
+      "last_event_id": "evt_example_902_auth_failed",
+      "source_event_ids": [
+        "evt_example_902_auth_failed"
+      ],
+      "artifact_paths": [
+        "/example/company-os/reports/runs/2026-05-20/run_example_902-auth-blocker.md"
+      ],
+      "trace_cards": []
+    },
+    {
+      "run_id": "run_example_901",
+      "issue_id": "[WORK_ITEM_ID]",
+      "parent_issue_id": "[WORK_ITEM_ID]",
+      "agent": "codex",
+      "mode": "verify",
+      "role_owner": "role:cao",
+      "department": "cao",
+      "worker_state": "needs_audit",
+      "controller_state": "ready_for_gate_review",
+      "issue_state_recommendation": "needs_human",
+      "human_gate_state": "required",
+      "human_gate_level": "",
+      "decision_gate": null,
+      "merge_state": "merge_gated",
+      "next_action": "review release evidence",
+      "blocking_reasons": [],
+      "event_count": 3,
+      "first_event_at": "2026-05-20T09:10:00.000Z",
+      "last_event_at": "2026-05-20T09:26:00.000Z",
+      "last_event_id": "evt_example_901_human_gate",
+      "source_event_ids": [
+        "evt_example_901_reported",
+        "evt_example_901_controller_pass",
+        "evt_example_901_human_gate"
+      ],
+      "artifact_paths": [
+        "/example/company-os/reports/runs/2026-05-20/run_example_901-worker-report.md",
+        "/example/company-os/reports/observability/raindrop-workshop/2026-05-20/run_example_901.md",
+        "/example/company-os/reports/runs/2026-05-20/run_example_901-controller.md",
+        "/example/company-os/reports/runs/2026-05-20/run_example_901-release-evidence.md"
+      ],
+      "trace_cards": [
+        {
+          "run_id": "run_example_901",
+          "issue_id": "[WORK_ITEM_ID]",
+          "agent": "claude",
+          "mode": "implement",
+          "source_event_id": "evt_example_901_reported",
+          "redaction_level": "public",
+          "trace_json": null,
+          "trace_markdown": "/example/company-os/reports/observability/raindrop-workshop/2026-05-20/run_example_901.md",
+          "prompt_result": null
+        }
+      ]
+    },
+    {
+      "run_id": "run_example_900",
+      "issue_id": "[WORK_ITEM_ID]",
+      "parent_issue_id": "[WORK_ITEM_ID]",
+      "agent": "codex",
+      "mode": "verify",
+      "role_owner": "role:cao",
+      "department": "cao",
+      "worker_state": "needs_audit",
+      "controller_state": "pass",
+      "issue_state_recommendation": "done_candidate",
+      "human_gate_state": "none",
+      "human_gate_level": "",
+      "decision_gate": null,
+      "merge_state": "not_applicable",
+      "next_action": "dispatch dependent work or close",
+      "blocking_reasons": [],
+      "event_count": 5,
+      "first_event_at": "2026-05-20T08:00:00.000Z",
+      "last_event_at": "2026-05-20T08:30:00.000Z",
+      "last_event_id": "evt_example_900_controller_pass",
+      "source_event_ids": [
+        "evt_example_900_locked",
+        "evt_example_900_heartbeat",
+        "evt_example_900_reported",
+        "evt_example_900_prompt_eval",
+        "evt_example_900_controller_pass"
+      ],
+      "artifact_paths": [
+        "/example/company-os/reports/runs/2026-05-20/run_example_900-worker-report.md",
+        "/example/company-os/reports/observability/raindrop-workshop/2026-05-20/run_example_900.json",
+        "/example/company-os/reports/observability/raindrop-workshop/2026-05-20/run_example_900.md",
+        "/example/company-os/reports/observability/raindrop-workshop/2026-05-20/run_example_900.prompt-result.md",
+        "/example/company-os/reports/runs/2026-05-20/run_example_900-controller.md"
+      ],
+      "trace_cards": [
+        {
+          "run_id": "run_example_900",
+          "issue_id": "[WORK_ITEM_ID]",
+          "agent": "claude",
+          "mode": "implement",
+          "source_event_id": "evt_example_900_reported",
+          "redaction_level": "public",
+          "trace_json": "/example/company-os/reports/observability/raindrop-workshop/2026-05-20/run_example_900.json",
+          "trace_markdown": "/example/company-os/reports/observability/raindrop-workshop/2026-05-20/run_example_900.md",
+          "prompt_result": null
+        },
+        {
+          "run_id": "run_example_900",
+          "issue_id": "[WORK_ITEM_ID]",
+          "agent": "claude",
+          "mode": "implement",
+          "source_event_id": "evt_example_900_prompt_eval",
+          "redaction_level": "public",
+          "trace_json": null,
+          "trace_markdown": null,
+          "prompt_result": "/example/company-os/reports/observability/raindrop-workshop/2026-05-20/run_example_900.prompt-result.md"
+        }
+      ]
+    }
+  ],
+  "human_gate_queue": [
+    {
+      "issue_id": "[WORK_ITEM_ID]",
+      "run_id": "run_example_904",
+      "human_gate_level": "HG-3",
+      "role_owner": "CEO",
+      "next_action": "Hold CEO critical release and route to EVE HG-3.5",
+      "blocking_reasons": [],
+      "source_event_id": "evt_example_904_hg3_hold",
+      "artifact_paths": [
+        "/example/company-os/reports/examples/command-center-read-model/hg35-eve-packet.json",
+        "/example/company-os/reports/releases/atlas-hg3-gate-evidence.example.md"
+      ]
+    },
+    {
+      "issue_id": "[WORK_ITEM_ID]",
+      "run_id": "run_example_901",
+      "human_gate_level": "",
+      "role_owner": "role:cao",
+      "next_action": "review release evidence",
+      "blocking_reasons": [],
+      "source_event_id": "evt_example_901_human_gate",
+      "artifact_paths": [
+        "/example/company-os/reports/runs/2026-05-20/run_example_901-worker-report.md",
+        "/example/company-os/reports/observability/raindrop-workshop/2026-05-20/run_example_901.md",
+        "/example/company-os/reports/runs/2026-05-20/run_example_901-controller.md",
+        "/example/company-os/reports/runs/2026-05-20/run_example_901-release-evidence.md"
+      ]
+    }
+  ],
+  "ceo_critical_releases": [
+    {
+      "issue_id": "[WORK_ITEM_ID]",
+      "run_id": "run_example_903",
+      "human_gate_level": "HG-3",
+      "status": "released",
+      "release_authority": "CEO_CRITICAL",
+      "released_by": "Codex-GPT-5.5-xhigh",
+      "founder_prediction_confidence": 0.98,
+      "release_validation": {
+        "schema_version": "human-gate-release/v1",
+        "status": "pass",
+        "check_count": 21,
+        "blocker_count": 0,
+        "decision_path": "/example/company-os/reports/releases/atlas-hg3-release-packet.example.json"
+      },
+      "next_action": "private beta release may proceed with rollback verified",
+      "source_event_id": "evt_example_903_hg3_release",
+      "artifact_paths": [
+        "/example/company-os/reports/releases/atlas-hg3-release-packet.example.json",
+        "/example/company-os/reports/releases/atlas-hg3-gate-evidence.example.md"
+      ]
+    }
+  ],
+  "eve_hg35_packets": [
+    {
+      "issue_id": "[WORK_ITEM_ID]",
+      "run_id": "run_example_904",
+      "originating_gate": "HG-3",
+      "target_gate": "HG-3.5",
+      "status": "awaiting-chief-of-staff-review",
+      "simulated": true,
+      "decision_mode": "CEO_CRITICAL_HOLD",
+      "decision": "Hold CEO critical release and route to EVE HG-3.5",
+      "reason": "",
+      "next_action": "write simulated EVE / HG-3.5 decision packet",
+      "challenge_questions": [
+        "What changes if the private beta gate is wrong?",
+        "Which proof would make CEO release obvious?"
+      ],
+      "assumptions": [
+        "rollback proof passes but product-risk interpretation is ambiguous"
+      ],
+      "consequences": {
+        "if_go": "Private beta can proceed behind reversible controls.",
+        "if_no_go": "ATLAS desktop MVP remains gated until rework closes.",
+        "if_wrong": "Founder receives a compressed HG-4 dossier before strategic exposure."
+      },
+      "blocked_actions": [
+        "Plane Done",
+        "public launch",
+        "production promotion"
+      ],
+      "source_event_id": "evt_example_904_hg3_hold",
+      "source_event_type": "human_gate.required",
+      "artifact_paths": [
+        "/example/company-os/reports/examples/command-center-read-model/hg35-eve-packet.json",
+        "/example/company-os/reports/releases/atlas-hg3-gate-evidence.example.md"
+      ]
+    }
+  ],
+  "trace_summary_cards": [
+    {
+      "run_id": "run_example_901",
+      "issue_id": "[WORK_ITEM_ID]",
+      "agent": "claude",
+      "mode": "implement",
+      "source_event_id": "evt_example_901_reported",
+      "redaction_level": "public",
+      "trace_json": null,
+      "trace_markdown": "/example/company-os/reports/observability/raindrop-workshop/2026-05-20/run_example_901.md",
+      "prompt_result": null
+    },
+    {
+      "run_id": "run_example_900",
+      "issue_id": "[WORK_ITEM_ID]",
+      "agent": "claude",
+      "mode": "implement",
+      "source_event_id": "evt_example_900_reported",
+      "redaction_level": "public",
+      "trace_json": "/example/company-os/reports/observability/raindrop-workshop/2026-05-20/run_example_900.json",
+      "trace_markdown": "/example/company-os/reports/observability/raindrop-workshop/2026-05-20/run_example_900.md",
+      "prompt_result": null
+    },
+    {
+      "run_id": "run_example_900",
+      "issue_id": "[WORK_ITEM_ID]",
+      "agent": "claude",
+      "mode": "implement",
+      "source_event_id": "evt_example_900_prompt_eval",
+      "redaction_level": "public",
+      "trace_json": null,
+      "trace_markdown": null,
+      "prompt_result": "/example/company-os/reports/observability/raindrop-workshop/2026-05-20/run_example_900.prompt-result.md"
+    }
+  ],
+  "event_type_counts": {
+    "controller.verdict": 2,
+    "dispatcher.prompt_result_eval": 1,
+    "human_gate.released": 1,
+    "human_gate.required": 2,
+    "runtime.auth_failed": 1,
+    "worker.heartbeat": 1,
+    "worker.locked": 1,
+    "worker.reported": 2
+  },
+  "blocked_actions": [
+    "no Plane writes",
+    "no Plane Done transitions",
+    "no worker dispatch",
+    "no deploy/publish/send/schedule/spend",
+    "no production writes"
+  ]
+}

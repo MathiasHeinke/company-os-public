@@ -1,0 +1,16 @@
+{
+  "name": "autoresearch-bioengine",
+  "version": "1.0.0",
+  "description": "Autonomous overnight research for ARES BioEngine scoring calibration (à la Karpathy)",
+  "type": "module",
+  "scripts": {
+    "prepare": "npx tsx prepare.ts",
+    "eval": "npx tsx eval.ts",
+    "eval:verbose": "npx tsx eval.ts --verbose",
+    "experiment": "bash run-experiment.sh"
+  },
+  "dependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}

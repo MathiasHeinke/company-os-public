@@ -1,0 +1,21 @@
+{
+  "schema": "build-public-mirror/v0",
+  "source_sha": "e05dfff887347b2d88694d38fcbf9624b62c23ba",
+  "strip_list_version": "v2",
+  "generated_at": "2026-06-02T08:24:28.376Z",
+  "output_file_count": 760,
+  "blocker_summary": [
+    {
+      "id": "include.unexpected",
+      "severity": "warn",
+      "detail": "484 file(s) excluded by default (not on include list, not on strip list)",
+      "sample": [
+        ".agents/skills/gitnexus/gitnexus-cli/SKILL.md",
+        ".agents/skills/gitnexus/gitnexus-debugging/SKILL.md",
+        ".agents/skills/gitnexus/gitnexus-exploring/SKILL.md",
+        ".agents/skills/gitnexus/gitnexus-guide/SKILL.md",
+        ".agents/skills/gitnexus/gitnexus-impact-analysis/SKILL.md"
+      ]
+    }
+  ]
+}

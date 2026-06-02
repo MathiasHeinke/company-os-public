@@ -1,0 +1,48 @@
+{
+  "schema_version": "eve-hg35-decision-packet/v0",
+  "generated_at": "2026-05-20T10:45:00.000Z",
+  "simulated": true,
+  "runtime": "codex-ceo-simulated-chief-of-staff",
+  "originating_gate": "HG-3",
+  "target_gate": "HG-3.5",
+  "decision_mode": "CEO_CRITICAL_HOLD",
+  "issue_id": "[WORK_ITEM_ID]",
+  "run_id": "run_example_904",
+  "summary": "Codex/CEO held the HG-3 release because the implementation evidence was green but the product-risk interpretation was still ambiguous.",
+  "source_events": [
+    {
+      "event_id": "evt_example_904_hg3_hold",
+      "event_type": "human_gate.required",
+      "evidence_path": "/example/company-os/reports/releases/atlas-hg3-gate-evidence.example.md"
+    }
+  ],
+  "cao_controller_evidence": [
+    "/example/company-os/reports/releases/atlas-hg3-gate-evidence.example.md"
+  ],
+  "worker_report_evidence": [
+    "/example/company-os/reports/runs/2026-05-20/run_example_904-worker-report.md"
+  ],
+  "challenge_questions": [
+    "What changes if the private beta gate is wrong?",
+    "Which proof would make CEO release obvious?"
+  ],
+  "assumptions": [
+    "Rollback proof passes.",
+    "The remaining ambiguity is product-risk interpretation, not implementation correctness."
+  ],
+  "consequences": {
+    "if_go": "Private beta can proceed behind reversible controls.",
+    "if_no_go": "ATLAS desktop MVP remains gated until rework closes.",
+    "if_wrong": "Founder receives a compressed HG-4 dossier before strategic exposure."
+  },
+  "recommendation": {
+    "verdict": "hold",
+    "next_action": "Chief-of-Staff / EVE should challenge the risk interpretation and either return CEO_CRITICAL_RELEASE or escalate to HG-4."
+  },
+  "blocked_actions": [
+    "no Plane Done",
+    "no public launch",
+    "no production promotion",
+    "no autonomous resume before HG-3.5 sign evidence"
+  ]
+}
