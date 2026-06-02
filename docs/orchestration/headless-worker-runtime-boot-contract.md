@@ -292,7 +292,7 @@ runtime-specific output parser.
 
 Default: one fresh CLI run per worker item. This is safer and easier to audit.
 
-Session reuse is allowed only when all are true:
+The baseline same-item resume path is allowed only when all are true:
 
 - same Plane work item
 - same target workspace
@@ -302,6 +302,15 @@ Session reuse is allowed only when all are true:
 - the next prompt includes the same boot pack and current Plane snapshot
 
 If any condition is missing, start fresh and reload context.
+
+Long-context workstreams may opt into a broader continuity policy only through
+`docs/orchestration/workstream-session-continuity.md`,
+`registries/sessions/workstream-continuity.json` and
+`scripts/orchestration/session-continuity-router.mjs`. That policy can route to
+`SC2-workstream-continuity` or `SC3-session-group`, but it still requires the
+current boot pack, current Plane snapshot, route receipt and explicit registry
+state. Audits, security reviews, release gates and high-risk/HG-4 surfaces
+remain fresh or blocked by default.
 
 ## Scheduler Responsibilities
 

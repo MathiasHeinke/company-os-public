@@ -85,6 +85,7 @@ function writeMinimalIncludeTree(root) {
   write(root, "registries/domain-packs/company-os.schema.json", "{\"title\":\"Domain Pack Registry\"}\n");
   write(root, "registries/plane-templates/company-os.json", "{\"version\":\"plane-template-registry/v0\"}\n");
   write(root, "registries/inference/eve-hermes-brain.json", "{\"version\":\"eve-brain-router/v0\",\"brain_classes\":[],\"routes\":{}}\n");
+  write(root, "registries/sessions/workstream-continuity.json", "{\"version\":\"session-continuity-router/v0\",\"session_classes\":[],\"routes\":{}}\n");
 
   write(root, "kits/company-os-kit/README.md", "# Kit\n");
   write(root, "kits/company-os-kit/templates/AGENTS.md", "# Template\n");
@@ -166,6 +167,7 @@ test("isIncluded recognizes documented include rules", () => {
   assert.ok(isIncluded("scripts/plane/plane-app-token-rotation.mjs"));
   assert.ok(isIncluded("registries/domain-packs/company-os.json"));
   assert.ok(isIncluded("registries/inference/eve-hermes-brain.json"));
+  assert.ok(isIncluded("registries/sessions/workstream-continuity.json"));
   assert.ok(isIncluded("registries/plane-templates/company-os.json"));
   assert.ok(isIncluded("registries/quality/post-worker-quality-loop.json"));
   assert.ok(isIncluded("kits/company-os-kit/.antigravity/agentic-plan-template.md"));
@@ -187,6 +189,7 @@ test("planPublicMirror returns copied + stripped + missing_fixtures for a synthe
   assert.ok(plan.copied.some((entry) => entry.path === "metrics/agent-events.example.jsonl"));
   assert.ok(plan.copied.some((entry) => entry.path === "registries/capabilities/example.json"));
   assert.ok(plan.copied.some((entry) => entry.path === "registries/inference/eve-hermes-brain.json"));
+  assert.ok(plan.copied.some((entry) => entry.path === "registries/sessions/workstream-continuity.json"));
   assert.ok(plan.copied.some((entry) => entry.path === "registries/domain-packs/company-os.json"));
   assert.ok(plan.copied.some((entry) => entry.path === "registries/plane-templates/company-os.json"));
   assert.ok(plan.copied.some((entry) => entry.path === "registries/quality/post-worker-quality-loop.json"));
@@ -296,6 +299,10 @@ test("runBuildPublicMirror full build copies sanitized tree and writes provenanc
   );
   assert.equal(
     fs.existsSync(path.join(outRoot, "registries/inference/eve-hermes-brain.json")),
+    true,
+  );
+  assert.equal(
+    fs.existsSync(path.join(outRoot, "registries/sessions/workstream-continuity.json")),
     true,
   );
   assert.equal(

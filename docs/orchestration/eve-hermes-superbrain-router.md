@@ -16,6 +16,9 @@ context-heavy.
 
 This document defines the operator-facing brain route. It complements
 `docs/orchestration/runtime-inference-router.md`, which routes worker runs.
+It is also separate from `docs/orchestration/workstream-session-continuity.md`,
+which decides whether EVE/Hermes, CEO, C-Level or worker sessions should start
+fresh, resume a same-item run, or stay open as a long-context workstream.
 
 ## Core Decision
 
@@ -55,6 +58,15 @@ scripts/orchestration/eve-brain-router.mjs
 
 The router writes nothing. It returns a route receipt that the shell must show
 or log before using the selected inference lane.
+
+Session-continuity decisions are routed separately through:
+
+```text
+scripts/orchestration/session-continuity-router.mjs
+```
+
+Brain routing chooses model power. Session routing chooses context lifetime.
+Neither grants decision authority.
 
 ## Brain Classes
 

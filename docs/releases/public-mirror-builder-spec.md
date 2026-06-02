@@ -59,6 +59,7 @@ precedence on exact matches.
 | `registries/capabilities/example.json` | Template version only (see §4). |
 | `registries/inference/example.json` | Template version only (see §4). |
 | `registries/inference/eve-hermes-brain.json` | Public EVE/Hermes operator-brain routing registry; no private workspace IDs. |
+| `registries/sessions/**` | Public session-continuity routing registry; runtime session IDs stay local/private. |
 | `registries/domain-packs/**` | Public onboarding/domain-pack registry required by first install. |
 | `registries/plane-templates/**` | Public Plane template registry required by setup. |
 | `registries/quality/**` | Public post-worker quality routing registry. |
@@ -137,6 +138,7 @@ copies them into the output tree at their declared target paths.
 | `registries/capabilities/example.json` | same path | Capability registry template. Blocked actions list kept for public value; all `company-os`-specific IDs replaced with `[client]`. |
 | `registries/inference/example.json` | same path | Inference registry template. Task classes and model routing patterns retained; all workspace slugs and Plane UUIDs replaced. |
 | `registries/inference/eve-hermes-brain.json` | same path | Public EVE/Hermes B0-B4 brain routing registry. Model aliases and blocked actions are generic; no private workspace IDs. |
+| `registries/sessions/workstream-continuity.json` | same path | Public SC0-SC4 session-continuity routing registry. It defines policy only; no live runtime session IDs. |
 | `registries/domain-packs/company-os.json` | same path | Public first-run domain pack registry. |
 | `registries/plane-templates/company-os.json` | same path | Public setup template registry for Plane workspaces/items/pages. |
 | `registries/quality/post-worker-quality-loop.json` | same path | Public lower-worker quality/audit/hotfix routing registry. |

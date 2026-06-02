@@ -1,0 +1,101 @@
+{
+  "version": "session-continuity-router/v0",
+  "generated_at": "2026-06-02",
+  "purpose": "Route Company.OS runtime requests to fresh, resumed, workstream-continuity, session-group, or continuity-blocked session policy.",
+  "defaults": {
+    "fallback_class": "SC0-fresh-task",
+    "route_receipt_required": true,
+    "default_session_policy": "fresh",
+    "continuity_opt_in": true,
+    "fail_closed_class": "SC4-continuity-blocked"
+  },
+  "session_classes": [
+    {
+      "id": "SC0-fresh-task",
+      "label": "Fresh task",
+      "examples": ["one-off audit", "small patch", "release gate", "validator run"],
+      "reuse_allowed": false
+    },
+    {
+      "id": "SC1-same-item-resume",
+      "label": "Same-item resume",
+      "examples": ["timeout recovery", "needs-human continuation", "bounded continuation of the same Plane item"],
+      "reuse_allowed": true
+    },
+    {
+      "id": "SC2-workstream-continuity",
+      "label": "Workstream continuity",
+      "examples": ["book drafting", "brand system", "long research thread", "multi-week concept", "EVE companion session"],
+      "reuse_allowed": true
+    },
+    {
+      "id": "SC3-session-group",
+      "label": "Session group",
+      "examples": ["EVE to CEO to C-Level continuity group", "coordinated CEO and worker sessions"],
+      "reuse_allowed": true
+    },
+    {
+      "id": "SC4-continuity-blocked",
+      "label": "Continuity blocked",
+      "examples": ["HG-4", "production writes", "secrets", "customer data", "pricing or legal commitment"],
+      "reuse_allowed": false
+    }
+  ],
+  "routes": {
+    "SC0-fresh-task": {
+      "session_policy": "fresh",
+      "reuse_allowed": false,
+      "session_group_allowed": false,
+      "context_policy": "load-boot-pack-and-context-slice",
+      "max_open_lifetime": "single-run",
+      "human_gate": "HG-1",
+      "required_registry_state": "none",
+      "allowed_actions": ["start fresh runtime session", "load bounded context slice"],
+      "blocked_actions": ["reuse stale session", "skip boot pack", "Plane Done"]
+    },
+    "SC1-same-item-resume": {
+      "session_policy": "same-item-resume",
+      "reuse_allowed": true,
+      "session_group_allowed": false,
+      "context_policy": "reload-same-boot-pack-plus-current-plane-snapshot",
+      "max_open_lifetime": "until-item-completes-or-closes",
+      "human_gate": "HG-2",
+      "required_registry_state": "stored-session-id-plus-same-item-proof",
+      "allowed_actions": ["resume same runtime session for same work item"],
+      "blocked_actions": ["cross-work-item reuse", "skip current Plane snapshot", "Plane Done"]
+    },
+    "SC2-workstream-continuity": {
+      "session_policy": "workstream-continuity",
+      "reuse_allowed": true,
+      "session_group_allowed": false,
+      "context_policy": "resume-registered-workstream-session-plus-current-boot-pack",
+      "max_open_lifetime": "configured-workstream-lifetime",
+      "human_gate": "HG-2.5",
+      "required_registry_state": "open-workstream-session",
+      "allowed_actions": ["resume workstream session", "append item report", "close or compact on owner signal"],
+      "blocked_actions": ["production write", "external send", "customer data", "Plane Done"]
+    },
+    "SC3-session-group": {
+      "session_policy": "session-group",
+      "reuse_allowed": true,
+      "session_group_allowed": true,
+      "context_policy": "resume-linked-runtime-sessions-plus-current-boot-packs",
+      "max_open_lifetime": "configured-parent-lifetime",
+      "human_gate": "HG-3",
+      "required_registry_state": "open-session-group-with-seat-map",
+      "allowed_actions": ["resume linked CEO/C-Level/worker sessions", "emit per-seat reports"],
+      "blocked_actions": ["merged authority", "hidden worker output", "production write", "Plane Done"]
+    },
+    "SC4-continuity-blocked": {
+      "session_policy": "fresh-or-founder-card",
+      "reuse_allowed": false,
+      "session_group_allowed": false,
+      "context_policy": "do-not-resume-hidden-context",
+      "max_open_lifetime": "none",
+      "human_gate": "HG-4",
+      "required_registry_state": "blocked",
+      "allowed_actions": ["start fresh with explicit boot pack", "prepare decision card"],
+      "blocked_actions": ["session reuse", "hidden context carryover", "production write", "external commitment", "Plane Done"]
+    }
+  }
+}

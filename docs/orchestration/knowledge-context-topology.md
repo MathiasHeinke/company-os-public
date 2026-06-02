@@ -62,6 +62,11 @@ durable **domain memory** for that node, and new sessions are "reborn" with that
 not with a global memory blob. This keeps EVE sharp instead of blurred. v0 locks the schema (sessions carry
 `domains` + `summary`); the compaction/rebirth logic is a later slice.
 
+Runtime session reuse is a sibling policy, not the same mechanism. `docs/orchestration/workstream-session-continuity.md`
+decides when a CEO/C-Level/worker runtime session may stay open for a long-context workstream or session
+group. T13 decides which knowledge/context slice is loaded. Both paths must keep Plane as execution ledger
+and must not turn hidden runtime context into durable memory truth.
+
 ## Rollout rule (the flat -> sorted transition)
 
 `FACT(founder meta 2026-05-29)`: do not show a half-learned tree.

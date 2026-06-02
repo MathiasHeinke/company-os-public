@@ -207,6 +207,12 @@ The absorption point is v0.7: only proven, sandboxed and audited patterns move
 into the read-only Voice Command Center POC. Until then, the sidecar is a
 learning and UX-validation lane.
 
+Long-context operator continuity is governed separately by
+`docs/orchestration/workstream-session-continuity.md`. EVE may keep selected
+CEO/C-Level/worker sessions open for books, brand systems, long research or
+multi-week product concepts, but the default remains fresh sessions for audits,
+security reviews, release gates and deterministic validators.
+
 `HG-3.5` is the Chief-of-Staff / Founder-Proxy Review layer. It can prepare and
 predict founder decisions from precedent and evidence, but it is not final
 Founder authority. Promotion from HG-4 to HG-3.5-assisted, HG-3 or a lower gate

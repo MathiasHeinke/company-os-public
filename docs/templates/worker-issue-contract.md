@@ -259,7 +259,7 @@ MemoryStore:
 MemoryUpdatePolicy: none | proposal-only | controller-approved
 ReflectionPolicy: none | required
 LearningProposalPolicy: none | required
-SessionPolicy:
+SessionPolicy: fresh | same-item-resume | workstream-continuity | session-group | continuity-blocked
 Coordinator:
 SubAgentRoster:
 SharedFilesystem: none | sandbox-worktree | managed-container
@@ -427,7 +427,14 @@ Heartbeat:
   include `learning_proposals:`. Proposal-only means no durable memory, SOP,
   skill, workflow or harness change happens until controller/CEO review.
 - `SessionPolicy` and `SubAgentRoster` are required before a coordinator can
-  spawn, delegate to, or parallelize specialist agents.
+  spawn, delegate to, or parallelize specialist agents. Default is `fresh`.
+  `same-item-resume`, `workstream-continuity`, `session-group` and
+  `continuity-blocked` are governed by
+  `docs/orchestration/workstream-session-continuity.md` and should be routed
+  through `scripts/orchestration/session-continuity-router.mjs` before launch.
+  Any continuity policy requires a route receipt, current boot pack, current
+  Plane snapshot and explicit registry state; it never permits hidden context
+  carryover, Plane `Done`, production writes or HumanGate bypass.
 - When `SubAgentRoster` is non-empty, the worker MUST emit a structured
   `subagents:` block inside its single `worker.reported` Plane comment per
   `docs/orchestration/subagent-reporting-contract.md`. Required keys per
