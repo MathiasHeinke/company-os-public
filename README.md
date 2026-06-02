@@ -63,8 +63,8 @@ controller review, department rollout and HumanGate model.
 For a new company or a clean MacBook setup, start from the public source:
 
 ```bash
-git clone https://github.com/MathiasHeinke/company-os.git
-cd company-os
+git clone https://github.com/MathiasHeinke/company-os-public.git
+cd company-os-public
 
 node scripts/install/public-rc.mjs install \
   --target /path/to/company-workspace \
