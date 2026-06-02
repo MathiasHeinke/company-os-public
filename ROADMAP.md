@@ -38,6 +38,11 @@ Open after `0.9.0-rc.0`:
   provisioning, voice mode, employee-facing Command Center UX and client
   support lifecycle remain future product layers, not `0.7.3-rc.0`
   requirements.
+- Command Center / dashboard / hosted account provisioning is now tracked as
+  a release-gated supergoal under
+  `docs/templates/supergoals-2026-06-02/command-center-hosted-provisioning-parent.md`:
+  `0.8` department packs plus dashboard templates, `0.9` client rollout
+  support/security/privacy, `1.0` stable baseline, `1.2` operator leverage.
 - Clicky-style status-bar/notch quick voice interaction is now captured as a
   research lane in
   `reports/operator-shell/2026-05-31/clicky-voice-desktop-research-compact.md`.
@@ -177,12 +182,16 @@ Open after `0.9.0-rc.0`:
 - [ ] Marketing / Growth department pack
 - [ ] Product department pack
 - [ ] Department dashboard template
+- [ ] Command Center / hosted provisioning supergoal child:
+      department dashboard template contract
 - [ ] Weekly autonomy board template
 - [ ] Department assistant surface for first client-style adoption: employees
       can talk or type to the Command Center, see visible process feedback, and
       create only gated intent cards for department automations
 - [ ] Command Center view for parent/child work: child lanes, proposal
       comparison, selected path, rejected paths, risks and next HumanGate
+- [ ] Command Center / hosted provisioning supergoal child:
+      department intent-card surface contract
 - [ ] EVE Quick Mode design packet and no-write prototype for short
       status-bar/notch interactions, synthetic or local-safe contexts only
 
@@ -194,6 +203,11 @@ Open after `0.9.0-rc.0`:
 - [ ] Security/privacy/license release gate
 - [ ] Cloud scheduler reference implementation
 - [ ] Role identity registry template
+- [ ] Hosted account provisioning architecture for guided client pilots:
+      tenant identity, provisioning states, support handoff and update-channel
+      relationship; no stable SaaS claim
+- [ ] Client rollout support/security/privacy gate for hosted provisioning,
+      voice/realtime consent, audit logs, data retention and kill switch
 - [ ] Voice/realtime privacy, consent, audit-log and kill-switch release gate
       for client installs
 - [ ] EVE Quick Mode privacy, retention, screenshot/audio audit-log,
@@ -211,6 +225,8 @@ Open after `0.9.0-rc.0`:
 - [ ] Stable artifact truth verifier
 - [ ] Three department packs usable
 - [ ] Public/client release gate passed
+- [ ] Stable baseline release pack for Command Center/dashboard/hosted
+      provisioning boundaries, unsupported actions and support lifecycle
 
 ## v1.2 - Operator Leverage Layer
 
@@ -220,6 +236,8 @@ Open after `0.9.0-rc.0`:
 - [ ] Marketing/content/social publication packets
 - [ ] Coding and website lanes repeatedly produce review-ready artifacts
 - [ ] One trained operator can supervise small-team output
+- [ ] Operator Leverage Layer scorecard proves the dashboard/gate-card surface
+      measurably compresses coordination work without bypassing HG-4
 - [ ] Quick Mode can compress short supervision loops into receipts, local
       captures, report lookups and gated intent-card drafts without becoming a
       second execution ledger

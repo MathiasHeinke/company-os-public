@@ -1,11 +1,11 @@
 # Company.OS Autonomy Product Horizon
 
 Status: strategic horizon
-Current Company.OS version: `0.7.1-rc.0`
+Current Company.OS version: `0.9.0-rc.0`
 Current autonomy profile: `Stage 3.65 / 5`, `7.45 / 10`
 Current runtime buildout: `Stage 7 / 9 proven, Stage 8-9 gated`
 Use for: deciding what must exist before Company.OS becomes beta, 1.0 and 1.2
-Last updated: 2026-05-26
+Last updated: 2026-06-02
 
 ## Purpose
 
@@ -150,6 +150,39 @@ Voice, animation or a face can improve trust and usability, but the control
 mechanism is still explicit evidence: every meaningful answer links back to a
 Plane item, report, event row, source document, diff or approved dashboard.
 State-changing commands must become visible intent cards before execution.
+
+## Command Center / Dashboard / Hosted Provisioning Supergoal
+
+The current public RC proves a local/public-upstream install path. It does not
+ship hosted account provisioning, a multi-tenant dashboard or stable SaaS.
+
+The next product surface is tracked as a release-gated supergoal:
+
+```text
+docs/templates/supergoals-2026-06-02/command-center-hosted-provisioning-parent.md
+```
+
+Gate map:
+
+1. `0.8.x`: department packs plus dashboard templates. The Command Center can
+   show department read models, parent/child lanes, proposal comparisons,
+   rejected paths, risks and next HumanGate. It still cannot become a second
+   ledger or run workers by itself.
+2. `0.9.x`: client rollout, support, security and privacy. Hosted account
+   provisioning may be designed and proven in guided form only after tenant
+   identity, data retention, audit logs, support ownership, kill switch and
+   privacy gates are explicit.
+3. `1.0.0`: stable operating baseline. The install/update/support/contracts
+   layer is stable and documented, with known unsupported actions and at least
+   three usable department packs. This still does not imply ungated production
+   writes or autonomous founder decisions.
+4. `1.2.x`: operator leverage layer. A trained operator can supervise
+   multi-department output through dashboards, gate cards, EVE conversations
+   and evidence drill-downs. The claim is measurable coordination replacement,
+   not generic AI capability.
+
+Hosted provisioning is therefore a v0.9+ architecture and security/privacy
+problem, not a hidden requirement for `0.9.0-rc.0`.
 
 ## Hermes Operator Shell Sidecar
 
