@@ -7,7 +7,10 @@ Last updated: 2026-05-20
 
 Related doctrine: `docs/orchestration/multi-inference-c-level-runtime.md`
 defines the model-agnostic target architecture for Claude, Codex, Gemini and
-future runtime lanes. This document remains the executable v0 router doctrine.
+future runtime lanes. `docs/orchestration/eve-hermes-superbrain-router.md`
+defines the separate operator-shell brain route for EVE/Hermes conversations
+and founder-intent orchestration. This document remains the executable v0
+worker-runtime router doctrine.
 
 ## Purpose
 

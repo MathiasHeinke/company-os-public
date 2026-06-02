@@ -151,6 +151,13 @@ mechanism is still explicit evidence: every meaningful answer links back to a
 Plane item, report, event row, source document, diff or approved dashboard.
 State-changing commands must become visible intent cards before execution.
 
+EVE/Hermes model power is governed by
+`docs/orchestration/eve-hermes-superbrain-router.md`: the shell may choose the
+brain tier autonomously (`B0` cheap scout through `B3` Superbrain), but it does
+not gain autonomous decision authority. HG-4, irreversible, legal, pricing,
+customer-facing, hosted-account, production-write and Plane-Done actions remain
+blocked and become decision cards.
+
 ## Command Center / Dashboard / Hosted Provisioning Supergoal
 
 The current public RC proves a local/public-upstream install path. It does not

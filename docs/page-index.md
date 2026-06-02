@@ -3,7 +3,7 @@
 Generated: deterministic
 Root: `.`
 Source: tracked-canonical
-Files: 363
+Files: 364
 
 > Generated Layer-0.5-compatible Markdown map. Edit source files, then regenerate this page index.
 > Source `tracked-canonical` enumerates only files tracked by git; `runtime-local` includes untracked working-tree files (developer view).
@@ -358,6 +358,7 @@ Files: 363
 | `docs/orchestration/contract-controller.md` | Contract Controller | Status: canonical Stage 0.5 pre-dispatch quality gate | Purpose, Position In The Run Chain, Verdicts, Remediation Ownership, What It Checks, HumanGate Awareness, Executable Files, Comment Shape, Bootstrap Escape Hatch, Hygiene |
 | `docs/orchestration/contract-remediation-router.md` | Contract Remediation Router | Status: canonical Stage 0.6 pre-dispatch remediation router | Purpose, Position In The Run Chain, Route Matrix, Executable Files, Comment Shape, Stable Reason Codes, Scheduler Rule, Non-Goals |
 | `docs/orchestration/domain-claude-c-level-boot-contract-template.md` | Domain Claude C-Level Boot Contract (Template) | **Generic reusable template.** Copy this file to a domain overlay, populate | Purpose, Canonical Sources, Domain Working Assumptions, Boot Sequence, Runtime Auth And Capability Access, Autonomy Ladder, Required Report Shape, Blocked Actions, Controller Review Rule |
+| `docs/orchestration/eve-hermes-superbrain-router.md` | EVE / Hermes Superbrain Router | Status: canonical operator-brain routing policy | Purpose, Core Decision, Executable Registry, Brain Classes, Default Model Intent, Route Receipt, Classification Rules, Autonomy Answer, Implementation Path, Gates |
 | `docs/orchestration/goal-runtime-plane-loop.md` | Goal Runtime Plane Loop | Status: agentic implementation plan | Purpose, Decision, Non-Goals, Runtime Boundary, Implementation Slices, Slice 1: Doctrine And Feature Gate, Slice 2: Plane Materialization, Slice 3: Goal Runner v0, Slice 4: Runtime Goal Adapter, Slice 5: Scheduler Loop Pilot, Slice 5.5: Supergoal Planner, Slice 6: CAO Synthesis And Parent Completion, Current Plane Seed, Exit Criteria |
 | `docs/orchestration/headless-worker-runtime-boot-contract.md` | Headless Worker Runtime Boot Contract | Status: canonical doctrine for Claude/Codex/Gemini headless worker starts | Purpose, Runtime Truth, Forbidden Boot Shapes, Required Boot Pack, 1. Runtime Identity, 2. Boot Reading Order, 3. Plane Work Item Snapshot, 4. Context Proof Requirement, 4.1 Timing Policy, 5. Reporting Contract, Claude CLI Shape, Codex CLI Shape, Gemini CLI Shape, Session Reuse, Scheduler Responsibilities, Automation Transition Policy, First Pilot Recommendation |
 | `docs/orchestration/knowledge-context-topology.md` | Knowledge & Context Topology (T13) | Status: canonical schema decision (foundational-early — decide now, or rebuild at 1.5) | Why this is a schema decision, not a feature, Data model (v0), Context Router (sibling to the Inference Router), Session lifecycle (domain-scoped, mitgedacht not built yet), Rollout rule (the flat -> sorted transition), Boundaries, Implementation order, Non-goals (v0) |

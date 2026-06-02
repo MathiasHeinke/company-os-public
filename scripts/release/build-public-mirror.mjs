@@ -83,6 +83,7 @@ export const INCLUDE_RULES = [
   { pattern: "metrics/ai-cost-ledger.example.jsonl" },
   { pattern: "registries/capabilities/example.json" },
   { pattern: "registries/inference/example.json" },
+  { pattern: "registries/inference/eve-hermes-brain.json" },
   { pattern: "registries/domain-packs/**" },
   { pattern: "registries/plane-templates/**" },
   { pattern: "registries/quality/**" },

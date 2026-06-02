@@ -1,0 +1,118 @@
+{
+  "version": "eve-brain-router/v0",
+  "generated_at": "2026-06-02",
+  "purpose": "Route EVE / Hermes operator-shell inference to the cheapest sufficient brain tier while preserving HumanGate and route-receipt boundaries.",
+  "defaults": {
+    "fallback_class": "B1-daily-brain",
+    "route_receipt_required": true,
+    "autonomous_model_selection": true,
+    "autonomous_external_action": false,
+    "fail_closed_class": "B4-founder-veto"
+  },
+  "brain_classes": [
+    {
+      "id": "B0-intake-scout",
+      "label": "Cheap intake scout",
+      "examples": ["classify intent", "summarize one short item", "dedupe", "ask one setup question"],
+      "autonomous": true
+    },
+    {
+      "id": "B1-daily-brain",
+      "label": "Daily EVE orchestration brain",
+      "examples": ["onboarding conversation", "morning report follow-up", "status request", "simple department routing"],
+      "autonomous": true
+    },
+    {
+      "id": "B2-long-context-challenger",
+      "label": "Long-context challenger",
+      "examples": ["large report sweep", "transcript or screenshot bundle", "cross-source contradiction scan"],
+      "autonomous": true
+    },
+    {
+      "id": "B3-superbrain",
+      "label": "Founder-intent and orchestration superbrain",
+      "examples": ["translate founder intent into CEO work", "multi-department roadmap", "ambiguous strategy", "high-impact routing"],
+      "autonomous": true
+    },
+    {
+      "id": "B4-founder-veto",
+      "label": "Founder / HG-4 veto lane",
+      "examples": ["irreversible decision", "legal or pricing commitment", "capital allocation", "customer-facing promise", "public founder voice"],
+      "autonomous": false
+    }
+  ],
+  "routes": {
+    "B0-intake-scout": {
+      "brain_lane": "cheap-scout",
+      "primary_runtime": "openrouter",
+      "primary_model_alias": "cheap-scout",
+      "candidate_models": ["deepseek-v4-flash", "grok-4.1-fast"],
+      "fallback_model_alias": "daily-brain",
+      "context_profile": "thin-intake",
+      "max_auto_cost_usd": 0.05,
+      "human_gate": "HG-0",
+      "autonomous_model_selection": true,
+      "autonomous_decision_authority": false,
+      "allowed_actions": ["classify intent", "summarize", "dedupe", "ask one next question"],
+      "blocked_actions": ["create work item", "dispatch worker", "write memory", "external action"]
+    },
+    "B1-daily-brain": {
+      "brain_lane": "daily-brain",
+      "primary_runtime": "anthropic-or-openai",
+      "primary_model_alias": "daily-brain",
+      "candidate_models": ["claude-sonnet-4-6", "gpt-5.4"],
+      "fallback_model_alias": "superbrain-primary",
+      "context_profile": "operator-standard",
+      "max_auto_cost_usd": 0.75,
+      "human_gate": "HG-2",
+      "autonomous_model_selection": true,
+      "autonomous_decision_authority": false,
+      "allowed_actions": ["answer", "ask setup question", "draft intent card", "recommend next route"],
+      "blocked_actions": ["external send", "production write", "hosted account creation", "Plane Done"]
+    },
+    "B2-long-context-challenger": {
+      "brain_lane": "long-context-challenger",
+      "primary_runtime": "google-or-anthropic",
+      "primary_model_alias": "long-context-challenger",
+      "candidate_models": ["gemini-3.1-pro-preview", "claude-sonnet-4-6-1m"],
+      "fallback_model_alias": "superbrain-primary",
+      "context_profile": "large-source-sweep",
+      "max_auto_cost_usd": 2,
+      "human_gate": "HG-2.5",
+      "autonomous_model_selection": true,
+      "autonomous_decision_authority": false,
+      "allowed_actions": ["compare sources", "find contradictions", "summarize large context", "produce report-only recommendation"],
+      "blocked_actions": ["state change", "external send", "production write", "Plane Done"]
+    },
+    "B3-superbrain": {
+      "brain_lane": "superbrain",
+      "primary_runtime": "anthropic",
+      "primary_model_alias": "superbrain-primary",
+      "candidate_models": ["claude-opus-4-8"],
+      "fallback_model_alias": "superbrain-veto",
+      "fallback_candidate_models": ["gpt-5.5-xhigh"],
+      "secondary_challenger_alias": "long-context-challenger",
+      "context_profile": "founder-intent-plus-company-state",
+      "max_auto_cost_usd": 8,
+      "human_gate": "HG-3",
+      "autonomous_model_selection": true,
+      "autonomous_decision_authority": false,
+      "allowed_actions": ["translate founder intent", "build decision path", "draft CEO delegation", "draft C-Level routing", "request HumanGate"],
+      "blocked_actions": ["final founder decision", "legal commitment", "pricing commitment", "customer-facing promise", "production write", "Plane Done"]
+    },
+    "B4-founder-veto": {
+      "brain_lane": "founder-veto",
+      "primary_runtime": "none",
+      "primary_model_alias": "blocked",
+      "candidate_models": [],
+      "fallback_model_alias": "none",
+      "context_profile": "founder-decision-card",
+      "max_auto_cost_usd": 0,
+      "human_gate": "HG-4",
+      "autonomous_model_selection": false,
+      "autonomous_decision_authority": false,
+      "allowed_actions": ["prepare decision card", "ask founder", "request explicit approval"],
+      "blocked_actions": ["autonomous model execution", "external action", "production write", "public commitment", "Plane Done"]
+    }
+  }
+}
