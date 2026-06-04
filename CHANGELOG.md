@@ -5,13 +5,14 @@ runtime changes.
 
 ## Unreleased
 
-## 0.9.0-rc.0 - 2026-06-02
+## 0.9.0-rc.0 - 2026-06-03
 
-Status: Public self-serve release candidate. This is the first Company.OS
-release line where the sanitized public clone or public mirror artifact is the
-canonical distribution source for a fresh external install. It is not a stable
-unsupported autonomy release, not scheduler-default-on and not a production
-write/publish/send/spend release.
+Status: Command EVE 0.9 remote-install release candidate. This is the first
+Company.OS public release-candidate line whose sanitized public clone or public
+mirror artifact is the canonical distribution source for a remote founder to
+install a fresh Company.OS target. It is a guided/self-serve RC, not stable
+production: not stable unsupported autonomy, not scheduler-default-on, and not
+a production write/publish/send/spend release.
 
 Added:
 
@@ -20,29 +21,45 @@ Added:
   bootstrap apply, `company-intake.json`, EVE boot packet, company discovery
   brief, first Plane parent draft, update provenance and public-RC handoff
   report.
-- Public-RC install core and tests proving a naked target can start from generic
-  company seed without any client-specific assumptions.
+- Public-RC install core and tests proving a naked target can start from
+  generic company seed without any client-specific assumptions.
 - Public mirror coverage for `registries/domain-packs/**`,
   `registries/plane-templates/**` and `registries/quality/**`, while private
-  capability and inference registries remain stripped or replaced with examples.
+  capability and inference registries remain stripped or replaced with
+  examples.
+- `docs/releases/0.9-public-rc.md` release notes describing the
+  remote-install RC entry point, 0.7.4 update target and explicit "RC, not
+  stable" framing for a remote founder following the public GitHub source.
 
 Changed:
 
-- `VERSION`, `README.md`, `ROADMAP.md`, `docs/releases/versioning.md`,
-  `docs/bootstrap/fresh-company-setup.md`, `docs/operations/client-productization-readiness.md`
-  and `kits/company-os-kit/README.md` now identify `0.9.0-rc.0` as the current
-  public-RC line.
+- `VERSION`, `README.md`, `docs/releases/versioning.md` and
+  `docs/operations/client-productization-readiness.md` now identify
+  `0.9.0-rc.0` as the current public remote-install RC line.
 - The install path is now public-first: private or client overlays update from
   the public source after the public mirror/clone proves install and update
   evidence, not the other way around.
+
+Update targets:
+
+- Existing `0.7.4-rc.0` installs are the supported update target for the
+  `0.9.0-rc.0` line. Operators must run
+  `node scripts/update/company-os-update.mjs check --source <public-rc-clone> --target <existing-074-install> --write-report --json`
+  followed by the same command with `apply --dry-run` before any non-dry-run
+  apply. Earlier 0.6.x / 0.7.0 / 0.7.1 / 0.7.3 installs are not in scope for a
+  direct one-shot update on this RC and should first reach 0.7.4-rc.0.
 
 Boundaries:
 
 - `0.9.0-rc.0` does not grant stable unattended self-serve claims, autonomous
   publish/schedule/send/spend behavior, production writes, Plane `Done`,
-  public tags or release uploads without the relevant HumanGate release.
+  GitHub tag creation, GitHub release publishes or scheduler-default-on
+  autonomy without the relevant HumanGate release.
 - EVE may guide first-run setup and prepare founder/CEO decision packets, but
   HG-4 remains founder-owned.
+- The public artifact is the sanitized public clone / fresh-history mirror;
+  the private source tree (`reports/`, `metrics/`, internal evidence) is not
+  the distribution surface and must not be copied into the public release.
 
 ## 0.7.4-rc.0 - 2026-06-02
 

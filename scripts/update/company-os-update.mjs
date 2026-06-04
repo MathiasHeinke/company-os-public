@@ -66,6 +66,13 @@ function printResult(result, json) {
     return;
   }
   process.stdout.write(`Company.OS update: ${result.status}\n`);
+  if (result.source_provenance) {
+    const p = result.source_provenance;
+    process.stdout.write(`provenance: classification=${p.classification} git=${p.is_git ? "yes" : "no"} remote=${p.remote_url || "n/a"} head=${p.head || "n/a"}\n`);
+  }
+  if (result.kit_secret_audit && result.kit_secret_audit.scanned) {
+    process.stdout.write(`secret_audit: ${result.kit_secret_audit.ok ? "clean" : `BLOCKER (${result.kit_secret_audit.findings.length} findings)`}\n`);
+  }
   if (result.summary) {
     process.stdout.write(`changes: add=${result.summary.add} update=${result.summary.update} unchanged=${result.summary.unchanged}\n`);
   }

@@ -2,20 +2,21 @@
 
 Status: canonical productization gate for `0.9.0-rc.0`
 Use for: deciding whether Company.OS can be installed into another company
-Last updated: 2026-06-02
+Last updated: 2026-06-03
 
 ## Verdict
 
-Company.OS `0.9.0-rc.0` is ready as a **public self-serve release candidate**
-for the install/onboarding/update path. A public clone or sanitized public
-mirror artifact can install the kit into a fresh target, write the first intake
-from generic signup/report seed, generate EVE's boot packet, write update
-provenance and produce a public-RC handoff report.
+Company.OS `0.9.0-rc.0` is ready as a **Command EVE remote-install release
+candidate** for the install/onboarding/update path. A public clone or
+sanitized public mirror artifact can install the kit into a fresh target,
+write the first intake from generic signup/report seed, generate EVE's boot
+packet, write update provenance and produce a public-RC handoff report.
 
-It is not yet a stable unrestricted autonomy product.
+It is a guided/self-serve release candidate, not a stable unrestricted
+autonomy product.
 
 ```text
-public self-serve rc install: yes
+public remote-install rc: yes
 public mirror artifact: yes
 private overlays update from public: yes
 stable unsupported autonomy: gated

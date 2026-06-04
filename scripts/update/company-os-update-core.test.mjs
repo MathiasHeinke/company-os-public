@@ -6,7 +6,10 @@ import test from "node:test";
 
 import {
   applyCompanyOsUpdate,
+  auditKitForSecrets,
+  gatherSourceProvenance,
   HARD_BLOCKED_UPDATE_PATHS,
+  KIT_SECRET_FILENAME_PATTERNS,
   LOCAL_STATE_FILES,
   MANUAL_REVIEW_PATHS,
   planCompanyOsUpdate,
@@ -314,4 +317,100 @@ test("protected state list covers install-record, workspace-registry, human-gate
   assert.ok(HARD_BLOCKED_UPDATE_PATHS.has(".company-os/install-record.md"));
   assert.ok(HARD_BLOCKED_UPDATE_PATHS.has(".company-os/operations/workspace-registry.json"));
   assert.ok(HARD_BLOCKED_UPDATE_PATHS.has(".company-os/operations/human-gates.md"));
+});
+
+// --- New tests: source provenance and kit secret audit for 0.9 remote-install RC ---
+
+test("gatherSourceProvenance reports is_git=false when source has no .git directory", () => {
+  const source = makeSource();
+  const provenance = gatherSourceProvenance(source);
+  assert.equal(provenance.is_git, false);
+  assert.equal(provenance.remote_url, null);
+  assert.equal(provenance.classification, "unknown");
+});
+
+test("planCompanyOsUpdate exposes source_provenance and kit_secret_audit fields", () => {
+  const source = makeSource();
+  const target = makeTarget();
+  const plan = planCompanyOsUpdate({ source, target, toVersion: "0.7.2", date: "2026-05-28" });
+  assert.ok(plan.source_provenance, "plan must expose source_provenance");
+  assert.equal(typeof plan.source_provenance.is_git, "boolean");
+  assert.equal(typeof plan.source_provenance.classification, "string");
+  assert.ok(plan.kit_secret_audit, "plan must expose kit_secret_audit");
+  assert.equal(plan.kit_secret_audit.scanned, true);
+  assert.equal(plan.kit_secret_audit.ok, true, "clean kit fixture must pass secret audit");
+});
+
+test("planCompanyOsUpdate source-is-target still reports provenance and audit", () => {
+  const source = makeSource();
+  const plan = planCompanyOsUpdate({ source, target: source, date: "2026-05-28" });
+  assert.equal(plan.status, "source-is-target");
+  assert.ok(plan.source_provenance);
+  assert.ok(plan.kit_secret_audit);
+});
+
+test("auditKitForSecrets flags .env, secrets.json, credentials.yaml in kit source", () => {
+  const source = makeSource();
+  const kitDir = path.join(source, "kits", "company-os-kit");
+  writeFile(kitDir, ".env", "API_KEY=xxx\n");
+  writeFile(kitDir, "config/secrets.json", "{}\n");
+  writeFile(kitDir, "scripts/credentials.yaml", "x: 1\n");
+  const audit = auditKitForSecrets(kitDir);
+  assert.equal(audit.ok, false);
+  assert.equal(audit.findings.length, 3);
+  const found = new Set(audit.findings.map((row) => row.path));
+  assert.ok(found.has(".env"));
+  assert.ok(found.has("config/secrets.json"));
+  assert.ok(found.has("scripts/credentials.yaml"));
+});
+
+test("auditKitForSecrets is clean for a kit with .env.example only", () => {
+  const source = makeSource();
+  const kitDir = path.join(source, "kits", "company-os-kit");
+  writeFile(kitDir, ".company-os/env.example", "COMPANY_OS_VERSION=0.7.2\n");
+  const audit = auditKitForSecrets(kitDir);
+  assert.equal(audit.ok, true);
+  assert.equal(audit.findings.length, 0);
+});
+
+test("auditKitForSecrets whitelists .env.example, secrets.example.json and .template suffixes", () => {
+  const source = makeSource();
+  const kitDir = path.join(source, "kits", "company-os-kit");
+  writeFile(kitDir, ".env.example", "API_KEY=replaceme\n");
+  writeFile(kitDir, "config/secrets.example.json", "{}\n");
+  writeFile(kitDir, "scripts/credentials.template.yaml", "x: 1\n");
+  writeFile(kitDir, "connector-auth.sample.json", "{}\n");
+  const audit = auditKitForSecrets(kitDir);
+  assert.equal(audit.ok, true, `template files should not be flagged; got ${JSON.stringify(audit.findings)}`);
+});
+
+test("auditKitForSecrets flags real .env.local alongside .env.example whitelist", () => {
+  const source = makeSource();
+  const kitDir = path.join(source, "kits", "company-os-kit");
+  writeFile(kitDir, ".env.example", "API_KEY=replaceme\n");
+  writeFile(kitDir, ".env.local", "API_KEY=secret-real\n");
+  const audit = auditKitForSecrets(kitDir);
+  assert.equal(audit.ok, false);
+  assert.equal(audit.findings.length, 1);
+  assert.equal(audit.findings[0].path, ".env.local");
+});
+
+test("KIT_SECRET_FILENAME_PATTERNS includes common secret-leak filenames", () => {
+  assert.ok(Array.isArray(KIT_SECRET_FILENAME_PATTERNS));
+  assert.ok(KIT_SECRET_FILENAME_PATTERNS.length >= 4);
+  assert.ok(KIT_SECRET_FILENAME_PATTERNS.some((re) => re.test(".env")));
+  assert.ok(KIT_SECRET_FILENAME_PATTERNS.some((re) => re.test("secrets.json")));
+  assert.ok(KIT_SECRET_FILENAME_PATTERNS.some((re) => re.test("credentials.yaml")));
+  assert.ok(KIT_SECRET_FILENAME_PATTERNS.some((re) => re.test("connector-auth.json")));
+});
+
+test("renderUpdateReport includes Source Provenance and Kit Secret Audit sections", () => {
+  const source = makeSource();
+  const target = makeTarget();
+  const plan = planCompanyOsUpdate({ source, target, toVersion: "0.7.2", date: "2026-05-28" });
+  const md = renderUpdateReport(plan, { dryRun: true });
+  assert.match(md, /## Source Provenance/);
+  assert.match(md, /Classification:/);
+  assert.match(md, /## Kit Secret Audit/);
+  assert.match(md, /No secret-pattern filenames found/);
 });

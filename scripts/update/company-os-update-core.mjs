@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
@@ -45,6 +46,39 @@ export const MANUAL_REVIEW_PATHS = new Set([
   ".company-os/eve/connector-manifests.json",
   ".company-os/eve/SOUL.md",
 ]);
+
+// Path-name fragments that must never appear inside the public kit source tree.
+// If the secret audit finds one, the update reports it as a blocker so the
+// operator never ships an .env, raw credentials file or connector auth dump
+// into a target install. Whitelist `.example` and `.template` suffixes — those
+// are intentional publishable scaffolds (e.g. `.env.example`).
+export const KIT_SECRET_FILENAME_PATTERNS = [
+  /^\.env(\..+)?$/,
+  /(^|[._-])secrets?\.(json|ya?ml|env|txt)$/i,
+  /(^|[._-])credentials?\.(json|ya?ml|env|txt)$/i,
+  /(^|[._-])service-?role(-key)?\.(json|env|txt)$/i,
+  /^connector-?auth\.(json|ya?ml)$/i,
+];
+
+export const KIT_SECRET_TEMPLATE_SUFFIXES = [
+  ".example",
+  ".template",
+  ".sample",
+];
+
+// Heuristic mapping of git remote URL fragments to a public/private label.
+// Used in source_provenance.classification so the update report can say
+// explicitly whether the source clone looks like a public artifact or a
+// private sandbox/client tree.
+const PUBLIC_REMOTE_FRAGMENTS = [
+  "company-os-public",
+  "/company-os-mirror",
+];
+const PRIVATE_REMOTE_FRAGMENTS = [
+  "company-os-private",
+  "aion-companyos-context",
+  "[SOURCE_WORKSPACE]/",
+];
 
 function compact(value) {
   return String(value ?? "").trim();
@@ -109,6 +143,89 @@ const BLOCKED_ACTIONS = [
   "do not mark Plane Done",
 ];
 
+function runGit(sourcePath, args) {
+  try {
+    return execFileSync("git", args, {
+      cwd: sourcePath,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+      timeout: 5_000,
+    }).trim();
+  } catch {
+    return "";
+  }
+}
+
+function classifyRemote(remoteUrl) {
+  const url = String(remoteUrl || "").toLowerCase();
+  if (!url) return "unknown";
+  for (const frag of PUBLIC_REMOTE_FRAGMENTS) if (url.includes(frag.toLowerCase())) return "public";
+  for (const frag of PRIVATE_REMOTE_FRAGMENTS) if (url.includes(frag.toLowerCase())) return "private";
+  return "unknown";
+}
+
+// Source provenance: tries to read git remote/head/branch so the update report
+// names *which* clone shipped these kit files. Falls back to a non-git
+// classification when source is not a git checkout.
+export function gatherSourceProvenance(sourcePath) {
+  const resolved = path.resolve(sourcePath || "");
+  const gitDir = path.join(resolved, ".git");
+  if (!fs.existsSync(gitDir)) {
+    return {
+      is_git: false,
+      remote_url: null,
+      head: null,
+      branch: null,
+      classification: "unknown",
+      reason: "no .git directory in source",
+    };
+  }
+  const remoteUrl = runGit(resolved, ["remote", "get-url", "origin"]);
+  const head = runGit(resolved, ["rev-parse", "HEAD"]);
+  const branch = runGit(resolved, ["rev-parse", "--abbrev-ref", "HEAD"]);
+  return {
+    is_git: true,
+    remote_url: remoteUrl || null,
+    head: head || null,
+    branch: branch || null,
+    classification: classifyRemote(remoteUrl),
+  };
+}
+
+function looksLikePublishableTemplate(filename) {
+  const lower = filename.toLowerCase();
+  for (const suffix of KIT_SECRET_TEMPLATE_SUFFIXES) {
+    if (lower.endsWith(suffix)) return true;
+    // Also accept `name.example.ext` / `name.template.ext` patterns.
+    if (lower.includes(`${suffix}.`)) return true;
+  }
+  return false;
+}
+
+// Kit secret audit: scans the kit source for filenames matching known
+// secret-leak patterns. The kit is meant to be publishable, so any match is a
+// blocker the operator must clean up before the update path is safe. Files
+// whose names carry an explicit publishable template marker (`.example`,
+// `.template`, `.sample`) are treated as intentional scaffolding and skipped.
+export function auditKitForSecrets(kitDir) {
+  if (!fs.existsSync(kitDir)) {
+    return { ok: false, scanned: false, findings: [], reason: "kit directory not found" };
+  }
+  const findings = [];
+  const files = listFilesRecursive(kitDir, kitDir);
+  for (const relative of files) {
+    const basename = path.basename(relative);
+    if (looksLikePublishableTemplate(basename)) continue;
+    for (const pattern of KIT_SECRET_FILENAME_PATTERNS) {
+      if (pattern.test(basename)) {
+        findings.push({ path: relative, pattern: pattern.source });
+        break;
+      }
+    }
+  }
+  return { ok: findings.length === 0, scanned: true, findings };
+}
+
 export function planCompanyOsUpdate({ source, target, toVersion = "", date } = {}) {
   const resolvedSource = path.resolve(source || "");
   const resolvedTarget = path.resolve(target || "");
@@ -117,6 +234,8 @@ export function planCompanyOsUpdate({ source, target, toVersion = "", date } = {
   // client update check. Operators must not mistake this for an update plan.
   if (resolvedSource === resolvedTarget) {
     const sourceVersion = compact(readOptional(path.join(resolvedSource, "VERSION"))) || "unknown";
+    const provenance = gatherSourceProvenance(resolvedSource);
+    const secretAudit = auditKitForSecrets(path.join(resolvedSource, "kits", "company-os-kit"));
     return {
       ok: true,
       version: COMPANY_OS_UPDATE_VERSION,
@@ -129,6 +248,8 @@ export function planCompanyOsUpdate({ source, target, toVersion = "", date } = {
       source_version: sourceVersion,
       target_version: "n/a",
       to_version: "n/a",
+      source_provenance: provenance,
+      kit_secret_audit: secretAudit,
       summary: {
         total_files: 0, add: 0, update: 0, unchanged: 0,
         collision: 0, blocked: 0, manual_review: 0, local_state_preserved: 0,
@@ -195,6 +316,9 @@ export function planCompanyOsUpdate({ source, target, toVersion = "", date } = {
     status = "up-to-date";
   }
 
+  const sourceProvenance = gatherSourceProvenance(resolvedSource);
+  const kitSecretAudit = auditKitForSecrets(kitDir);
+
   return {
     ok: true,
     version: COMPANY_OS_UPDATE_VERSION,
@@ -207,6 +331,8 @@ export function planCompanyOsUpdate({ source, target, toVersion = "", date } = {
     source_version: sourceVersion,
     target_version: targetVersion,
     to_version: effectiveToVersion,
+    source_provenance: sourceProvenance,
+    kit_secret_audit: kitSecretAudit,
     summary: {
       total_files: files.length,
       add: changes.filter((row) => row.status === "add").length,
@@ -247,6 +373,34 @@ export function renderUpdateReport(plan, { applied = false, dryRun = true } = {}
     `Source version: ${plan.source_version}`,
     `Installed version: ${plan.target_version}`,
     `Target version: ${plan.to_version}`,
+    "",
+    "## Source Provenance",
+    "",
+    plan.source_provenance
+      ? [
+          `Is git checkout: ${plan.source_provenance.is_git ? "yes" : "no"}`,
+          `Remote URL: ${plan.source_provenance.remote_url || "n/a"}`,
+          `HEAD: ${plan.source_provenance.head || "n/a"}`,
+          `Branch: ${plan.source_provenance.branch || "n/a"}`,
+          `Classification: ${plan.source_provenance.classification}`,
+          plan.source_provenance.classification === "private"
+            ? "Warning: source clone looks private/sandbox; do not publish update artifacts from this run."
+            : plan.source_provenance.classification === "unknown"
+              ? "Note: source classification is unknown; verify the clone is the public Company.OS source before public-facing apply."
+              : "Source classification: public Company.OS clone.",
+        ].join("\n")
+      : "- source provenance unavailable",
+    "",
+    "## Kit Secret Audit",
+    "",
+    plan.kit_secret_audit
+      ? (plan.kit_secret_audit.ok
+          ? "No secret-pattern filenames found in kit source."
+          : [
+              "Blocker: kit source contains files matching secret-leak patterns. These must not ship through the kit.",
+              ...((plan.kit_secret_audit.findings || []).map((row) => `- ${row.path} (pattern: ${row.pattern})`)),
+            ].join("\n"))
+      : "- secret audit not run",
     "",
     "## Summary",
     "",

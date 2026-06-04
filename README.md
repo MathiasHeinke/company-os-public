@@ -5,15 +5,17 @@ agentic teams.
 
 Current version: `0.9.0-rc.0`
 
-Current productization status: public self-serve release candidate, not stable.
-Company.OS now has a public-first install path: a sanitized public clone or
-public mirror artifact can install a fresh target from generic signup/report
-seed, generate EVE's first boot packet, write update provenance and produce a
-public-RC handoff report. The 0.9 RC carries forward the 0.7.4 Supergoal
-Factory hardening, post-worker quality lane and lower-worker audit/hotfix
-profiles, but external posting, outreach sends, spend changes, production
-writes, scheduler-default-on, Plane Done, stable self-serve claims, tags and
-release uploads remain gated.
+Current productization status: Command EVE 0.9 remote-install release
+candidate, not stable production. Company.OS now has a public-first install
+path: a sanitized public clone or public mirror artifact can install a fresh
+target from generic signup/report seed, generate EVE's first boot packet,
+write update provenance and produce a public-RC handoff report. The 0.9 RC
+carries forward the 0.7.4 Supergoal Factory hardening, post-worker quality
+lane and lower-worker audit/hotfix profiles, but external posting, outreach
+sends, spend changes, production writes, scheduler-default-on, Plane Done,
+stable self-serve claims, GitHub tags and release uploads remain gated. This
+is a guided/self-serve RC for a remote founder to try, not a stable
+production product.
 
 Current runtime proof: Stage 7 / 9 proven by live pilots; Stage 8-9 still
 gated.
@@ -127,10 +129,12 @@ It also writes the release-candidate handoff to:
 
 ## Readiness
 
-`0.9.0-rc.0` is the public self-serve release candidate for the install,
-onboarding and update path. It carries the `0.7.4-rc.0` Supergoal Factory
-substrate forward and closes the public-upstream distribution path for fresh
-targets.
+`0.9.0-rc.0` is the Command EVE remote-install release candidate for the
+install, onboarding and update path. It carries the `0.7.4-rc.0` Supergoal
+Factory substrate forward and closes the public-upstream distribution path for
+remote founders installing a fresh Company.OS target. Existing `0.7.4-rc.0`
+installs are the supported update target when
+`scripts/update/company-os-update.mjs` passes its dry-run.
 
 For installs, this is a release candidate and not stable. The public clone or
 fresh-history mirror is the distribution source, but tags, release uploads,
@@ -263,11 +267,13 @@ the public mirror includes the generic Post-Worker Quality Registry plus
 lower-worker capability profiles. It is still a release candidate, not
 scheduler-default-on or stable unattended client autonomy.
 
-`0.9.0-rc.0` closes the public-upstream install/update path: the public clone
+`0.9.0-rc.0` closes the public-upstream remote-install path: the public clone
 or sanitized public mirror contains the domain-pack, Plane-template and
 post-worker-quality registries needed for a fresh external install, and
 `scripts/install/public-rc.mjs` collapses bootstrap, onboarding, EVE boot packet
-and update provenance into one generic flow.
+and update provenance into one generic flow. See
+[`docs/releases/0.9-public-rc.md`](./docs/releases/0.9-public-rc.md)
+for the remote-install RC entry point.
 
 ```bash
 node scripts/release/build-public-mirror.mjs --out /tmp/company-os-public --verify
@@ -282,10 +288,11 @@ generated fresh-history mirror to
 `https://github.com/MathiasHeinke/company-os-public`. Do not push the private
 history to a public remote.
 
-Company.OS 0.9.0-rc.0 remains a public release candidate. Scheduler-default-on,
-full department autonomy, autonomous publish/schedule/send actions, spend
-changes, production writes, Plane Done, public tags/release uploads and stable
-unsupported self-serve claims stay gated past this cut.
+Company.OS 0.9.0-rc.0 is a remote-install release candidate, not a stable
+release. Scheduler-default-on, full department autonomy, autonomous
+publish/schedule/send actions, spend changes, production writes, Plane Done,
+public tags/release uploads and stable unsupported self-serve claims stay
+gated past this cut.
 
 ## Company.OS Kit
 
@@ -381,15 +388,15 @@ should stay reusable, clean, and safe to publish.
 
 Current status:
 
-- `0.9.0-rc.0` is the current public self-serve release candidate. It
+- `0.9.0-rc.0` is the current Command EVE remote-install release candidate. It
   includes the 0.6.5 Plane-first runtime substrate, the 0.7.0 AionUI/Hermes/EVE
-  operator-shell packaging, the 0.7.1 install/onboarding/update smoke, the 0.7.3
-  governance spine, goal/supergoal planner, confidence reporting, the 0.7.4
-  post-worker quality / lower-worker scheduler handoff doctrine and the 0.9
-  public-RC install wrapper. Public remote push, autonomous publishing, scheduling,
-  outreach sends, spend changes, production writes, regulated claim approvals,
-  direct controller spawning and stable unattended self-serve installs remain
-  gated.
+  operator-shell packaging, the 0.7.1 install/onboarding/update smoke, the
+  0.7.3 governance spine, goal/supergoal planner, confidence reporting, the
+  0.7.4 post-worker quality / lower-worker scheduler handoff doctrine and the
+  0.9 public-RC install wrapper for remote founders. Public remote push,
+  autonomous publishing, scheduling, outreach sends, spend changes, production
+  writes, regulated claim approvals, direct controller spawning and stable
+  unattended self-serve installs remain gated.
 - `0.7.4-rc.0` was the Supergoal Factory and post-worker quality release
   candidate.
 - `0.7.1-rc.0` was the first self-serve install/onboarding/update candidate.

@@ -500,6 +500,56 @@ When upgrading an existing install to `0.2.0-alpha.1`:
 - verify Artifact Truth reports are included in morning brief
 - rerun Page Index after doc changes
 
+### 0.7.4-rc.0 → 0.9.0-rc.0 Update Path
+
+The `0.9.0-rc.0` line accepts one supported in-place update: an existing
+`0.7.4-rc.0` install. Earlier 0.6.x, 0.7.0, 0.7.1 and 0.7.3 installs must
+reach `0.7.4-rc.0` first; there is no one-shot path to 0.9 from those lines.
+
+A remote founder runs the canonical update command twice in non-destructive
+mode before any non-dry-run apply:
+
+```bash
+# 1. Check against the public clone; writes markdown+JSON report.
+node scripts/update/company-os-update.mjs check \
+  --source /path/to/company-os-public \
+  --target /path/to/existing-074-install \
+  --to 0.9.0-rc.0 \
+  --write-report \
+  --json
+
+# 2. Dry-run apply to see exactly which files would change.
+node scripts/update/company-os-update.mjs apply \
+  --source /path/to/company-os-public \
+  --target /path/to/existing-074-install \
+  --to 0.9.0-rc.0 \
+  --dry-run
+```
+
+Both commands record:
+
+- `source_version` (read from the source `VERSION`),
+- `target_version` (read from `.company-os/install-record.md` on the target),
+- `to_version` (must match the source `VERSION` exactly when `--to` is set),
+- `source_provenance`: git remote URL, HEAD, branch and `public/private/unknown`
+  classification of the source clone,
+- `kit_secret_audit`: a scan of the kit source for known secret-leak
+  filenames (`.env*`, `secrets.json`, `credentials.yaml`, `connector-auth.json`).
+
+The dry-run report under `<target>/reports/company-os-updates/<YYYY-MM-DD>/`
+shows every kit file classified as `add`, `update`, `unchanged`,
+`manual-review`, `collision` or `blocked`. Only `add` and `update` are copied
+during a real apply. `collision` (would overwrite local state),
+`blocked` (hard-blocked path such as install-record / workspace-registry /
+human-gates) and `manual-review` (connector manifests, EVE soul) are skipped
+by default and reported as work for the operator.
+
+The update never reaches outside the public source tree. The kit excludes
+`.env`, raw credentials and connector auth files by construction, so the
+update path cannot pull private state into a public target. If the source
+clone is classified `private`, the report includes an explicit warning so
+operators do not publish artifacts produced from that run.
+
 ## Stop Rules
 
 Stop and report, do not improvise, when:

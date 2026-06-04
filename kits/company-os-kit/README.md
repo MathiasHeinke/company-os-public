@@ -62,9 +62,12 @@ docs/integrations/plane-app-control-plane.md
 
 ## Fresh Project Install
 
-For `0.9.0-rc.0`, the recommended public-RC entrypoint is:
+For `0.9.0-rc.0`, the recommended remote-founder install path is:
 
 ```bash
+git clone https://github.com/MathiasHeinke/company-os-public.git
+cd company-os-public
+
 node scripts/install/public-rc.mjs install \
   --target /path/to/target-workspace \
   --company "Acme Systems" \
@@ -182,8 +185,10 @@ See `.antigravity/personas/README.md` for the full doctrine and private-overlay 
 - `growth-engine` - growth and marketing pressure-test
 - `compliance-officer` - compliance gate
 
-Named or domain-specific personas for private deployments belong in a private overlay
-(e.g. `~/.company-os/private-overlays/[workspace]/personas/`), not in the kit.
+Named or domain-specific personas for private deployments belong in a local
+private overlay (for example under a user-owned `.company-os/private-overlays/`
+folder), not in the kit. Public-RC install and smoke checks must not inspect or
+depend on any private overlay path.
 
 ## Primary Org Layers
 
@@ -263,25 +268,62 @@ questionnaire.
 
 ## Updates
 
-The first `/update_eve` implementation lives in the Company.OS source repo:
+The `/update_eve` implementation lives in the Company.OS source repo at
+`scripts/update/company-os-update.mjs`. The supported update target for the
+`0.9.0-rc.0` line is an existing `0.7.4-rc.0` install. Earlier 0.6.x, 0.7.0,
+0.7.1 and 0.7.3 installs are not in scope for a one-shot 0.9.x update; reach
+`0.7.4-rc.0` first.
+
+A remote founder updating an existing `0.7.4-rc.0` install must run the
+command twice in non-destructive mode before any non-dry-run apply:
 
 ```bash
+# Step 1: dry-run check from the public clone; writes a markdown+JSON report
+# under the target workspace and prints provenance + secret-audit lines.
 node scripts/update/company-os-update.mjs check \
-  --source /path/to/Company.OS \
-  --target /path/to/target-workspace \
-  --to 0.7.2 \
-  --write-report
+  --source /path/to/company-os-public \
+  --target /path/to/existing-074-install \
+  --to 0.9.0-rc.0 \
+  --write-report \
+  --json
 
+# Step 2: dry-run apply; classifies every kit file as add/update/unchanged/
+# manual-review/collision/blocked without writing to the target.
 node scripts/update/company-os-update.mjs apply \
-  --source /path/to/Company.OS \
-  --target /path/to/target-workspace \
-  --to 0.7.2 \
+  --source /path/to/company-os-public \
+  --target /path/to/existing-074-install \
+  --to 0.9.0-rc.0 \
   --dry-run
 ```
 
-It compares versioned kit files and writes an update report. It does not
-overwrite active local `.company-os/` state such as install record, workspace
-registry, software stack, human gates, intake record or first Plane draft.
+The check output records:
+
+- `source_version`, `target_version` (read from the target's install-record)
+  and `to_version`.
+- `source_provenance` (git remote URL, HEAD, branch, `public/private/unknown`
+  classification) so the operator can see *which* clone shipped the kit.
+- `kit_secret_audit` so an `.env`, `secrets.json`, `credentials.yaml` or
+  `connector-auth.json` accidentally living inside the kit source becomes a
+  visible blocker before any apply.
+- A markdown report at
+  `reports/company-os-updates/<YYYY-MM-DD>/company-os-update-<version>.md`
+  under the target workspace with sections for Versions, Source Provenance,
+  Kit Secret Audit, Summary, Safe Changes, Manual Review Required, Collisions,
+  Blocked by Policy, Preserved Local State, Rollback and Blocked Actions.
+
+The update does not overwrite active local `.company-os/` state such as
+install record, workspace registry, software stack, human gates, intake
+record, first Plane draft, connector manifests or EVE soul file. These are
+either preserved by classification (`collision`), hard-blocked
+(`HARD_BLOCKED_UPDATE_PATHS`) or held for `manual-review`. The kit also
+deliberately excludes `.env`, raw credentials and connector auth files, so a
+clean run never copies secrets from the source into the target. The secret
+audit makes that guarantee mechanical, not implicit.
+
+The same command supports updating against a sandbox/private source clone for
+operator development, but the report will then classify the source as
+`private` and warn the operator not to publish any artifacts produced from
+that run.
 
 ## Productization Boundary
 

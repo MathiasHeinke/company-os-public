@@ -2,7 +2,7 @@
 
 Status: canonical versioning doctrine
 Current version: `0.9.0-rc.0`
-Last updated: 2026-06-02
+Last updated: 2026-06-03
 
 ## Purpose
 
@@ -32,14 +32,15 @@ audit, upgrade and discuss the system without relying on chat memory.
 This means:
 
 - `0`: pre-1.0 product, still evolving quickly.
-- `9`: the active product layer is the public-upstream install/update release
+- `8`: the active product layer is the Command EVE remote-install release
   candidate: a public clone or sanitized public mirror can install a fresh
   target from generic company seed, generate EVE's first boot packet and write
-  update plus handoff provenance.
-- `0`: first claim in the 0.9 line. It closes the public-first distribution
-  path without claiming stable unattended autonomy.
-- `rc.0`: release-candidate evidence for public self-serve install packaging.
-  It is not stable, not scheduler-default-on and not an autonomous
+  update plus handoff provenance for a remote founder following the public
+  GitHub source.
+- `0`: first claim in the 0.9 line. It opens the public remote-install
+  distribution path without claiming stable unattended autonomy.
+- `rc.0`: release-candidate evidence for public guided/self-serve install
+  packaging. It is not stable, not scheduler-default-on and not an autonomous
   publishing/scheduling/outreach/spend/release-worker release.
 
 Included in this candidate:

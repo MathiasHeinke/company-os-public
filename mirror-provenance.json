@@ -1,14 +1,14 @@
 {
   "schema": "build-public-mirror/v0",
-  "source_sha": "b38bc5b61308bd9f1f9e0e5bb99f8ef85a9a0754",
+  "source_sha": "e64ffa3f04a1634c869874ccb394b5c977b113c4",
   "strip_list_version": "v2",
-  "generated_at": "2026-06-02T14:58:47.060Z",
-  "output_file_count": 733,
+  "generated_at": "2026-06-04T00:11:59.681Z",
+  "output_file_count": 743,
   "blocker_summary": [
     {
       "id": "include.unexpected",
       "severity": "warn",
-      "detail": "21 file(s) excluded by default (not on include list, not on strip list)",
+      "detail": "28 file(s) excluded by default (not on include list, not on strip list)",
       "sample": [
         ".agents/skills/gitnexus/gitnexus-cli/SKILL.md",
         ".agents/skills/gitnexus/gitnexus-debugging/SKILL.md",
