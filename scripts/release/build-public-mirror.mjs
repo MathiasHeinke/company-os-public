@@ -139,6 +139,66 @@ export const STRIP_RULES = [
   },
   // Atlas/ARES domain overlay docs
   {
+    pattern: "docs/calibration/**",
+    reason: "source-company-calibration",
+  },
+  {
+    pattern: "docs/superpowers/**",
+    reason: "internal-implementation-plans",
+  },
+  {
+    pattern: "docs/strategy/command-eve-outreach-kit.md",
+    reason: "source-company-commercial-copy",
+  },
+  {
+    pattern: "docs/operations/atlas-*.md",
+    reason: "source-company-domain-overlay",
+  },
+  {
+    pattern: "docs/orchestration/atlas-*.md",
+    reason: "source-company-domain-overlay",
+  },
+  {
+    pattern: "docs/templates/atlas-*.md",
+    reason: "source-company-domain-overlay",
+  },
+  {
+    pattern: "docs/operations/marketing-public-fetch-fallback.md",
+    reason: "source-company-marketing-overlay",
+  },
+  {
+    pattern: "scripts/sandbox-pr/**",
+    reason: "source-founder-shadow-run",
+  },
+  {
+    pattern: "assets/brand/eve-command/site/public/agb.html",
+    reason: "site-legal-page-not-install-mirror",
+  },
+  {
+    pattern: "assets/brand/eve-command/site/public/datenschutz.html",
+    reason: "site-legal-page-not-install-mirror",
+  },
+  {
+    pattern: "assets/brand/eve-command/site/public/impressum.html",
+    reason: "site-legal-page-not-install-mirror",
+  },
+  {
+    pattern: "kits/company-os-kit/scripts/autoresearch-bioengine/**",
+    reason: "source-company-kit-example",
+  },
+  {
+    pattern: "kits/company-os-kit/scripts/engine-eval-template/**",
+    reason: "source-company-kit-example",
+  },
+  {
+    pattern: "kits/company-os-kit/scripts/mcp-gateway/**",
+    reason: "source-company-kit-example",
+  },
+  {
+    pattern: "kits/company-os-kit/scripts/mcp-gateway-template/**",
+    reason: "source-company-kit-example",
+  },
+  {
     pattern: "docs/templates/atlas-worker-templates.md",
     reason: "atlas-domain-overlay",
   },
@@ -227,6 +287,17 @@ const PRIVATE_WORKSPACE_NAMES = [
   [".agent", "sandboxes"].join("-"),
 ];
 
+const PUBLIC_READER_MARKER_SCOPES = [
+  "README.md",
+  "CHANGELOG.md",
+  "ROADMAP.md",
+  "AGENTS.md",
+  "docs/",
+  "kits/",
+  "registries/",
+  "assets/brand/eve-command/site/public/",
+];
+
 const PRIVATE_CONTENT_PATTERNS = [
   {
     id: "source-company-token",
@@ -278,6 +349,18 @@ const PRIVATE_CONTENT_PATTERNS = [
     severity: "private-content",
   },
   {
+    id: "source-company-visible-marker",
+    regex: /\b(?:ARES|ATLAS|Fyn Labs|FYN Labs)\b/,
+    severity: "private-content",
+    scope: PUBLIC_READER_MARKER_SCOPES,
+  },
+  {
+    id: "founder-visible-marker",
+    regex: /\bMathias\b/,
+    severity: "private-content",
+    scope: PUBLIC_READER_MARKER_SCOPES,
+  },
+  {
     id: "founder-email",
     regex: /marketing@mathiasheinke\.de/,
     severity: "private-content",
@@ -286,6 +369,7 @@ const PRIVATE_CONTENT_PATTERNS = [
     id: "work-item-id",
     regex: /\b(?:ATLAS|COMPA|MAT)-[0-9]+/,
     severity: "private-content",
+    scope: PUBLIC_READER_MARKER_SCOPES,
   },
 ];
 
@@ -304,6 +388,11 @@ const MIRROR_TEXT_REWRITE_EXTENSIONS = new Set([
   ".yml",
 ]);
 const CODE_TEXT_REWRITE_EXTENSIONS = new Set([".cjs", ".js", ".jsx", ".mjs", ".ts", ".tsx"]);
+
+function allowsVisibleMarkerRewrite(relativePath) {
+  if (relativePath.startsWith("assets/brand/eve-command/site/public/assets/")) return true;
+  return !CODE_TEXT_REWRITE_EXTENSIONS.has(path.extname(relativePath).toLowerCase());
+}
 
 const PUBLIC_MIRROR_TEXT_REWRITES = [
   {
@@ -359,6 +448,24 @@ const PUBLIC_MIRROR_TEXT_REWRITES = [
     regex: new RegExp(String.raw`(?:^|(?<=\W))(?:${PRIVATE_WORKSPACE_NAMES.map(regexEscape).join("|")})(?=$|\W)`, "g"),
     replacement: "[SOURCE_WORKSPACE]",
     appliesTo: () => true,
+  },
+  {
+    id: "source-company-visible-marker",
+    regex: /\b(?:ARES|ATLAS|Fyn Labs|FYN Labs)\b/g,
+    replacement: "[SOURCE_COMPANY]",
+    appliesTo: allowsVisibleMarkerRewrite,
+  },
+  {
+    id: "founder-possessive-visible-marker",
+    regex: /\bMathias['’]/g,
+    replacement: "the founder's",
+    appliesTo: allowsVisibleMarkerRewrite,
+  },
+  {
+    id: "founder-visible-marker",
+    regex: /\bMathias\b/g,
+    replacement: "the founder",
+    appliesTo: allowsVisibleMarkerRewrite,
   },
 ];
 
@@ -639,6 +746,9 @@ function scanForPrivateContent(outRoot) {
           }
           pattern.regex.lastIndex = 0;
           if (pattern.regex.test(lines[index])) {
+            if (pattern.id === "founder-visible-marker" && relative === "LICENSE") {
+              continue;
+            }
             failures.push({
               id: pattern.id,
               path: relative,

@@ -44,12 +44,12 @@ The canonical pairs in candidate fallback lists are:
 | OAuth client secret | `ares-control-plane-linear-client-secret` | `ares-control-plane` |
 
 Other entries in the candidate arrays exist for backward compatibility
-(legacy Company.OS / ARES naming variants); the three above are the
+(legacy Company.OS / [SOURCE_COMPANY] naming variants); the three above are the
 recommended canonical pairs going forward.
 
 ## Recommended Scheduled-Host Install (current)
 
-The current passing path on Mathias' host is **OAuth client credentials
+The current passing path on the founder's host is **OAuth client credentials
 in macOS Keychain**, resolved via path 5 of the ladder. Install once, on
 the scheduled host:
 
@@ -191,6 +191,6 @@ schedulers and CAO read.
 - The verification command must remain a non-interactive
   `--json --soft` invocation so that schedulers and CAO can parse the
   result.
-- Source-company-specific naming (ARES Control Plane Runner) belongs
+- Source-company-specific naming ([SOURCE_COMPANY] Control Plane Runner) belongs
   in private operating docs; the generic Company.OS canonical pairs
   stay generic.

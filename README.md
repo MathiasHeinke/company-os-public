@@ -258,7 +258,7 @@ planner, dispatcher runtime-effort guard, WorkerConfidence contract, Command EVE
 runtime policy gate and public mirror include-list v2. It is still a release
 candidate, not stable unattended public distribution.
 
-`0.7.4-rc.0` adds the reusable Supergoal Factory layer proven during the ATLAS
+`0.7.4-rc.0` adds the reusable Supergoal Factory layer proven during the [SOURCE_COMPANY]
 private run: the Execution Ladder keeps built / integrated / live truth
 separate, State-Truth Pass and HG-2.5 Merge Readiness Pack become canonical,
 the controller writes scheduler-visible `controller.audit-followup` and

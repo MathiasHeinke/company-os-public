@@ -151,7 +151,7 @@ spawn workers:
 node scripts/goal/goal.mjs supergoal \
   --parent [WORK_ITEM_ID] \
   --project-id 268df2ed-a071-4cc8-a394-595e4b7353c2 \
-  --project-identifier ATLAS \
+  --project-identifier [SOURCE_COMPANY] \
   --max-children 2 \
   --window-hours 24 \
   --dry-run \

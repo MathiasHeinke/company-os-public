@@ -41,7 +41,7 @@ Codex Cost Router = bounded Grok, DeepSeek, Claude and Gemini worker dispatch
 Heartbeat = live run visibility and stop path
 Controller = work-quality decision
 C-level role = domain ownership and acceptance bar
-Calendar = Mathias attention layer
+Calendar = the founder attention layer
 ```
 
 ## Pre-Approved Automation Contract
@@ -89,7 +89,7 @@ Still requires Founder `NEEDS-HUMAN` / HG-4:
 - unclear source-of-truth, missing worker contract, active lock conflict,
   unauthenticated required tool or unstable runtime
 
-CEO/Codex may release HG-1/HG-2 examples without waking Mathias:
+CEO/Codex may release HG-1/HG-2 examples without waking the founder:
 
 - retrying a failed read/report lane after runtime auth is green
 - dispatching a bounded L2 read-only audit worker from a valid due contract
@@ -231,7 +231,7 @@ The worker must be read-only unless the founder explicitly approves edit mode.
 
 ## Sandbox Edit Lane
 
-When Mathias approves edit mode, the worker still does not edit the source
+When the founder approves edit mode, the worker still does not edit the source
 workspace directly. The controller must create or approve an isolated sandbox
 branch and worktree before dispatch:
 
@@ -276,7 +276,7 @@ Deep audit queue:
 reports/night-shift/YYYY-MM-DD/deep-audit-queue.md
 ```
 
-ARES product-domain queue:
+[SOURCE_COMPANY] product-domain queue:
 
 ```text
 reports/night-shift/YYYY-MM-DD/activities-production-readiness-retro.md

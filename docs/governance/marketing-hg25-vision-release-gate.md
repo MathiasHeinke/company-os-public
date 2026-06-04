@@ -105,7 +105,7 @@ node scripts/release-gates/marketing-copy-lint.mjs \
 ```
 
 It performs no publish, schedule, send, import, Plane Done, network or
-production action. It catches deterministic public-copy blockers (`ARES Bio.OS`
+production action. It catches deterministic public-copy blockers (`[SOURCE_COMPANY] Bio.OS`
 brand drift, internal routing metadata, hard claim-safety terms) and annotates
 WARN / REVIEW_REQUIRED findings for CMO Claim Safety review. It does not
 replace visual review and does not approve claims.
@@ -127,7 +127,7 @@ creative_quality_review:
 
 Review dimensions:
 
-- `brand_fit`: matches the established ATLAS / Company.OS voice, positioning
+- `brand_fit`: matches the established [SOURCE_COMPANY] / Company.OS voice, positioning
   and audience expectation.
 - `copy_quality`: clear, platform-appropriate, no obvious typo, grammar,
   truncation or wrong-language issue.

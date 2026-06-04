@@ -1,11 +1,11 @@
-# ATLAS HG-3 Artifact Truth Example
+# [SOURCE_COMPANY] HG-3 Artifact Truth Example
 
 Status: sanitized example
 Date: 2026-05-24
 
 ## Artifact Truth
 
-The ATLAS desktop MVP release packet may cite only artifacts that exist in the
+The [SOURCE_COMPANY] desktop MVP release packet may cite only artifacts that exist in the
 release evidence set or in a public-safe example URL.
 
 ## Checks

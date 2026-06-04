@@ -59,7 +59,7 @@ It must pass through:
 | `taskstoissues` | Plane item creator / normalizer | Must target Plane, not GitHub Issues, unless a repo release explicitly chooses GitHub. |
 
 Spec Kit may be installed in an isolated spec workspace or a new public repo.
-Do not blindly initialize it inside existing ARES or Company.OS repos if it
+Do not blindly initialize it inside existing [SOURCE_COMPANY] or Company.OS repos if it
 would overwrite `.claude`, `.agents`, `AGENTS.md`, `CLAUDE.md`, hooks or local
 skills. Existing project boot files are authoritative.
 
@@ -151,9 +151,9 @@ Only after those are present should a worker item move to `dispatch: ready`.
 | Cost, pricing, runway, metrics | `role:cfo` | Claude or Codex | Requires numbers reconcile and cost-ledger gates. |
 | Audit, privacy, claims, controller pass | `role:cao` | Separate audit session | CAO builds nothing and never self-passes building work. |
 
-## ATLAS Failure Mode Captured
+## [SOURCE_COMPANY] Failure Mode Captured
 
-The ATLAS Plane project proved the gap this doctrine closes:
+The [SOURCE_COMPANY] Plane project proved the gap this doctrine closes:
 
 - Plane project exists.
 - Labels, modules, cycles and pages exist.
@@ -162,7 +162,7 @@ The ATLAS Plane project proved the gap this doctrine closes:
   `contract.required-field-missing` because the descriptions did not contain
   the exact flat fenced Worker Issue Contract.
 
-This is not an ATLAS-specific bug. It is the canonical failure mode for any new
+This is not an [SOURCE_COMPANY]-specific bug. It is the canonical failure mode for any new
 project created outside the current Company.OS boot doctrine. The fix is not to
 make the dispatcher parse arbitrary prose; the fix is to normalize specs and
 Plane descriptions into the contract shape before runtime dispatch.

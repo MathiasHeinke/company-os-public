@@ -27,7 +27,7 @@
 
 ### Creative North Star: "[NORTH STAR NAME]"
 > [1-2 Sätze die beschreiben, wie sich das Interface ANFÜHLEN soll. Nicht was es tut, sondern wie es sich anfühlt.]
-> Beispiele: "The Sentinel Overlay" (Autarch), "The Bio Cockpit" (ARES), "The Knowledge Cathedral"
+> Beispiele: "The Sentinel Overlay" (Autarch), "The Bio Cockpit" ([SOURCE_COMPANY]), "The Knowledge Cathedral"
 
 ### Core Principles
 1. **Tokens before hardcoded values** — NEVER use raw hex in components (except for documented exceptions in Section 9).

@@ -7,7 +7,7 @@
     "founder_prediction_confidence": 0.97,
     "decision": "CEO_CRITICAL_RELEASE",
     "requested_actions": [
-      "merge ATLAS desktop MVP release branch",
+      "merge [SOURCE_COMPANY] desktop MVP release branch",
       "deploy private beta control plane",
       "run reversible production configuration promotion"
     ],

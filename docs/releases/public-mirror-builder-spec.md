@@ -31,7 +31,7 @@ precedence on exact matches.
 
 | Path / Pattern | Notes |
 |---|---|
-| `docs/**` | All docs after PUB-07 (path portability) and PUB-08 (Atlas/ARES relocation). Strip-list entries override exact paths. |
+| `docs/**` | All docs after PUB-07 (path portability) and PUB-08 (Atlas/[SOURCE_COMPANY] relocation). Strip-list entries override exact paths. |
 | `scripts/orchestration/**` | All orchestration scripts. |
 | `scripts/release-gates/**` | All release gate scripts. |
 | `scripts/plane/**` | All Plane scripts **except** `scripts/plane/enrich-batch-5-mirror-plans.mjs`. |
@@ -93,7 +93,7 @@ The strip list takes precedence over the include list on exact matches.
 | Internal metrics ledgers | `metrics/ai-cost-ledger.jsonl` | None (example variant included instead) |
 | Live worker stream JSONL | `reports/**/*.stream.jsonl` | One minimal example in `reports/examples/` (see §4) |
 | Private kit log body | `kits/company-os-kit/.antigravity/logs/architect-memory.md` | `kits/company-os-kit/.antigravity/logs/architect-memory.example.md` template |
-| ARES-named operations doc | `docs/operations/ares-product-domain-night-shift-queue.md` | None (moved to private overlay by PUB-08) |
+| [SOURCE_COMPANY]-named operations doc | `docs/operations/ares-product-domain-night-shift-queue.md` | None (moved to private overlay by PUB-08) |
 | Internal migration script | `scripts/plane/enrich-batch-5-mirror-plans.mjs` | None |
 | Private company registries | `registries/capabilities/company-os.json` | `registries/capabilities/example.json` template |
 | Private company registries | `registries/inference/company-os.json` | `registries/inference/example.json` template |
@@ -113,8 +113,8 @@ The strip list takes precedence over the include list on exact matches.
 | Named-person personas (if PUB-06 doctrine A) | `kits/company-os-kit/.antigravity/personas/the-refactorer.md` | None |
 | Named-person personas (if PUB-06 doctrine A) | `kits/company-os-kit/.antigravity/personas/the-nexus.md` | None |
 | Knowledge files (do-not-publish) | Per `kits/company-os-kit/.antigravity/knowledge/SOURCES.md` PUB-09 verdict | None |
-| Atlas/ARES domain overlay docs | `docs/templates/atlas-worker-templates.md` | Generic `docs/templates/domain-overlay-template.md` (PUB-08) |
-| Atlas/ARES domain overlay docs | `docs/orchestration/atlas-claude-c-level-boot-contract.md` | Generic `docs/orchestration/domain-claude-c-level-boot-contract-template.md` (PUB-08) |
+| Atlas/[SOURCE_COMPANY] domain overlay docs | `docs/templates/atlas-worker-templates.md` | Generic `docs/templates/domain-overlay-template.md` (PUB-08) |
+| Atlas/[SOURCE_COMPANY] domain overlay docs | `docs/orchestration/atlas-claude-c-level-boot-contract.md` | Generic `docs/orchestration/domain-claude-c-level-boot-contract-template.md` (PUB-08) |
 | Private .env files | `.env`, `**/.env`, `**/.env.local`, `**/.env.*.local` | None |
 | git / tooling internals | `.git/**`, `node_modules/**`, `.DS_Store` | None |
 
@@ -169,7 +169,7 @@ regardless of which private source SHA is used as input.
 | No source-company domain strings in docs or kit | `rg --hidden -nP '<SOURCE_COMPANY_DOMAIN_PATTERN>' <OUT_ROOT>/docs <OUT_ROOT>/kits` must return no matches |
 | No source-company prefix identifiers in tracked content | `rg --hidden -nP '<SOURCE_COMPANY_PREFIX_PATTERN>' <OUT_ROOT>/docs <OUT_ROOT>/kits <OUT_ROOT>/scripts` must return no matches |
 | No private Plane workspace slug `companyos` in non-example scripts | `rg --hidden -nP '"companyos"' <OUT_ROOT>/scripts` must return no matches (example files are excluded from scripts/) |
-| No ATLAS-*/COMPA-*/MAT-* work item IDs | `rg --hidden -nP '\b(ATLAS|COMPA|MAT)-[0-9]+' <OUT_ROOT>/docs <OUT_ROOT>/kits` must return no matches |
+| No [SOURCE_COMPANY]-*/COMPA-*/MAT-* work item IDs | `rg --hidden -nP '\b([SOURCE_COMPANY]|COMPA|MAT)-[0-9]+' <OUT_ROOT>/docs <OUT_ROOT>/kits` must return no matches |
 | No founder email | `rg --hidden -nP 'marketing@mathiasheinke\.de' <OUT_ROOT>` must return no matches |
 
 ### 5.3 Stripped paths absent

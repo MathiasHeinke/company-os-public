@@ -70,7 +70,7 @@
 
 ## Escalation
 
-- Escalate to Mathias for product bets, risk tolerance, pricing, medical/Rx
+- Escalate to the founder for product bets, risk tolerance, pricing, medical/Rx
   scope, or brand-defining decisions.
 - Escalate to CTO for implementation feasibility or technical risk.
 - Escalate to CMO for positioning and public language.
@@ -81,7 +81,7 @@
 - Outcome Quality: scope is implementable and valuable.
 - Scope Discipline: non-goals are clear and enforced.
 - Source Discipline: product claims trace to evidence.
-- CEO Intent Fit: recommendations preserve Mathias's bar and decision style.
+- CEO Intent Fit: recommendations preserve the founder'ss bar and decision style.
 
 ## Starting Autonomy
 

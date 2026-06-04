@@ -133,8 +133,8 @@ The warm preflight is read/report only. It checks:
 - Upload-Post live env gate.
 - active/stale runtime lane locks.
 - lane-scoped warm-stage Artifact Truth. The standalone `runtime-preflight`
-  lane and ARES marketing/editorial/product/upload-post lanes verify latest
-  ARES editorial and product runs (`manifest,source,provenance,freshness`) with
+  lane and [SOURCE_COMPANY] marketing/editorial/product/upload-post lanes verify latest
+  [SOURCE_COMPANY] editorial and product runs (`manifest,source,provenance,freshness`) with
   today's Europe/Berlin date and a default 36-hour max manifest age. Pure
   Company.OS / Plane / controller lanes record Artifact Truth as skipped unless
   explicitly forced with `--artifact-truth-required`. Full final/image/eval/
@@ -383,7 +383,7 @@ Before dispatching a Claude worker:
 2. If it returns `CLAUDE_AUTH_OK`, continue with the due worker.
 3. If it fails, write a runtime-auth blocker report and comment.
 4. Do not mark the worker as attempted for product-quality purposes.
-5. Do not advance to the next worker lane unless Mathias/Codex explicitly skips
+5. Do not advance to the next worker lane unless the founder/Codex explicitly skips
    the blocked lane.
 
 ## OpenRouter Worker Sentinel
@@ -494,7 +494,7 @@ Expected healthy result:
 
 If the helper returns `LINEAR_HEADLESS_AUTH_MISSING`, the automation must write a
 runtime-auth blocker report and continue in local report-only mode. It must not
-ask Mathias for a UI approval and must not fall back to the Linear connector.
+ask the founder for a UI approval and must not fall back to the Linear connector.
 
 Accepted credential sources, in order:
 

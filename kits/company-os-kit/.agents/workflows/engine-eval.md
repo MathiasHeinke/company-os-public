@@ -44,7 +44,7 @@ Fülle die TODO-Marker aus:
 
 Erstelle gelabelte Szenarien für JEDE logische Kategorie:
 
-| Szenario-Typ | Beispiel (ARES) |
+| Szenario-Typ | Beispiel ([SOURCE_COMPANY]) |
 |---|---|
 | Happy Path pro Tier | "Dianabol" → Tier 4, "Kreatin" → Tier 2 |
 | Grenzwerte | 500mg threshold, Clamping [-20, +15] |

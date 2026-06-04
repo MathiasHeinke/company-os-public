@@ -71,7 +71,7 @@ The setup key used during bootstrap should be rotated after the first
 successful write-capable pilot if it crossed chat/session context.
 
 The productized target is the Plane OAuth App, not a long-lived personal API
-key. In Mathias' Company.OS workspace, the app is installed and verified; new
+key. In the founder's Company.OS workspace, the app is installed and verified; new
 automation should default to app-token auth.
 
 Source: `docs/integrations/plane-app-control-plane.md`.
@@ -227,7 +227,7 @@ Do not encode accountability only in assignee.
 Workspace:
 
 ```text
-FYN Labs / Company.OS
+[SOURCE_COMPANY] / Company.OS
 ```
 
 Projects:
@@ -235,10 +235,10 @@ Projects:
 - Company.OS Control Plane
 - Company.OS Product / Public Repo
 - Company.OS Private Ops
-- ARES Core Product
-- ARES Growth Engine
-- ARES Command Center
-- FYN Labs AI Systems
+- [SOURCE_COMPANY] Core Product
+- [SOURCE_COMPANY] Growth Engine
+- [SOURCE_COMPANY] Command Center
+- [SOURCE_COMPANY] AI Systems
 - [SOURCE_WORKSPACE] Founder Office
 
 Modules:

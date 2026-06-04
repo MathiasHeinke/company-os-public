@@ -141,7 +141,7 @@ echte Founder-Entscheidung.
   personal files.
 - Prefer generic terms such as CEO, founder, company, agent, controller, and
   department.
-- When an ARES-specific pattern is useful, extract the reusable operating
+- When an [SOURCE_COMPANY]-specific pattern is useful, extract the reusable operating
   principle and keep private context in the private company workspace.
 - Do not leave a registered Company.OS workspace dirty as a final state. If
   dirty files exist, apply the Workspace Stewardship Protocol before moving on:
@@ -159,7 +159,7 @@ echte Founder-Entscheidung.
 
 Any new document should be usable in three modes:
 
-1. Internal ARES/Fyn Labs operating system.
+1. Internal [SOURCE_COMPANY]/[SOURCE_COMPANY] operating system.
 2. Client-facing paid implementation playbook.
 3. MIT/open-source reference implementation.
 

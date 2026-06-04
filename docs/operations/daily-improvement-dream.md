@@ -96,7 +96,7 @@ Controller or CEO review decides proposal fate:
 Durable memory writes go through the correct memory layer:
 
 - private founder/company context: `mcp__honcho_personal__*`
-- ARES/Hermes architecture context: `mcp__honcho__*`
+- [SOURCE_COMPANY]/Hermes architecture context: `mcp__honcho__*`
 - app/user context: `mcp__honcho_users__*`
 - canonical docs: Memory Bank, ADR, wiki, or skill library
 

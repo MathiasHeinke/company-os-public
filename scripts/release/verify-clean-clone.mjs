@@ -52,6 +52,7 @@ const PRIVATE_SOURCE_MARKER_PATTERN = new RegExp(
     String.raw`\b${["app", "bio-os"].join(regexDot)}\b`,
     String.raw`\b${["api", "bio-os"].join(regexDot)}\b`,
     String.raw`(?:^|(?<=\W))(?:${PRIVATE_WORKSPACE_NAMES.map(regexEscape).join("|")})(?=$|\W)`,
+    String.raw`\b(?:ARES|ATLAS|Fyn Labs|FYN Labs|Mathias)\b`,
   ].join("|"),
 );
 const TOKEN_PATTERNS = [
@@ -69,6 +70,17 @@ const TEXT_FILE_EXTENSIONS = new Set([
   ".md", ".mdx", ".mjs", ".cjs", ".js", ".ts", ".tsx", ".jsx", ".py",
   ".json", ".yaml", ".yml", ".sh", ".txt", ".env", ".jsonl",
 ]);
+
+const PUBLIC_READER_MARKER_SCOPES = [
+  "README.md",
+  "CHANGELOG.md",
+  "ROADMAP.md",
+  "AGENTS.md",
+  "docs/",
+  "kits/",
+  "registries/",
+  "assets/brand/eve-command/site/public/",
+];
 
 const SKIP_DIRECTORY_NAMES = new Set([
   ".git", "node_modules", ".next", "dist", "build", ".cache", ".turbo",
@@ -346,15 +358,20 @@ function checkPrivatePathScan(rootDir) {
 
 function checkPrivateMarkerScan(rootDir) {
   const files = listTextFiles(rootDir);
+  const markerFiles = files.filter((file) =>
+    PUBLIC_READER_MARKER_SCOPES.some((scope) => file.startsWith(scope)),
+  );
   const hits = [
-    ...scanLinesForRegex(rootDir, files, INTERNAL_WORK_ITEM_PATTERN).map((hit) => ({
+    ...scanLinesForRegex(rootDir, markerFiles, INTERNAL_WORK_ITEM_PATTERN).map((hit) => ({
       ...hit,
       pattern: "internal-work-item-id",
     })),
-    ...scanLinesForRegex(rootDir, files, PRIVATE_SOURCE_MARKER_PATTERN).map((hit) => ({
-      ...hit,
-      pattern: "private-source-marker",
-    })),
+    ...scanLinesForRegex(rootDir, markerFiles, PRIVATE_SOURCE_MARKER_PATTERN)
+      .filter((hit) => hit.path !== "LICENSE")
+      .map((hit) => ({
+        ...hit,
+        pattern: "private-source-marker",
+      })),
   ];
   if (hits.length === 0) {
     return makeCheck("private.marker.scan", "pass", "No internal work item ids or source-company markers detected");

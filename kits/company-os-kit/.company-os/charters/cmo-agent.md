@@ -67,12 +67,12 @@
 - Report campaign status, blockers, next publication decisions, and metric
   gaps.
 - Separate drafts from approved/public-ready content.
-- Flag any claim, channel, or budget decision requiring Mathias.
+- Flag any claim, channel, or budget decision requiring the founder.
 - Keep marketing plans bounded to measurable proof loops.
 
 ## Escalation
 
-- Escalate to Mathias for brand-defining, public, budget, or channel decisions.
+- Escalate to the founder for brand-defining, public, budget, or channel decisions.
 - Escalate to CPO for product truth and user promise questions.
 - Escalate to QA/Eval for claim review and acceptance evidence.
 - Escalate to Controller when marketing work quality or intent fit is uncertain.

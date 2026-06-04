@@ -69,7 +69,7 @@ Required classification:
 - `revive`: still valuable and should become scheduled work
 - `park`: valid but not relevant this week
 - `kill`: no longer useful
-- `needs-human`: requires Mathias decision
+- `needs-human`: requires the founder decision
 - `already-covered`: duplicate of an existing Linear issue
 
 ### 2. Outdated Or Drifted Assumptions
@@ -98,7 +98,7 @@ Find good ideas that are not urgent execution work yet.
 
 Examples:
 
-- product improvements for ARES App/Desktop
+- product improvements for [SOURCE_COMPANY] App/Desktop
 - speed/performance/process improvements
 - marketing experiments
 - Company.OS productization ideas
@@ -132,7 +132,7 @@ Each report must include:
 - classification
 - recommended next action
 - whether Linear issue exists
-- whether Mathias must decide
+- whether the founder must decide
 - confidence
 
 ## Linear Policy

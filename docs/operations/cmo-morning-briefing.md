@@ -41,7 +41,7 @@ levels. The CMO may prepare HG-3 marketing-risk packets; CEO/Codex decides
 them. Strategic brand/company-position decisions move through Chief-of-Staff to
 HG-4 Founder.
 
-`HumanGate` is a legacy field name, not a synonym for "ask Mathias". In the
+`HumanGate` is a legacy field name, not a synonym for "ask the founder". In the
 Marketing Department, `HG-1` and `HG-2` are CMO-operable inside the approved
 department envelope, `HG-2.5` and `HG-3` are CEO/Codex decisions, `HG-3.5` is
 Chief-of-Staff / Founder-Proxy review, and the real human/founder decision

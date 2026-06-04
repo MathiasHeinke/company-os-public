@@ -193,5 +193,5 @@ matrix.
   hoc label creation in Plane.
 - Generic `role:*` labels stay project-scoped. They are a Company.OS routing
   primitive; private installs may extend the set in their own workspace docs.
-- Source-company specifics (ARES/Fyn) belong in private operating docs, not
+- Source-company specifics ([SOURCE_COMPANY]/Fyn) belong in private operating docs, not
   here.

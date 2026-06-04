@@ -170,7 +170,7 @@ If the worker cannot prove the profile, it must return
 `BLOCKED_DEPENDENCY` with `runtime.capability-profile-missing` or
 `runtime.capability-profile-stale`.
 
-Atlas / ARES Bio.OS workers also inherit
+Atlas / [SOURCE_COMPANY] Bio.OS workers also inherit
 `docs/orchestration/atlas-claude-c-level-boot-contract.md`, which adds the
 Atlas workspace map, evidence-label discipline, runtime-auth sentinel rules and
 the report rejection rule for pointer-only Claude output.

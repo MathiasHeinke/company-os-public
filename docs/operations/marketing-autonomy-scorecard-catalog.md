@@ -2,7 +2,7 @@
 
 Status: canonical v0.1 evaluation catalog
 Created: 2026-05-23
-Use for: scoring ATLAS/Company.OS Marketing Department autonomy, quality and
+Use for: scoring [SOURCE_COMPANY]/Company.OS Marketing Department autonomy, quality and
 human-gate readiness across social, performance and blog-engine lanes
 
 ## Purpose
@@ -65,7 +65,7 @@ The CMO must report both the numeric score and the evidence grade:
 | 1 | Plane Ledger And Worker Contracts | Every recurring lane has a parseable Plane contract, correct role label, source of truth, gates, human gate, reporting and no hidden manual side channel. |
 | 2 | CMO Executive Autonomy | The CMO executive reads department state, supervises workers, repairs department-local drift, escalates only real decisions and writes one CEO-ready report. |
 | 3 | Research And Evidence Quality | Topics, claims and article inputs are source-backed, current, useful, caveated and linked to audience value rather than generic trend chasing. |
-| 4 | Content And Copy Quality | X, LinkedIn, Reddit and blog copy matches ATLAS voice, has clear operator usefulness, avoids hype, fits channel norms and needs minimal human rewrite. |
+| 4 | Content And Copy Quality | X, LinkedIn, Reddit and blog copy matches [SOURCE_COMPANY] voice, has clear operator usefulness, avoids hype, fits channel norms and needs minimal human rewrite. |
 | 5 | Blog Engine Depth And SEO | EN/DE articles have parity, strong structure, titles/meta, internal links, tables, source lists, claim boundaries, import dry-run proof and article review queue coverage. |
 | 6 | Visual And Creative QA | Images, carousels and blog visuals are generated from recorded prompts, readable on mobile, on-brand, channel-fit, claim-safe and reviewed through HG-2.5 vision gates. |
 | 7 | Claim Safety And Public Risk Control | Health, medical, partnership, performance, legal and founder-voice claims are classified, evidence-checked and blocked before public release when needed. |

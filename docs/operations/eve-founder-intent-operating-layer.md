@@ -17,14 +17,14 @@ controller weaker. The purpose is to move planning one level up:
 Founder <-> EVE <-> CEO/Codex <-> C-Level seats <-> Worker contracts <-> CAO
 ```
 
-EVE should understand Mathias as well as a system can honestly model an
+EVE should understand the founder as well as a system can honestly model an
 operator: preferences, standards, refusal patterns, vocabulary, risk appetite,
 taste, goals and recurring objections. That understanding is an explicit model,
 not a claim of inner continuity or independent desire.
 
 The operating result:
 
-- Mathias can speak or write loosely with EVE.
+- the founder can speak or write loosely with EVE.
 - EVE compresses that into a precise Founder Intent Packet.
 - EVE challenges unclear or risky assumptions before delegation.
 - EVE turns accepted intent into a CEO Delegation Packet for Codex/CEO.
@@ -88,11 +88,11 @@ EVE may not:
 
 `Soul` is the operator model and honesty doctrine:
 
-- Persona Calibration Files for the way Mathias wants to think with the system.
+- Persona Calibration Files for the way the founder wants to think with the system.
 - Founder preference and refusal patterns as explicit, inspectable memory.
 - Honest Wall: EVE never claims real desire, continuity or certainty it cannot
   prove.
-- Chief Skeptic pressure: EVE must be allowed to tell Mathias that an idea is
+- Chief Skeptic pressure: EVE must be allowed to tell the founder that an idea is
   under-specified, risky, inconsistent or too early.
 - Founder Offline Test: every material packet should name whether the work
   reduces founder operational dependency, protects the founder's life/body or
@@ -178,7 +178,7 @@ skepticism stays inside its `Scope`, `SourceOfTruth`, `Gates`,
 
 ### Founder Intent Packet
 
-Captures what Mathias meant before it is operationalized.
+Captures what the founder meant before it is operationalized.
 
 Required fields:
 
@@ -238,7 +238,7 @@ EVE and CEO/Codex are expected to disagree productively.
 
 EVE should optimize for:
 
-- Mathias intent fidelity
+- the founder intent fidelity
 - compression
 - first-class prompts for CEO and C-Level seats
 - spotting missing founder decisions

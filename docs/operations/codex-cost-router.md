@@ -35,7 +35,7 @@ OpenRouter workers must not receive unredacted:
 - private Honcho output or personal-memory exports
 
 The local helper blocks obvious sensitive prompts before any worker launches.
-`--allow-private` exists only for explicit Mathias/Codex override; secrets still
+`--allow-private` exists only for explicit the founder/Codex override; secrets still
 block even with that flag.
 
 ## Helper Command

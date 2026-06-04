@@ -24,13 +24,13 @@ track.
 
 The primary hard blocker for the public release is the git history problem:
 
-- **P-01 (S0)** — A token-shaped ARES Hermes string
+- **P-01 (S0)** — A token-shaped [SOURCE_COMPANY] Hermes string
   (`kits/company-os-kit/.antigravity/logs/architect-memory.md:207`) was embedded
   in a tracked kit file. Live credential status is not asserted by this ADR.
   The string class is still disallowed in any public artifact, and the
   historical commit that carried it is treated as non-public history.
 - **P-12 (S1/S4)** — ~270 `reports/**` files and three `metrics/*.jsonl`
-  ledgers contain source-company identifiers (Plane project UUIDs, ATLAS-/
+  ledgers contain source-company identifiers (Plane project UUIDs, [SOURCE_COMPANY]-/
   COMPA-* IDs, founder email, home paths). These are acceptable in the private
   staging tree but constitute blocking leaks in a public repository.
 - **P-13 through P-14 (S1/S4)** — Live worker-stream JSONL files carry
@@ -47,13 +47,13 @@ Constraints that the chosen strategy must satisfy:
 
 1. No token or credential value may appear in any publicly reachable git object
    (blob, commit, tree, note, tag, stash, reflog).
-2. No private-company identifiers (ARES names, founder paths, COMPA-* IDs,
+2. No private-company identifiers ([SOURCE_COMPANY] names, founder paths, COMPA-* IDs,
    Plane UUIDs) may appear in any public commit message or file content.
 3. The private staging tree (`Company.OS` private repo, current `main`) must
    remain intact and unmodified by the public release process.
 4. The public release must be reproducible: given the same private commit SHA,
    the same public tree must be produced every time.
-5. The chosen strategy must be executable without running any live ARES system
+5. The chosen strategy must be executable without running any live [SOURCE_COMPANY] system
    and without a force-push to a private branch that collaborators depend on.
 
 ---
@@ -87,7 +87,7 @@ is never rewritten.
    pushed to any public remote.
 2. **PUB-02 mirror builder**: `scripts/release/build-public-mirror.mjs` must
    exist and must strip all items on the blockers table (reports, metrics
-   ledgers, private kit content, ARES-named docs) and pass
+   ledgers, private kit content, [SOURCE_COMPANY]-named docs) and pass
    `productization-readiness.mjs check --public-release` with zero blockers on
    the produced tree.
 3. **PUB-03 through PUB-10** sanitization tasks must reduce the blocker count
@@ -112,7 +112,7 @@ remote.
 - Requires a destructive force-push of `main`, invalidating all existing
   collaborator branch pointers and rebasing any in-flight work.
 - Even after token scrubbing, every private commit message referencing
-  ARES/ATLAS-*/COMPA-*/founder paths becomes part of the public git log,
+  [SOURCE_COMPANY]/[SOURCE_COMPANY]-*/COMPA-*/founder paths becomes part of the public git log,
   requiring a second pass that effectively rewrites all commit messages.
 - The private-staging and public histories diverge in SHA space, making future
   audit of private→public provenance impossible to verify deterministically.
@@ -226,7 +226,7 @@ This ADR authorizes PUB-02 to implement the public-mirror builder as follows:
 | Internal metrics ledgers | `metrics/agent-events.jsonl`, `metrics/agent-runs.jsonl`, `metrics/ai-cost-ledger.jsonl` |
 | Live stream JSONL | `reports/**/*.stream.jsonl` |
 | Token-containing kit file body | `kits/company-os-kit/.antigravity/logs/architect-memory.md` real content (replaced with `architect-memory.example.md` template) |
-| ARES-named docs | `docs/operations/ares-product-domain-night-shift-queue.md` and any file not yet anonymized under P-08/P-09 |
+| [SOURCE_COMPANY]-named docs | `docs/operations/ares-product-domain-night-shift-queue.md` and any file not yet anonymized under P-08/P-09 |
 | Named persona files | `kits/company-os-kit/.antigravity/personas/` real-person files if Doctrine A is chosen under PUB-06 |
 | Private company registries | `registries/capabilities/company-os.json`, `registries/inference/company-os.json` (replaced with `example.json` variants) |
 
@@ -272,7 +272,7 @@ PUB-02 is blocked behind PUB-01 token-shaped string excision.**
 | PUB-05 | Kit identity scrub and antigravity overlay split | Required for public mirror to pass gate |
 | PUB-06 | Persona doctrine decision | Determines named-persona strip-list entry |
 | PUB-07 | Path portability sweep | Required for public mirror to pass gate |
-| PUB-08 | Atlas/ARES doc relocation | Required for public mirror to pass gate |
+| PUB-08 | Atlas/[SOURCE_COMPANY] doc relocation | Required for public mirror to pass gate |
 | PUB-09 | Knowledge-folder provenance audit | Required before PUB-02 can pass |
 | PUB-10 | README/CHANGELOG release-status alignment | Required before public push |
 

@@ -294,7 +294,7 @@ test("planted /Users private path in scripts forces BLOCKED_PRIVATE_PATH exit 4"
   cleanupTempClone(result);
 });
 
-test("internal work item ids in scripts force BLOCKED_PRIVATE_PATH exit 4", async () => {
+test("internal work item ids in scripts are allowed outside reader surfaces", async () => {
   const root = fixtureRoot();
   writeCompletePublicTree(root);
   write(
@@ -305,15 +305,13 @@ test("internal work item ids in scripts force BLOCKED_PRIVATE_PATH exit 4", asyn
 
   const result = await runVerifyCleanClone({ root });
 
-  assert.equal(result.status, "BLOCKED_PRIVATE_PATH");
-  assert.equal(result.exit_code, 4);
+  assert.equal(result.status, "PASS");
   const markerCheck = result.checks.find((entry) => entry.id === "private.marker.scan");
-  assert.equal(markerCheck.status, "fail");
-  assert.match(markerCheck.evidence.sample[0], /internal-work-item-id/);
+  assert.equal(markerCheck.status, "pass");
   cleanupTempClone(result);
 });
 
-test("source-company workspace names in scripts force BLOCKED_PRIVATE_PATH exit 4", async () => {
+test("source-company workspace names in scripts are allowed outside reader surfaces", async () => {
   const root = fixtureRoot();
   writeCompletePublicTree(root);
   write(
@@ -324,11 +322,41 @@ test("source-company workspace names in scripts force BLOCKED_PRIVATE_PATH exit 
 
   const result = await runVerifyCleanClone({ root });
 
+  assert.equal(result.status, "PASS");
+  const markerCheck = result.checks.find((entry) => entry.id === "private.marker.scan");
+  assert.equal(markerCheck.status, "pass");
+  cleanupTempClone(result);
+});
+
+test("visible source-company and founder markers force BLOCKED_PRIVATE_PATH exit 4", async () => {
+  const root = fixtureRoot();
+  writeCompletePublicTree(root);
+  write(
+    root,
+    "docs/operations/source-company-visible.md",
+    "Mathias described the ARES and Fyn Labs operating layer.\n",
+  );
+
+  const result = await runVerifyCleanClone({ root });
+
   assert.equal(result.status, "BLOCKED_PRIVATE_PATH");
   assert.equal(result.exit_code, 4);
   const markerCheck = result.checks.find((entry) => entry.id === "private.marker.scan");
   assert.equal(markerCheck.status, "fail");
   assert.match(markerCheck.evidence.sample[0], /private-source-marker/);
+  cleanupTempClone(result);
+});
+
+test("copyright holder in LICENSE is allowed while visible docs remain blocked", async () => {
+  const root = fixtureRoot();
+  writeCompletePublicTree(root);
+  write(root, "LICENSE", "MIT License\n\nCopyright (c) 2026 Mathias Heinke\n");
+
+  const result = await runVerifyCleanClone({ root });
+
+  assert.equal(result.status, "PASS");
+  const markerCheck = result.checks.find((entry) => entry.id === "private.marker.scan");
+  assert.equal(markerCheck.status, "pass");
   cleanupTempClone(result);
 });
 

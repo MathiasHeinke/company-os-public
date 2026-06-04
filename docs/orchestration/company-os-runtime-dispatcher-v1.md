@@ -617,5 +617,5 @@ Still to build:
   fresh dry-run pilot before live runs return.
 - The set of stable run states is closed; new states are added by extending
   this doc, not by ad-hoc emissions.
-- Source-company-specific runtime details (ARES/Fyn) belong in private
+- Source-company-specific runtime details ([SOURCE_COMPANY]/Fyn) belong in private
   operating docs. This doctrine remains generic and reusable.

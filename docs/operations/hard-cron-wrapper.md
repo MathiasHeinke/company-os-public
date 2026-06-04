@@ -75,12 +75,12 @@ be proven before the child command starts.
 ## Lane-Scoped Artifact Truth
 
 The wrapper passes `--lane` into warm preflight. Artifact Truth is required for
-the standalone `runtime-preflight` lane and ARES marketing/editorial/product/
-upload-post lanes. Pure Company.OS / Plane / controller lanes skip ARES
+the standalone `runtime-preflight` lane and [SOURCE_COMPANY] marketing/editorial/product/
+upload-post lanes. Pure Company.OS / Plane / controller lanes skip [SOURCE_COMPANY]
 marketing Artifact Truth by default, so a stale editorial or product manifest
 does not block unrelated scheduler/controller work. Force the old behavior with
 the warm-preflight option `--artifact-truth-required` when a source-of-truth
-issue deliberately couples a lane to ARES artifact freshness.
+issue deliberately couples a lane to [SOURCE_COMPANY] artifact freshness.
 
 ## Plane UI Worker Lane
 

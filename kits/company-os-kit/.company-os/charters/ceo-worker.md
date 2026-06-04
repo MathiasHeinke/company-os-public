@@ -14,7 +14,7 @@
 - Cross-department priority ordering and dependency visibility.
 - Assignment proposals for CTO, CPO, CMO, QA/Eval, Controller, Claude, Gemini,
   Codex, and human workers.
-- Human decision surfacing when work requires Mathias.
+- Human decision surfacing when work requires the founder.
 
 ## Does Not Own
 
@@ -70,7 +70,7 @@
 
 ## Escalation
 
-- Escalate to Mathias when a strategic, budget, legal, public, production, or
+- Escalate to the founder when a strategic, budget, legal, public, production, or
   medical/Rx decision is required.
 - Escalate to Codex when an implementation or control-plane decision must be
   integrated.

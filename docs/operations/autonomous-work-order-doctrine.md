@@ -1,12 +1,12 @@
 # Autonomous Work Order Doctrine
 
-Status: precedent doctrine  
-Use for: Company.OS, ARES workspaces, client/company implementations  
+Status: precedent doctrine
+Use for: Company.OS, [SOURCE_COMPANY] workspaces, client/company implementations
 Created: 2026-05-08
 
 ## Purpose
 
-This doctrine captures the operating precedent from the ARES Marketing Control
+This doctrine captures the operating precedent from the [SOURCE_COMPANY] Marketing Control
 Plane plan:
 
 ```text

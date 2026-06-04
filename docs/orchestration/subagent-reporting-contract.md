@@ -163,5 +163,5 @@ worker.reported:
 - The required-key set is closed. Optional keys may be extended in
   later phases without breaking the contract, as long as the required
   set is preserved.
-- Source-company-specific subagent patterns (ARES/Fyn) belong in
+- Source-company-specific subagent patterns ([SOURCE_COMPANY]/Fyn) belong in
   private operating docs. This contract stays generic and reusable.

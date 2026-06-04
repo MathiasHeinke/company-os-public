@@ -23,7 +23,7 @@ Use when reviewing how an agent worked, not only what it produced.
 8. Identify calibration gaps.
 9. Classify root cause.
 10. Set `mathias_let_this_pass`.
-11. Write what Mathias would likely say, what would fail his quality bar, why,
+11. Write what the founder would likely say, what would fail his quality bar, why,
     and what rework is required.
 12. Recommend one of: PROMOTE, KEEP, RESTRICT, RETRAIN, RETIRE, NEEDS-HUMAN.
 13. Propose SOP, skill, harness, eval, or Linear follow-up changes.

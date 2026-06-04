@@ -96,9 +96,9 @@ contracts and scheduler prompts.
 | Project | Identifier | Project id |
 |---|---|---|
 | CompanyOS | COMPA | `3537d502-b5a7-4214-9f7d-8f571fb1cd1e` |
-| Atlas Bio.OS | ATLAS | `268df2ed-a071-4cc8-a394-595e4b7353c2` |
+| Atlas Bio.OS | [SOURCE_COMPANY] | `268df2ed-a071-4cc8-a394-595e4b7353c2` |
 | Atlas Growth Engine | GROW | `2fd81365-a180-483e-b5ed-f9212ebca876` |
-| FYN Labs | FYN | `f96e33d6-491d-425d-bae9-09a94da9c73c` |
+| [SOURCE_COMPANY] | FYN | `f96e33d6-491d-425d-bae9-09a94da9c73c` |
 | Command Center | CMD | `a0289488-bae2-4403-8628-8ce842a0becc` |
 | [SOURCE_WORKSPACE] Founder Office | MHDEV | `488fac05-3714-4cf5-bced-3a6a032291db` |
 
@@ -161,7 +161,7 @@ Checked on 2026-05-13:
 - `company-os-plane@mathias-local` is installed, enabled and smoke-tested at
   MCP protocol level; `mcp_servers.company_os_plane` is also configured as a
   direct fallback in `~/.codex/config.toml`.
-- Plane App identity is `ARES Multi-Agent`.
+- Plane App identity is `[SOURCE_COMPANY] Multi-Agent`.
 - `plane-app-token-rotation --mode ensure`: PASS, action `kept`.
 - `plane-api-sanity --workspace companyos --auth app-token`: PASS, reads all
   six Company.OS projects.

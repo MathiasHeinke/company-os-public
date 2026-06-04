@@ -73,7 +73,7 @@
 
 ## Escalation
 
-- Escalate to Mathias when intent fit is uncertain or rejected.
+- Escalate to the founder when intent fit is uncertain or rejected.
 - Escalate to Codex when system files, directives, or orchestration need
   changes.
 - Escalate to QA/Eval when evidence is missing or verification is weak.

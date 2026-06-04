@@ -187,7 +187,7 @@ HumanGate: only the explicit external-impact boundaries listed for that job.
 
 ## Current Local Pilot Mapping
 
-The ARES/Fyn local pilot currently maps to the generic registry like this:
+The [SOURCE_COMPANY]/Fyn local pilot currently maps to the generic registry like this:
 
 | Generic ID | Local Automation ID | Notes |
 |---|---|---|
@@ -196,12 +196,12 @@ The ARES/Fyn local pilot currently maps to the generic registry like this:
 | `git-worktree-hygiene` | `company-os-git-worktree-hygiene` | Local Mac cron, read-only Git/worktree hygiene report before night work. |
 | `morning-ceo-brief` | `company-os-morning-ceo-brief` | Local Mac cron, writes morning CEO brief. |
 | `cmo-morning-brief` | `company-os-cmo-morning-brief` | Target Plane-first sink: Command Center `Morning Briefing - Current`; append dated comment, never create daily items. |
-| `marketing-editorial` | `ares-daily-editorial-desk` | ARES-specific implementation of generic editorial desk. |
-| `marketing-quality-gate` | `ares-editorial-quality-gate` | ARES-specific editorial gate. |
+| `marketing-editorial` | `ares-daily-editorial-desk` | [SOURCE_COMPANY]-specific implementation of generic editorial desk. |
+| `marketing-quality-gate` | `ares-editorial-quality-gate` | [SOURCE_COMPANY]-specific editorial gate. |
 | `marketing-quality-gate` | `ares-editorial-eval-gate` | Claude eval gate before scheduling. |
 | `marketing-daily-planner` | `atlas-marketing-daily-planner-cmo-worker` | Plane `role:cmo` department-pack worker; converts founder intent, analytics and source intake into lane assignments. |
 | `marketing-evidence-scout` | `atlas-marketing-evidence-scout-cmo-worker` | Plane `role:cmo` department-pack worker; creates source-backed topic cards with evidence class, hard facts and caveats. |
-| `marketing-case-file` | `atlas-case-file-cmo-worker` | Plane `role:cmo` child contract; uses the ARES Website Case File renderer, image gate, eval and Upload-Post dry-run. |
+| `marketing-case-file` | `atlas-case-file-cmo-worker` | Plane `role:cmo` child contract; uses the [SOURCE_COMPANY] Website Case File renderer, image gate, eval and Upload-Post dry-run. |
 | `marketing-editorial-image-post` | `atlas-editorial-image-post-cmo-worker` | Plane `role:cmo` child contract; uses Daily Editorial, image generation, eval and Upload-Post dry-run. |
 | `marketing-blog-article` | `atlas-blog-article-cmo-worker` | Plane `role:cmo` child contract; runs Blog Engine morning-after audit and reports publish/index blockers. |
 | `marketing-distribution-manager` | `atlas-marketing-distribution-manager-cmo-worker` | Plane `role:cmo` department-pack worker; verifies Upload-Post payloads, media attachment, cadence fit and cancel path. |

@@ -73,12 +73,12 @@ Recommended first children:
 The exact Plane sequences are assigned by Plane. Do not pre-allocate sequence
 numbers in docs.
 
-## ATLAS Desktop MVP Pilot
+## [SOURCE_COMPANY] Desktop MVP Pilot
 
-The first domain-specific CTO lane is the ATLAS Desktop MVP pilot:
+The first domain-specific CTO lane is the [SOURCE_COMPANY] Desktop MVP pilot:
 
 ```text
-ATLAS Desktop MVP / CTO Department Dashboard-First Private Beta
+[SOURCE_COMPANY] Desktop MVP / CTO Department Dashboard-First Private Beta
 ```
 
 Canonical pilot doctrine:
@@ -88,7 +88,7 @@ Canonical pilot doctrine:
 - `docs/operations/sandbox-branch-lane.md`
 - `docs/templates/worker-issue-contract.md`
 
-The ATLAS pilot is dashboard-first. `[SOURCE_COMPANY_DOMAIN]-desktop` is the primary UI
+The [SOURCE_COMPANY] pilot is dashboard-first. `[SOURCE_COMPANY_DOMAIN]-desktop` is the primary UI
 control-plane workspace, `[SOURCE_WORKSPACE]` is backend/Supabase/Edge/Hermes source of
 truth, `[SOURCE_COMPANY_DOMAIN]-dashboard` is the operator surface, and Swift/iOS remains
 capture-first until CEO/Codex changes the parent cutline.

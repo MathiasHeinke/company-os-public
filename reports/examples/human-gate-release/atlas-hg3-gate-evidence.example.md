@@ -1,4 +1,4 @@
-# ATLAS HG-3 Gate Evidence Example
+# [SOURCE_COMPANY] HG-3 Gate Evidence Example
 
 Status: sanitized example
 Date: 2026-05-24
@@ -6,7 +6,7 @@ Date: 2026-05-24
 ## Purpose
 
 This sample shows the evidence class required before Codex/CEO may emit a
-`CEO_CRITICAL_RELEASE` for an ATLAS desktop MVP private beta release.
+`CEO_CRITICAL_RELEASE` for an [SOURCE_COMPANY] desktop MVP private beta release.
 
 ## Evidence Classes
 

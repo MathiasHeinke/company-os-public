@@ -1,10 +1,10 @@
 # Company.OS Marketing Department Pack v0.6.7
 
 Status: draft-to-build operating pack
-Use for: turning the ATLAS marketing pilot into a reusable Company.OS CMO
+Use for: turning the [SOURCE_COMPANY] marketing pilot into a reusable Company.OS CMO
 department before v0.7 autonomous ops
 Plane parent: [WORK_ITEM_ID]
-ATLAS execution parent: GROW-44
+[SOURCE_COMPANY] execution parent: GROW-44
 Last updated: 2026-05-21
 
 ## Decision
@@ -12,7 +12,7 @@ Last updated: 2026-05-21
 v0.6.7 is the Marketing Department Pack bridge between the v0.6
 Marketing/Growth wedge and the v0.7 Autonomous Ops Loop.
 
-The ATLAS Growth Engine already has working tool lanes in `[SOURCE_WORKSPACE]`.
+The [SOURCE_COMPANY] Growth Engine already has working tool lanes in `[SOURCE_WORKSPACE]`.
 Company.OS must now wrap those lanes in a company-shaped department:
 
 ```text
@@ -26,14 +26,14 @@ Founder intent / market signal
 -> analytics and learning loop
 ```
 
-GROW stays the ATLAS execution project. COMPA owns the productizable operating
+GROW stays the [SOURCE_COMPANY] execution project. COMPA owns the productizable operating
 model, reusable templates, gates, reporting and department rhythm.
 
 ## Plane Shape
 
 COMPA parent:
 
-- [WORK_ITEM_ID]: Company.OS v0.6.7 - Marketing Department Pack / ATLAS Pilot Org
+- [WORK_ITEM_ID]: Company.OS v0.6.7 - Marketing Department Pack / [SOURCE_COMPANY] Pilot Org
 
 COMPA children:
 
@@ -108,7 +108,7 @@ cannot self-approve it.
 
 ## Current Lanes Versus Department Workers
 
-The current ATLAS pilot has three production lanes:
+The current [SOURCE_COMPANY] pilot has three production lanes:
 
 1. Case File slides: high-density carousel, X up to four slides, LinkedIn full
    deck.
@@ -181,7 +181,7 @@ Reject patterns:
 - product explainers that do not stand alone as useful content
 - generated visuals with no topic-specific scene
 - unreadable axes, missing scale labels or decorative charts
-- ARES Bio.OS in public ATLAS Bio.OS copy
+- [SOURCE_COMPANY] Bio.OS in public [SOURCE_COMPANY] Bio.OS copy
 - internal routing metadata in public posts
 
 Deterministic enforcement for the text-checkable part lives in
@@ -253,7 +253,7 @@ v0.6.7 can be called ready for v0.7 absorption when:
 
 ## Productization Rule
 
-For a client install, replace ATLAS-specific paths with the client's marketing
+For a client install, replace [SOURCE_COMPANY]-specific paths with the client's marketing
 workspace and keep the same operating split:
 
 ```text

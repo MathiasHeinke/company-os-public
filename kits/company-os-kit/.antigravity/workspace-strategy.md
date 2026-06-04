@@ -7,7 +7,7 @@
 
 ## MCP-Server → Workspace Benefit Matrix
 
-| MCP Server | Capability | ARES Bio.OS | The Swarm | NOUS Bridge | Meta-Workspace |
+| MCP Server | Capability | [SOURCE_COMPANY] Bio.OS | The Swarm | NOUS Bridge | Meta-Workspace |
 |---|---|---|---|---|---|
 | **Supabase** | DB, Auth, Edge Functions, Migrations | ✅ Kern | ✅ Kern | ⚡ Edge Cases | ❌ |
 | **GitHub** | Repos, PRs, Issues, Code Search | ✅ | ✅ | ✅ | ✅ |
@@ -23,7 +23,7 @@
 
 ## Persona → Workspace Relevanz
 
-| Persona | ARES Bio.OS | The Swarm | NOUS Bridge | Meta-Workspace |
+| Persona | [SOURCE_COMPANY] Bio.OS | The Swarm | NOUS Bridge | Meta-Workspace |
 |---|---|---|---|---|
 | 🧬 NOUS | ✅ Immer | ✅ Immer | ✅ Immer | ✅ Immer |
 | 🖥️ Carmack | ✅ Engines, DB | ✅ Backend | ✅ Node.js | ⚡ |

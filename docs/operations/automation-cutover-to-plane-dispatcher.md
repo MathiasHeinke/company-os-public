@@ -67,7 +67,7 @@ Keep active for now:
 
 - `company-os-runtime-auth-preflight`
 - `company-os-morning-ceo-brief`
-- ARES marketing/content jobs that are still wanted operationally and already
+- [SOURCE_COMPANY] marketing/content jobs that are still wanted operationally and already
   fail closed on auth/artifact gates
 
 Do not rely on as the future controller:
@@ -141,7 +141,7 @@ Move selected recurring jobs from old Codex automations into Plane:
 2. Morning CEO brief lane
 3. Night sweep / improvement dream lane
 4. Worktree hygiene lane
-5. ARES marketing lanes, only after domain owners accept Plane-first routing
+5. [SOURCE_COMPANY] marketing lanes, only after domain owners accept Plane-first routing
 
 ## Stop Rules
 

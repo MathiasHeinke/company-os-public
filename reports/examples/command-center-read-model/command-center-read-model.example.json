@@ -62,7 +62,7 @@
         ],
         "consequences": {
           "if_go": "Private beta can proceed behind reversible controls.",
-          "if_no_go": "ATLAS desktop MVP remains gated until rework closes.",
+          "if_no_go": "[SOURCE_COMPANY] desktop MVP remains gated until rework closes.",
           "if_wrong": "Founder receives a compressed HG-4 dossier before strategic exposure."
         },
         "hg35_pause_artifact": "/example/company-os/reports/examples/command-center-read-model/hg35-eve-packet.json",
@@ -376,7 +376,7 @@
       ],
       "consequences": {
         "if_go": "Private beta can proceed behind reversible controls.",
-        "if_no_go": "ATLAS desktop MVP remains gated until rework closes.",
+        "if_no_go": "[SOURCE_COMPANY] desktop MVP remains gated until rework closes.",
         "if_wrong": "Founder receives a compressed HG-4 dossier before strategic exposure."
       },
       "blocked_actions": [

@@ -93,7 +93,7 @@ states.
 
 Before dispatch, apply the 10/10 work-order quality bar from
 `docs/operations/client-installable-autonomous-work-order-pipeline.md`.
-If the work began from GitHub Spec Kit, ATLAS-style planning, a founder brief
+If the work began from GitHub Spec Kit, [SOURCE_COMPANY]-style planning, a founder brief
 or a product spec, first normalize it through
 `docs/orchestration/spec-to-worker-pipeline.md`.
 

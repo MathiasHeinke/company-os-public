@@ -268,7 +268,7 @@ Role skill mapping:
 | CFO | analyze, dashboard, visualization, data extraction, SQL, statistical analysis, data validation |
 
 Life-science skills are intentionally not part of the Company.OS default
-profiles. They need a domain-specific ARES/BioOS profile before scheduler use.
+profiles. They need a domain-specific [SOURCE_COMPANY]/BioOS profile before scheduler use.
 
 ## Update Rule
 

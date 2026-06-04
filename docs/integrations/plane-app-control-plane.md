@@ -44,12 +44,12 @@ surface:
 App name:
 
 ```text
-ARES Multi-Agent
+[SOURCE_COMPANY] Multi-Agent
 ```
 
 Earlier docs and scripts may still refer to `Company.OS Control Plane`; treat
 that as the former/control-plane role name. The verified current Plane bot
-identity is `ARES Multi-Agent`.
+identity is `[SOURCE_COMPANY] Multi-Agent`.
 
 Recommended initial mode:
 
@@ -58,7 +58,7 @@ Bot Token Flow / Client Credentials
 ```
 
 Reason: Company.OS workers and controllers act as the installed company
-operating layer, not as Mathias personally.
+operating layer, not as the founder personally.
 
 User Token Flow remains optional for future user-specific actions that must be
 attributed to a human.

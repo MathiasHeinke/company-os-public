@@ -166,5 +166,5 @@ The api-key should be rotated after each bootstrap-class write per
   emit / read the new comment marker consistently.
 - Optional label additions require their own work item with HG-2.5
   release card; bulk additions are forbidden.
-- Source-company-specific lifecycle (ARES/Fyn) belongs in private
+- Source-company-specific lifecycle ([SOURCE_COMPANY]/Fyn) belongs in private
   operating docs. This doctrine remains generic and reusable.

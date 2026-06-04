@@ -95,7 +95,7 @@ Changed:
   identify `0.7.4-rc.0` as the current productization line.
 - Public mirror tests now assert that the reusable Supergoal / Post-Worker
   Quality doctrine, registry and capability examples are included while
-  private ATLAS evidence, reports and company-specific capability registries
+  private [SOURCE_COMPANY] evidence, reports and company-specific capability registries
   remain excluded.
 
 Boundaries:
@@ -103,7 +103,7 @@ Boundaries:
 - No Plane `Done`, merge, push, deploy, production write, schema/RLS/auth,
   service-role use, public medical/Rx/legal claim approval or scheduler
   default-on behavior is released by this version.
-- Private ATLAS run reports are evidence for the internal controller, not
+- Private [SOURCE_COMPANY] run reports are evidence for the internal controller, not
   public artifacts.
 
 ## 0.7.3-rc.0 - 2026-05-30
@@ -138,7 +138,7 @@ Added:
   treated as ready.
 - Department Capability Pack Creator: reusable templates, scaffold/evaluator
   CLIs, native EVE/Hermes skill routing, CTO CapabilityProfile gating and a
-  non-ARES `customer-support-kb` proof pack that evaluates `READY` at 10/10
+  non-[SOURCE_COMPANY] `customer-support-kb` proof pack that evaluates `READY` at 10/10
   across all ten disciplines.
 - Obsidian Brain Interface: optional public-safe cockpit doctrine, kit
   checklist and setup workflow that treat Obsidian as a local interface over

@@ -132,6 +132,18 @@ function writePrivateContent(root) {
   write(root, ".env", "SECRET=do-not-publish\n");
   write(root, "docs/templates/atlas-worker-templates.md", "atlas\n");
   write(root, "docs/orchestration/atlas-claude-c-level-boot-contract.md", "atlas\n");
+  write(root, "docs/calibration/mathias-fit-layer.md", "Mathias fit\n");
+  write(root, "docs/superpowers/plans/internal-plan.md", "internal plan\n");
+  write(root, "docs/strategy/command-eve-outreach-kit.md", "Fyn Labs outreach\n");
+  write(root, "docs/operations/atlas-marketing-performance-memory.md", "ATLAS memory\n");
+  write(root, "docs/orchestration/atlas-marketing-department-runtime.md", "ATLAS runtime\n");
+  write(root, "docs/templates/atlas-marketing-case-file-worker-contract.md", "ATLAS worker\n");
+  write(root, "docs/operations/marketing-public-fetch-fallback.md", "Mathias browser action\n");
+  write(root, "scripts/sandbox-pr/example.mjs", "function whatMathiasWouldReject() {}\n");
+  write(root, "kits/company-os-kit/scripts/autoresearch-bioengine/README.md", "ARES BioEngine\n");
+  write(root, "kits/company-os-kit/scripts/engine-eval-template/README.md", "ARES Engine Eval\n");
+  write(root, "kits/company-os-kit/scripts/mcp-gateway/gateway.py", "ARES App\n");
+  write(root, "kits/company-os-kit/scripts/mcp-gateway-template/gateway.py", "ARES Website\n");
   write(root, "kits/company-os-kit/.antigravity/knowledge/source-x.md", "knowledge\n");
 }
 
@@ -149,6 +161,20 @@ test("isStripped recognizes private paths and keeps reports/.gitkeep", () => {
   assert.ok(isStripped("metrics/agent-runs.jsonl"));
   assert.ok(isStripped("registries/capabilities/company-os.json"));
   assert.ok(isStripped("scripts/plane/enrich-batch-5-mirror-plans.mjs"));
+  assert.ok(isStripped("scripts/sandbox-pr/example.mjs"));
+  assert.ok(isStripped("docs/superpowers/plans/internal-plan.md"));
+  assert.ok(isStripped("docs/calibration/mathias-fit-layer.md"));
+  assert.ok(isStripped("docs/strategy/command-eve-outreach-kit.md"));
+  assert.ok(isStripped("docs/operations/atlas-marketing-performance-memory.md"));
+  assert.ok(isStripped("docs/orchestration/atlas-marketing-department-runtime.md"));
+  assert.ok(isStripped("docs/templates/atlas-marketing-case-file-worker-contract.md"));
+  assert.ok(isStripped("docs/operations/marketing-public-fetch-fallback.md"));
+  assert.ok(isStripped("assets/brand/eve-command/site/public/agb.html"));
+  assert.ok(isStripped("assets/brand/eve-command/site/public/datenschutz.html"));
+  assert.ok(isStripped("assets/brand/eve-command/site/public/impressum.html"));
+  assert.ok(isStripped("kits/company-os-kit/scripts/autoresearch-bioengine/README.md"));
+  assert.ok(isStripped("kits/company-os-kit/scripts/engine-eval-template/README.md"));
+  assert.ok(isStripped("kits/company-os-kit/scripts/mcp-gateway/gateway.py"));
   assert.ok(isStripped("reports/runs/internal.md"));
   assert.ok(isStripped("reports/runs/internal.stream.jsonl"));
   assert.ok(isStripped("kits/company-os-kit/.antigravity/personas/elon-musk.md"));
@@ -201,6 +227,17 @@ test("planPublicMirror returns copied + stripped + missing_fixtures for a synthe
   assert.ok(strippedPaths.includes("metrics/agent-events.jsonl"));
   assert.ok(strippedPaths.includes("registries/capabilities/company-os.json"));
   assert.ok(strippedPaths.includes("scripts/plane/enrich-batch-5-mirror-plans.mjs"));
+  assert.ok(strippedPaths.includes("scripts/sandbox-pr/example.mjs"));
+  assert.ok(strippedPaths.includes("docs/superpowers/plans/internal-plan.md"));
+  assert.ok(strippedPaths.includes("docs/calibration/mathias-fit-layer.md"));
+  assert.ok(strippedPaths.includes("docs/strategy/command-eve-outreach-kit.md"));
+  assert.ok(strippedPaths.includes("docs/operations/atlas-marketing-performance-memory.md"));
+  assert.ok(strippedPaths.includes("docs/orchestration/atlas-marketing-department-runtime.md"));
+  assert.ok(strippedPaths.includes("docs/templates/atlas-marketing-case-file-worker-contract.md"));
+  assert.ok(strippedPaths.includes("docs/operations/marketing-public-fetch-fallback.md"));
+  assert.ok(strippedPaths.includes("kits/company-os-kit/scripts/autoresearch-bioengine/README.md"));
+  assert.ok(strippedPaths.includes("kits/company-os-kit/scripts/engine-eval-template/README.md"));
+  assert.ok(strippedPaths.includes("kits/company-os-kit/scripts/mcp-gateway/gateway.py"));
   assert.ok(strippedPaths.includes("kits/company-os-kit/.antigravity/personas/elon-musk.md"));
   assert.ok(strippedPaths.includes("kits/company-os-kit/.antigravity/logs/architect-memory.md"));
   assert.ok(strippedPaths.includes(".env"));
@@ -335,6 +372,26 @@ test("runBuildPublicMirror full build copies sanitized tree and writes provenanc
   );
   assert.equal(
     fs.existsSync(path.join(outRoot, "scripts/plane/enrich-batch-5-mirror-plans.mjs")),
+    false,
+  );
+  assert.equal(fs.existsSync(path.join(outRoot, "scripts/sandbox-pr/example.mjs")), false);
+  assert.equal(fs.existsSync(path.join(outRoot, "docs/superpowers/plans/internal-plan.md")), false);
+  assert.equal(fs.existsSync(path.join(outRoot, "docs/calibration/mathias-fit-layer.md")), false);
+  assert.equal(fs.existsSync(path.join(outRoot, "docs/strategy/command-eve-outreach-kit.md")), false);
+  assert.equal(
+    fs.existsSync(path.join(outRoot, "docs/operations/atlas-marketing-performance-memory.md")),
+    false,
+  );
+  assert.equal(
+    fs.existsSync(path.join(outRoot, "docs/orchestration/atlas-marketing-department-runtime.md")),
+    false,
+  );
+  assert.equal(
+    fs.existsSync(path.join(outRoot, "docs/templates/atlas-marketing-case-file-worker-contract.md")),
+    false,
+  );
+  assert.equal(
+    fs.existsSync(path.join(outRoot, "kits/company-os-kit/scripts/autoresearch-bioengine/README.md")),
     false,
   );
   assert.equal(fs.existsSync(path.join(outRoot, ".env")), false);
@@ -477,6 +534,20 @@ test("sanitizePublicMirrorText scrubs safe public mirror fixture tokens and work
       `const workspace = '${["ares", "app"].join("-")}';\n`,
     ),
     "const workspace = '[SOURCE_WORKSPACE]';\n",
+  );
+  assert.equal(
+    sanitizePublicMirrorText(
+      "docs/operations/example.md",
+      "Mathias runs ARES at Fyn Labs while ATLAS is private.\n",
+    ),
+    "the founder runs [SOURCE_COMPANY] at [SOURCE_COMPANY] while [SOURCE_COMPANY] is private.\n",
+  );
+  assert.equal(
+    sanitizePublicMirrorText(
+      "assets/brand/eve-command/site/public/assets/index.js",
+      "placeholder:\"Mathias\",copy:\"ARES at Fyn Labs\"\n",
+    ),
+    "placeholder:\"the founder\",copy:\"[SOURCE_COMPANY] at [SOURCE_COMPANY]\"\n",
   );
   assert.equal(
     sanitizePublicMirrorText("scripts/orchestration/example.mjs", `const token = '${githubPatFixture}';\n`),

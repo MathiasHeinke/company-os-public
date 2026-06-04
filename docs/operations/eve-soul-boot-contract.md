@@ -60,7 +60,7 @@ founder decoupling:
   public-voice, medical or major reputation decisions
 
 For public installs, this is productized as the `Founder Offline Test`. Each
-Founder may define their own version of the test during onboarding. Mathias'
+Founder may define their own version of the test during onboarding. the founder's
 private Mars framing is not required for clients; the reusable principle is
 that Company.OS should make the founder progressively less operationally
 required without removing founder authority.

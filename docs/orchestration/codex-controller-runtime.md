@@ -138,7 +138,7 @@ stops on that work item.
 
 ## Escalation Rules
 
-The controller must escalate to **chat CEO (Mathias)** when:
+The controller must escalate to **chat CEO (the founder)** when:
 
 - a CAO REJECT contains a reason code the controller has not seen before
   (no precedent decision)
@@ -354,5 +354,5 @@ Still to build (each gated by HG-2.5 release card on its own work item):
   amendment to this doc and to the worker-issue-contract template.
 - The set of allowed write surfaces is closed. New surfaces require an
   amendment to this doc and a separate HG-2.5 release card.
-- Source-company-specific deputy-CEO behaviour (ARES/Fyn) belongs in
+- Source-company-specific deputy-CEO behaviour ([SOURCE_COMPANY]/Fyn) belongs in
   private operating docs. This doctrine remains generic and reusable.
