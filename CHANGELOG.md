@@ -5,6 +5,187 @@ runtime changes.
 
 ## Unreleased
 
+## 1.0.0-alpha.3 - 2026-06-05
+
+Status: Command EVE publish-prep closure release. This is still alpha, not
+stable production.
+
+- Promoted the active product line to `1.0.0-alpha.3` after the HG-4 publish
+  pass for the Command EVE 0.8 / 0.9 closure work.
+- Added the public `1.0.0-alpha.3` closure supergoal that reconciles all
+  unfinished 0.8.x and 0.9.x work below the alpha line instead of hiding it
+  behind the self-install milestone.
+- Materialized the Plane parent/child tree for the closure lane:
+  `[WORK_ITEM_ID]` through `[WORK_ITEM_ID]`, covering absorbed install closeout,
+  department dashboard/review cards, post-worker quality/hotfix autonomy,
+  support/security/privacy/license gate, scheduler kill-switch/budget brake,
+  ladder/context topology integration, self-observability watchdog,
+  plugin/connector onboarding harness, remote pilot handoff and CAO
+  security/code-review/hotfix gate.
+- Added an idempotent Plane materializer for the alpha3 closure tree with
+  cursor pagination, App-token fallback for role-label-only planning and
+  API-key support for full version/status/gate labels.
+- Added the Claude Opus CAO audit and Codex controller hotfix synthesis
+  reports for the closure release. The audit found no P0/P1 issues; P2
+  materializer idempotency/update-state findings were fixed before publish
+  preparation.
+- Added the website-facing Command EVE alpha3 feature and structure brief for
+  turning the current product truth into public copy without overstating
+  hosted, stable or autonomous publish/send/spend claims.
+
+## 1.0.0-alpha.2 - 2026-06-04
+
+Status: Self-install pilot hardening for the public local-first Command EVE
+operator-shell alpha. This is still alpha, not stable production.
+
+- Added the `1.0.0-alpha.2` Self-Install Pilot Hardening supergoal as the next
+  local-first proof band: public-main update proof, one-command GitHub
+  self-install, BYOK/Hermes auth preflight, first-run EVE confirmation flow,
+  update lifecycle smoke, draft-only marketing wedge, remote pilot runbook and
+  beta promotion gate.
+- Added `scripts/install/command-eve-self-install.mjs` as the first
+  founder-facing one-command installer wrapper. It composes the public-RC
+  workspace install with the managed AionUI/Hermes/EVE sidecar install, keeps a
+  no-write dry-run path, checks source/version/target/prerequisite/component
+  state before sidecar writes and emits one combined install report with
+  start/update command hints.
+- Bumped `VERSION` and the operator-shell manifest to `1.0.0-alpha.2`, so the
+  AionUI login/version surface updates through the generated
+  `public/command-eve-brand.json` instead of a hardcoded fork string.
+- Added Hermes BYOK auth preflight receipts under `hermes.auth_profile`.
+  `start_eve --auth-check` and `start_eve.mjs check --auth-check --json`
+  report provider, model, auth mode and readiness proof; provider-key, quota
+  or timeout failures surface as `BLOCKED_AUTH`, not as broken installs.
+- Added generated `first_run_confirmation` receipts to the EVE runtime boot
+  packet so a fresh EVE session starts with known account/company facts,
+  correction confirmation, progressive required/helpful/later setup queues and
+  existing-system inventory before proposing new structure.
+- Extended the generated `.company-os/bin/start_eve` launcher with `check` and
+  `--auth-check` modes while preserving default no-argument UI start behavior.
+
+## 1.0.0-alpha.1 - 2026-06-04
+
+Status: Security and portability hardening for the Command EVE managed
+operator-shell alpha. This is still alpha, not stable production.
+
+Changed:
+
+- Replaced copy-pasteable pipe-to-shell installer guidance with operator-reviewed
+  package-manager or upstream-doc install paths for Bun and Raindrop Workshop.
+- Made Claude/Gemini runtime defaults portable (`claude` / `gemini`, overridable
+  by `CLAUDE_BIN` / `GEMINI_BIN`) instead of defaulting to the founder-local binary
+  paths.
+- Made the model-router workspace default portable through `COMPANY_OS_ROOT` or
+  the current working directory.
+- Renamed the Vitest engine-eval template from `*.test.ts` to
+  `*.vitest.ts` so Node's native `node --test` runner no longer tries to run a
+  template file that intentionally requires Vitest after being copied into a
+  real project test.
+
+Security:
+
+- Added Supabase token-shaped values to the model-router, runtime dispatcher,
+  public mirror, clean-clone and productization secret scanners.
+- Extended tests so Supabase-like token fixtures are blocked or redacted across
+  router output, worker runtime output, productization readiness, public mirror
+  generation and clean-clone verification.
+- Replaced a token-shaped Supabase test fixture in the MCP gateway kit with a
+  non-secret placeholder and expanded the gateway scrubber pattern.
+
+- Post-Worker Quality Loop now supports multi-marker controller decision cards:
+  the controller can emit separate quality, security, regression, deep-audit or
+  hotfix markers, and the scheduler/Plane handoff fans them out into distinct
+  lower-worker candidates while terminal or human-blocked markers fail closed.
+- Release truth is aligned around `1.0.0-alpha.1` as the current managed
+  operator-shell alpha. Historical `0.7.4`, `0.9.0-rc.0` and
+  `1.0.0-alpha.0` docs remain release evidence, not current-version claims.
+- Restored missing public substrate docs for the Command EVE offer, KI-Rendite
+  questionnaire, Lead Signal loop, Founder Voice and Belief Model and M0 seed
+  interview without importing private [SOURCE_COMPANY]/founder-specific branch content.
+- Command EVE AionUI overlay now ships a full German-first `de-DE` language
+  pack across all AionUI `en-US` namespaces with key/placeholder parity,
+  defaults fresh installs to German, keeps `en-US` selectable, replaces the
+  login logo with the face-focused EVE wait video, and writes a generated
+  `public/command-eve-brand.json` so the login title can show the installed
+  `⌘ EVE` product identity plus `v1.x` release line without hardcoding the version in the AionUI
+  patch.
+- `start_eve` now treats the AionUI `public/command-eve-brand.json` as a
+  launch-time version gate: missing, invalid or stale UI brand config is
+  refreshed from the root `VERSION` before AionUI preflight, and the
+  `aionui.brand_version` stage reports the visible UI version.
+- Added `scripts/operator-shell/aionui-localization-gate.mjs` so the Command
+  EVE `de-DE` pack can be validated against a fresh AionUI locale tree before
+  shipping an overlay update.
+- Command EVE marketing/content-machine stand is now integrated into the
+  active `1.0.0-alpha.1` operator-shell alpha line as
+  `command-eve-marketing-stand/2026-06-04`; this is a GTM marker, not a
+  separate product-version bump or `1.0.1` claim.
+- Added the Content Machine Department Pack as the shared CMO substrate before
+  social, blog, book, video and campaign lanes: source inventory, FVBM check,
+  content vault, founder interview/raw brief, research, draft, writer council,
+  derivatives, release packets and lessons.
+- Added installable Content Machine kit surface, EVE/AionUI skill routing,
+  starter command, parent/child worker contracts, capability profile and
+  evaluator proof artifacts.
+- Added Command EVE daily posting automation doctrine for the current
+  bilingual marketing motion: 4 German and 4 English Command EVE drafts per
+  day, image-first Upload-Post candidates, max one direct offer post per
+  language and Founder approval before any external post or schedule.
+- Added Command EVE visual design source for social images and Image 2.0
+  briefs, using `try.command-eve.com` as the visual truth.
+
+## 1.0.0-alpha.0 - 2026-06-04
+
+Status: Command EVE managed operator-shell alpha. This is the first
+Company.OS line that treats local AionUI + Hermes installation as part of the
+install product instead of a separate founder/operator sidecar task. It is an
+alpha, not stable: expect supervised setup, dependency repair and explicit
+provider auth.
+
+Added:
+
+- Managed Command EVE operator-shell manifest at
+  `registries/operator-shell/command-eve-1.0-alpha.json`.
+- `scripts/operator-shell/install-command-eve.mjs` and core tests for a
+  pinned sidecar install path:
+  - AionUI `v2.1.10` source-overlay lane with Command EVE branding.
+  - AionCore `v0.1.19` backend binary prepared through AionUI's pinned
+    `prepareAioncore.js` flow and wired into `start_eve`.
+  - AionUI renderer assets built locally before `start_eve`, so web UI startup
+    does not require a separate manual `bun run package`.
+  - Hermes Agent `0.15.2` installed into a local Python venv.
+  - EVE SOUL, runtime policy, connector manifest and first-run skill materialized
+    under the target's local `.company-os/operator-shell/` tree.
+  - Default inference profile points to `openrouter` /
+    `minimax/minimax-m3` without storing or collecting raw API keys.
+- Target-local `.company-os/bin/start_eve` and `.company-os/bin/update_eve`
+  launchers for remote pilots; updates pull from the public Company.OS source
+  first, then refresh the managed AionUI/Hermes sidecars.
+- Public mirror inclusion and clean-clone gates now require the Operator-Shell
+  manifest, preventing a public install that has scripts but no component pins.
+- Installer prerequisite guidance for missing `git`, `python3` or `bun`, with
+  `bun` called out as the likely fresh-macOS blocker for AionUI source-overlay
+  installs.
+- Hermes package decision now falls back to installed Python package metadata,
+  so the venv/wheel path reports Hermes `0.15.2` instead of `unknown`.
+- AionUI ChatConversation overlay hunk now targets the generic conversation
+  panel instead of the AionRS-only panel; the patch applies cleanly to AionUI
+  `v2.1.10` and preserves TypeScript build validity.
+- `start_eve` now exports the prepared `AIONUI_BACKEND_BIN`, avoiding an
+  accidental frontend-only AionUI launch on fresh installs.
+- `clientRoot` support for EVE sidecar/start scripts, so EVE can read public
+  Company.OS source docs from the repo while reading the real client
+  onboarding seed from the installed workspace.
+
+Boundaries:
+
+- No API keys, OAuth secrets, cookies, browser storage or raw `.env` values are
+  collected in chat or committed.
+- AionUI/Hermes native scheduled tasks, team/full-auto/YOLO, broad delegation,
+  publish/send/spend/deploy and Plane Done remain gated.
+- This alpha does not create a hosted account, SaaS tenant, packaged signed
+  macOS app or stable unsupported self-serve claim.
+
 ## 0.9.0-rc.0 - 2026-06-03
 
 Status: Command EVE 0.9 remote-install release candidate. This is the first

@@ -674,6 +674,40 @@ test("Video-first content engine profile allows local dry-run media setup and bl
   assert.equal(result.ok, true, `expected PASS but got: ${JSON.stringify(result.reason_codes)}`);
 });
 
+test("Content machine profile allows local draft setup and blocks public/secret surfaces", () => {
+  assert.equal(REAL_REGISTRY_RESULT.ok, true, `real registry load failed: ${JSON.stringify(REAL_REGISTRY_RESULT.reason_codes)}`);
+  const profile = REAL_REGISTRY_RESULT.registry.profiles.find(
+    (candidate) => candidate.id === "claude-clevel-worker/cmo/content-machine"
+  );
+  assert.ok(profile, "content-machine profile missing");
+  assert.equal(profile.max_autonomy_level, "L2");
+  assert.ok(profile.forbidden_surfaces.includes("secret-read"));
+  assert.ok(profile.forbidden_surfaces.includes("public-publish"));
+  assert.ok(profile.forbidden_surfaces.includes("public-send"));
+  assert.ok(profile.forbidden_surfaces.includes("public-schedule"));
+  assert.ok(profile.forbidden_surfaces.includes("plane-done-by-worker"));
+  assert.ok(profile.allowed_claude_tools.includes("Bash(node scripts/content/content-machine-start.mjs*)"));
+
+  const result = evaluateCapabilityProfile({
+    registry: REAL_REGISTRY_RESULT.registry,
+    contractFields: {
+      Agent: "claude",
+      RoleLabel: "role:cmo",
+      Role: "role:cmo",
+      Mode: "research",
+      Workspace: "registry:company-os",
+      AutonomyLevel: "L2",
+      CapabilityProfile: "claude-clevel-worker/cmo/content-machine",
+      SubAgentRoster: "none",
+      MemoryStore: "honcho:company",
+      MemoryUpdatePolicy: "proposal-only"
+    },
+    usedCapabilities: { commands: ["node"] },
+    now: new Date("2026-06-04T00:00:00Z")
+  });
+  assert.equal(result.ok, true, `expected PASS but got: ${JSON.stringify(result.reason_codes)}`);
+});
+
 for (const [role, profile] of [
   ["role:cto", "gemini-clevel-worker/cto/audit"],
   ["role:cpo", "gemini-clevel-worker/cpo/audit"],

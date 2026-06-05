@@ -5,7 +5,9 @@ import { loadPostWorkerQualityRegistry } from "./post-worker-quality-loop-core.m
 import {
   QUALITY_SCHEDULER_REASONS,
   buildLowerWorkerDispatchFromMarker,
+  buildLowerWorkerDispatchesFromMarkers,
   latestQualityMarker,
+  latestQualityMarkers,
   parseQualityMarkerFields,
 } from "./post-worker-quality-scheduler-core.mjs";
 import { validateContract } from "./worker-ledger-validator.mjs";
@@ -54,6 +56,24 @@ test("latestQualityMarker selects newest quality marker", () => {
   assert.equal(latest.marker, "controller.hotfix-request");
 });
 
+test("latestQualityMarkers keeps multiple markers from newest controller card", () => {
+  const markers = latestQualityMarkers([
+    comment("a", "controller.audit-followup:\n  worker_class: quality-auditor", "2026-05-27T10:00:00.000Z"),
+    comment("b", [
+      "post_worker_quality:",
+      "  status: FOLLOWUP_READY",
+      "  scheduler_may_spawn: true",
+      "controller.audit-followup:",
+      "  worker_class: quality-auditor",
+      "controller.audit-followup:",
+      "  worker_class: security-auditor",
+    ].join("\n"), "2026-05-27T10:05:00.000Z"),
+  ]);
+
+  assert.equal(markers.length, 2);
+  assert.deepEqual(markers.map((marker) => marker.fields.worker_class), ["quality-auditor", "security-auditor"]);
+});
+
 test("controller-only audit marker does not spawn lower worker", () => {
   const result = buildLowerWorkerDispatchFromMarker({
     registry: loaded.registry,
@@ -64,6 +84,64 @@ test("controller-only audit marker does not spawn lower worker", () => {
 
   assert.equal(result.status, "NO_SPAWN");
   assert.deepEqual(result.reason_codes, [QUALITY_SCHEDULER_REASONS.CONTROLLER_ONLY]);
+});
+
+test("completed audit marker does not spawn another lower worker", () => {
+  const result = buildLowerWorkerDispatchFromMarker({
+    registry: loaded.registry,
+    comments: [comment("marker-1", "controller.audit-followup:\n  state: AUDIT_COMPLETED\n  worker_class: security-auditor")],
+    parentContractFields: parentFields,
+    workspaceRoot,
+  });
+
+  assert.equal(result.status, "NO_SPAWN");
+  assert.deepEqual(result.reason_codes, [QUALITY_SCHEDULER_REASONS.MARKER_TERMINAL]);
+});
+
+test("controller quality summary can block scheduler fanout", () => {
+  const result = buildLowerWorkerDispatchFromMarker({
+    registry: loaded.registry,
+    comments: [comment("marker-1", [
+      "post_worker_quality:",
+      "  status: NEEDS_HUMAN",
+      "  scheduler_may_spawn: false",
+      "controller.audit-followup:",
+      "  state: AUDIT_REQUESTED",
+      "  worker_class: security-auditor",
+    ].join("\n"))],
+    parentContractFields: parentFields,
+    workspaceRoot,
+  });
+
+  assert.equal(result.status, "NO_SPAWN");
+  assert.deepEqual(result.reason_codes, [QUALITY_SCHEDULER_REASONS.CONTROLLER_SPAWN_FORBIDDEN]);
+});
+
+test("multi-marker controller decision fans out into separate lower-worker candidates", () => {
+  const result = buildLowerWorkerDispatchesFromMarkers({
+    registry: loaded.registry,
+    comments: [comment("marker-1", [
+      "post_worker_quality:",
+      "  status: FOLLOWUP_READY",
+      "  scheduler_may_spawn: true",
+      "controller.audit-followup:",
+      "  state: AUDIT_REQUESTED",
+      "  worker_class: quality-auditor",
+      "controller.audit-followup:",
+      "  state: AUDIT_REQUESTED",
+      "  worker_class: security-auditor",
+    ].join("\n"))],
+    parentContractFields: parentFields,
+    workItem: { sequence_id: 999 },
+    workspaceRoot,
+  });
+
+  assert.equal(result.status, "CANDIDATES_READY");
+  assert.equal(result.marker_count, 2);
+  assert.equal(result.candidate_count, 2);
+  assert.deepEqual(result.candidates.map((candidate) => candidate.worker_class), ["quality-auditor", "security-auditor"]);
+  assert.equal(result.scheduler.controller_may_spawn_workers, false);
+  assert.equal(result.scheduler.scheduler_may_spawn_next_lower_worker, true);
 });
 
 test("hotfix marker becomes a valid ready lower-worker contract", () => {

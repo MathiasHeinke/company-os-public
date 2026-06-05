@@ -17,9 +17,11 @@ export const QUALITY_SCHEDULER_REASONS = Object.freeze({
   WORKER_CLASS_MISSING: "quality-scheduler.worker-class-missing",
   WORKER_CLASS_UNKNOWN: "quality-scheduler.worker-class-unknown",
   CONTROLLER_ONLY: "quality-scheduler.controller-only",
+  MARKER_TERMINAL: "quality-scheduler.marker-terminal",
   HOTFIX_LIMIT: "quality-scheduler.hotfix-round-limit",
   HOTFIX_WRITE_SCOPE_MISSING: "quality-scheduler.hotfix-write-scope-missing",
   HUMAN_GATE_BLOCKED: "quality-scheduler.human-gate-blocked",
+  CONTROLLER_SPAWN_FORBIDDEN: "quality-scheduler.controller-spawn-forbidden",
 });
 
 const QUALITY_MARKERS = Object.freeze([
@@ -32,6 +34,18 @@ const AUDIT_CLASSES = new Set([
   "security-auditor",
   "bug-regression-auditor",
   "deep-audit-worker",
+]);
+
+const TERMINAL_MARKER_STATES = new Set([
+  "AUDIT_COMPLETED",
+  "AUDIT_REPORTED",
+  "HOTFIX_COMPLETED",
+  "HOTFIX_REPORTED",
+  "FOLLOWUP_COMPLETED",
+  "CANDIDATE_CONSUMED",
+  "DONE",
+  "COMPLETE",
+  "COMPLETED",
 ]);
 
 function compact(value) {
@@ -79,11 +93,15 @@ export function parseQualityMarkerFields(body, marker) {
   }
   if (startIndex === -1) return {};
 
+  return parseMarkerFieldsFromLines(lines, startIndex);
+}
+
+function parseMarkerFieldsFromLines(lines, startIndex) {
   const fields = {};
   let currentKey = "";
   for (const raw of lines.slice(startIndex + 1)) {
     if (!raw.trim()) continue;
-    if (/^\S/.test(raw) && raw.trim().endsWith(":") && !/^\s/.test(raw)) break;
+    if (isTopLevelMarkerStart(raw)) break;
 
     const kv = raw.match(/^\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*:\s*(.*?)\s*$/);
     if (kv) {
@@ -100,28 +118,63 @@ export function parseQualityMarkerFields(body, marker) {
   return fields;
 }
 
-export function latestQualityMarker(comments = [], markers = QUALITY_MARKERS) {
+function isTopLevelMarkerStart(raw) {
+  const trimmed = raw.trim();
+  if (/^\s/.test(raw) || !trimmed.endsWith(":")) return false;
+  return QUALITY_MARKERS.includes(trimmed.slice(0, -1));
+}
+
+function qualityMarkersInBody(body, markers = QUALITY_MARKERS) {
+  const lines = String(body || "").split(/\r?\n/);
+  const markerEntries = markers.map((marker) => ({ marker, rx: markerRegex(marker) }));
+  const controllerQuality = parseQualityMarkerFields(body, "post_worker_quality");
+  const found = [];
+  for (let index = 0; index < lines.length; index += 1) {
+    const matched = markerEntries.find((entry) => entry.rx.test(lines[index].trim()));
+    if (!matched) continue;
+    const fields = parseMarkerFieldsFromLines(lines, index);
+    if (!Object.keys(fields).length) continue;
+    found.push({
+      marker: matched.marker,
+      fields,
+      controller_quality: controllerQuality,
+      ordinal: found.length,
+    });
+  }
+  return found;
+}
+
+export function latestQualityMarkers(comments = [], markers = QUALITY_MARKERS) {
   let best = null;
   for (const comment of comments || []) {
     const body = commentBody(comment);
-    for (const marker of markers) {
-      if (!body.includes(marker)) continue;
-      const fields = parseQualityMarkerFields(body, marker);
-      if (!Object.keys(fields).length) continue;
-      const ts = commentTime(comment);
-      if (!best || ts >= best.ts) {
-        best = {
-          marker,
-          comment_id: comment.id || null,
-          created_at: comment.created_at || null,
-          body,
-          fields,
-          ts,
-        };
-      }
+    const found = qualityMarkersInBody(body, markers);
+    if (!found.length) continue;
+    const ts = commentTime(comment);
+    if (!best || ts >= best.ts) {
+      best = {
+        comment,
+        body,
+        found,
+        ts,
+      };
     }
   }
-  return best;
+  if (!best) return [];
+  return best.found.map((marker) => ({
+    marker: marker.marker,
+    comment_id: best.comment.id || null,
+    created_at: best.comment.created_at || null,
+    body: best.body,
+    fields: marker.fields,
+    controller_quality: marker.controller_quality || {},
+    ts: best.ts,
+    ordinal: marker.ordinal,
+  }));
+}
+
+export function latestQualityMarker(comments = [], markers = QUALITY_MARKERS) {
+  return latestQualityMarkers(comments, markers).at(-1) || null;
 }
 
 function sequenceRef(workItem = {}) {
@@ -276,8 +329,147 @@ export function buildLowerWorkerDispatchFromMarker({
     };
   }
 
+  return buildLowerWorkerDispatchFromResolvedMarker({
+    registry,
+    marker,
+    parentContractFields,
+    workItem,
+    workspaceRoot,
+    now,
+  });
+}
+
+export function buildLowerWorkerDispatchesFromMarkers({
+  registry,
+  comments = [],
+  parentContractFields = {},
+  workItem = {},
+  workspaceRoot = process.cwd(),
+  now = new Date(),
+} = {}) {
+  const validation = validatePostWorkerQualityRegistry(registry);
+  if (!validation.ok) {
+    return blocked([QUALITY_SCHEDULER_REASONS.REGISTRY_INVALID], { validation });
+  }
+
+  const markers = latestQualityMarkers(comments);
+  if (!markers.length) {
+    return {
+      ok: true,
+      version: POST_WORKER_QUALITY_SCHEDULER_VERSION,
+      status: "NO_SPAWN",
+      generated_at: now.toISOString(),
+      reason_codes: [QUALITY_SCHEDULER_REASONS.MARKER_MISSING],
+      evidence: {},
+      marker_count: 0,
+      candidate_count: 0,
+      blocked_count: 0,
+      no_spawn_count: 1,
+      candidates: [],
+      blocked: [],
+      no_spawn: [],
+    };
+  }
+
+  if (markers.length === 1) {
+    const single = buildLowerWorkerDispatchFromResolvedMarker({
+      registry,
+      marker: markers[0],
+      parentContractFields,
+      workItem,
+      workspaceRoot,
+      now,
+    });
+    return {
+      ...single,
+      marker_count: 1,
+      candidate_count: single.status === "LOWER_WORKER_READY" ? 1 : 0,
+      blocked_count: single.status === "BLOCKED" ? 1 : 0,
+      no_spawn_count: single.status === "NO_SPAWN" ? 1 : 0,
+      candidates: single.status === "LOWER_WORKER_READY" ? [single] : [],
+      blocked: single.status === "BLOCKED" ? [single] : [],
+      no_spawn: single.status === "NO_SPAWN" ? [single] : [],
+    };
+  }
+
+  const results = markers.map((marker) => buildLowerWorkerDispatchFromResolvedMarker({
+    registry,
+    marker,
+    parentContractFields,
+    workItem,
+    workspaceRoot,
+    now,
+  }));
+  const candidates = results.filter((result) => result.status === "LOWER_WORKER_READY");
+  const blockedResults = results.filter((result) => result.status === "BLOCKED");
+  const noSpawn = results.filter((result) => result.status === "NO_SPAWN");
+  const reasonCodes = [...new Set(results.flatMap((result) => result.reason_codes || []))];
+  return {
+    ok: blockedResults.length === 0,
+    version: POST_WORKER_QUALITY_SCHEDULER_VERSION,
+    status: blockedResults.length ? "BLOCKED" : candidates.length ? "CANDIDATES_READY" : "NO_SPAWN",
+    generated_at: now.toISOString(),
+    reason_codes: reasonCodes,
+    marker_count: markers.length,
+    candidate_count: candidates.length,
+    blocked_count: blockedResults.length,
+    no_spawn_count: noSpawn.length,
+    candidates,
+    blocked: blockedResults,
+    no_spawn: noSpawn,
+    scheduler: {
+      controller_may_spawn_workers: false,
+      scheduler_may_spawn_next_lower_worker: candidates.length > 0 && blockedResults.length === 0,
+      required_next_step: "Runtime Dispatcher may consume each generated lower-worker contract after normal Stage 0.5/0.65/capability gates pass.",
+    },
+  };
+}
+
+function buildLowerWorkerDispatchFromResolvedMarker({
+  registry,
+  marker,
+  parentContractFields = {},
+  workItem = {},
+  workspaceRoot = process.cwd(),
+  now = new Date(),
+} = {}) {
   if (!QUALITY_MARKERS.includes(marker.marker)) {
     return blocked([QUALITY_SCHEDULER_REASONS.MARKER_UNKNOWN], { marker: marker.marker });
+  }
+
+  const controllerQuality = normalizeFieldMap(marker.controller_quality || {});
+  const controllerQualityStatus = compact(controllerQuality.status).toUpperCase();
+  const schedulerMaySpawn = compact(controllerQuality.schedulermayspawn || controllerQuality.scheduler_may_spawn).toLowerCase();
+  if (schedulerMaySpawn === "false" || ["NEEDS_HUMAN", "BLOCKED"].includes(controllerQualityStatus)) {
+    return {
+      ok: true,
+      version: POST_WORKER_QUALITY_SCHEDULER_VERSION,
+      status: "NO_SPAWN",
+      generated_at: now.toISOString(),
+      reason_codes: [
+        schedulerMaySpawn === "false"
+          ? QUALITY_SCHEDULER_REASONS.CONTROLLER_SPAWN_FORBIDDEN
+          : QUALITY_SCHEDULER_REASONS.HUMAN_GATE_BLOCKED,
+      ],
+      marker,
+      evidence: {
+        post_worker_quality_status: controllerQualityStatus || null,
+        scheduler_may_spawn: schedulerMaySpawn || null,
+      },
+    };
+  }
+
+  const markerState = compact(marker.fields.state).toUpperCase();
+  if (TERMINAL_MARKER_STATES.has(markerState)) {
+    return {
+      ok: true,
+      version: POST_WORKER_QUALITY_SCHEDULER_VERSION,
+      status: "NO_SPAWN",
+      generated_at: now.toISOString(),
+      reason_codes: [QUALITY_SCHEDULER_REASONS.MARKER_TERMINAL],
+      marker,
+      evidence: { marker_state: markerState },
+    };
   }
 
   const workerClass = compact(marker.fields.worker_class);

@@ -9,9 +9,9 @@ import {
 
 export const ROUTER_VERSION = "codex-cost-router/v0";
 
-export const DEFAULT_WORKSPACE = "[LOCAL_WORKSPACE]";
-export const DEFAULT_CLAUDE_BINARY = "[LOCAL_WORKSPACE]";
-export const DEFAULT_GEMINI_BINARY = "[LOCAL_WORKSPACE]";
+export const DEFAULT_WORKSPACE = process.env.COMPANY_OS_ROOT || process.cwd();
+export const DEFAULT_CLAUDE_BINARY = process.env.CLAUDE_BIN || "claude";
+export const DEFAULT_GEMINI_BINARY = process.env.GEMINI_BIN || "gemini";
 export const CLAUDE_AUDIT_FIRST_RECHECK_SECONDS = 300;
 export const CLAUDE_AUDIT_EXPECT_OUTPUT_AFTER_SECONDS = 600;
 export const CLAUDE_AUDIT_TIMEOUT_MS = 1_800_000;
@@ -95,6 +95,7 @@ const SECRET_PATTERNS = [
   { id: "openrouter_key", pattern: /sk-or-v1-[A-Za-z0-9._-]+/ },
   { id: "openai_or_compatible_key", pattern: /\bsk-[A-Za-z0-9._-]{20,}\b/ },
   { id: "xai_key", pattern: /\bxai-[A-Za-z0-9._-]{20,}\b/ },
+  { id: "supabase_token", pattern: /\b(?:sbp_[A-Za-z0-9._-]{16,}|su_(?:live|test)_[A-Za-z0-9._-]{16,})\b/ },
   { id: "honcho_token", pattern: /\bhch-v3-[A-Za-z0-9._-]+/ },
   { id: "jwt", pattern: /\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/ },
   { id: "private_key", pattern: /-----BEGIN [A-Z ]*PRIVATE KEY-----/ },

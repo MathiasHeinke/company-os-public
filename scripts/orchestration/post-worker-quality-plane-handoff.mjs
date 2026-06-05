@@ -14,6 +14,7 @@ import {
   buildPlaneQualitySchedulerHandoff,
   findExistingCandidateComment,
   loadDefaultQualityRegistry,
+  postableCandidateResults,
   renderPlaneCandidateMarkdown,
   writePlaneHandoffReport,
   writePlaneProjectScanReport,
@@ -411,38 +412,52 @@ async function main() {
   }
 
   if (args.mode === "post") {
-    if (result.status !== "LOWER_WORKER_READY") {
+    const candidates = postableCandidateResults(result);
+    if (!candidates.length) {
       result.post = {
         ok: true,
         skipped: true,
         reason: "no lower-worker candidate to post",
       };
     } else {
-      const existing = findExistingCandidateComment(comments.comments, result);
-      if (existing) {
-        result.post = {
-          ok: true,
-          skipped: true,
-          reason: "candidate already posted for marker",
-          comment_id: existing.id,
-        };
-      } else {
+      const posts = [];
+      for (const candidate of candidates.slice(0, args.postLimit)) {
+        const existing = findExistingCandidateComment(comments.comments, candidate);
+        if (existing) {
+          posts.push({
+            work_item: candidate.work_item.ref,
+            worker_class: candidate.worker_class,
+            ok: true,
+            skipped: true,
+            reason: "candidate already posted for marker",
+            comment_id: existing.id,
+          });
+          continue;
+        }
         const post = await postComment({
           baseUrl: args.baseUrl,
           authHeaders: auth.headers,
           workspace: args.workspace,
           projectId: args.projectId,
           workItemId: itemResponse.body.id,
-          markdown: renderPlaneCandidateMarkdown(result),
+          markdown: renderPlaneCandidateMarkdown(candidate),
         });
-        result.post = {
+        posts.push({
+          work_item: candidate.work_item.ref,
+          worker_class: candidate.worker_class,
           ok: post.ok,
           status: post.status,
           comment_id: post.body?.id || null,
           error: post.ok ? null : post.body,
-        };
-        if (!post.ok) result.ok = false;
+        });
       }
+      result.post = {
+        attempted: posts.length,
+        post_limit: args.postLimit,
+        ok: posts.every((post) => post.ok),
+        posts,
+      };
+      if (!result.post.ok) result.ok = false;
     }
   }
 

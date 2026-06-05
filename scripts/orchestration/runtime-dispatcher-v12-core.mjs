@@ -11,6 +11,7 @@ const SECRET_PATTERNS = [
   /\bsk-or-v1-[A-Za-z0-9_-]{16,}\b/g,
   /\bplane_api_[A-Za-z0-9]{16,}\b/g,
   /\b(?:sk|pk)-[A-Za-z0-9]{20,}\b/g,
+  /\b(?:sbp_[A-Za-z0-9_-]{16,}|su_(?:live|test)_[A-Za-z0-9_-]{16,})\b/g,
   /\bAKIA[0-9A-Z]{16}\b/g,
   /-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z ]*PRIVATE KEY-----/g,
   /\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{5,}\b/g,

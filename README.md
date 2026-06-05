@@ -3,22 +3,35 @@
 Company.OS is an AI-native operating system for small companies, founders, and
 agentic teams.
 
-Current version: `0.9.0-rc.0`
+Current version: `1.0.0-alpha.3`
 
-Current productization status: Command EVE 0.9 remote-install release
-candidate, not stable production. Company.OS now has a public-first install
-path: a sanitized public clone or public mirror artifact can install a fresh
-target from generic signup/report seed, generate EVE's first boot packet,
-write update provenance and produce a public-RC handoff report. The 0.9 RC
-carries forward the 0.7.4 Supergoal Factory hardening, post-worker quality
-lane and lower-worker audit/hotfix profiles, but external posting, outreach
-sends, spend changes, production writes, scheduler-default-on, Plane Done,
-stable self-serve claims, GitHub tags and release uploads remain gated. This
-is a guided/self-serve RC for a remote founder to try, not a stable
-production product.
+Current productization status: Command EVE 1.0 managed operator-shell alpha,
+not stable production. Company.OS now has a public-first install path plus a
+managed local AionUI/Hermes installer: a sanitized public clone can install a
+fresh target from generic signup/report seed, generate EVE's first boot packet,
+install a pinned AionUI `v2.1.10` source-overlay, install Hermes Agent
+`0.15.2` into a local venv, prepare AionCore `v0.1.19`, write EVE's
+SOUL/runtime-policy context and emit a local `start_eve` / `update_eve`
+command pair. External posting, outreach sends, spend changes, production
+writes, scheduler-default-on, Plane Done, stable self-serve claims, GitHub tags
+and release uploads remain gated unless an explicit HG-4 prerelease/publish
+pass names the exact version.
+`1.0.0-alpha.3` adds the 0.8/0.9 closure and publish-prep layer: the open
+department dashboard, review-card, support/security/privacy, scheduler
+kill-switch, context-topology, watchdog, connector-harness and remote-pilot
+handoff lanes are now captured as a public Plane parent/child tree with CAO
+security/code-review/hotfix gates. It keeps the alpha.2 self-install, BYOK
+preflight and first-run EVE confirmation path intact.
 
 Current runtime proof: Stage 7 / 9 proven by live pilots; Stage 8-9 still
 gated.
+
+Current Command EVE marketing stand: `command-eve-marketing-stand/2026-06-04`.
+This is a GTM/content-system marker, not a product-version bump. It captures the
+cash-first Command EVE offer, the installable Content Machine Department Pack,
+the bilingual daily posting doctrine and the `try.command-eve.com` visual source
+truth. External publish, scheduling, outreach, spend and connector writes remain
+Founder/HumanGate gated.
 
 It turns high-level CEO intent into structured work:
 
@@ -67,8 +80,15 @@ For a new company or a clean MacBook setup, start from the public source:
 ```bash
 git clone https://github.com/MathiasHeinke/company-os-public.git
 cd company-os-public
+```
 
-node scripts/install/public-rc.mjs install \
+For the Command EVE alpha line, the recommended remote-founder command is the
+guided self-install wrapper. It performs the public-RC workspace install first,
+then installs the managed AionUI/Hermes/EVE sidecars and writes one combined
+report:
+
+```bash
+node scripts/install/command-eve-self-install.mjs install \
   --target /path/to/company-workspace \
   --company "Acme Systems" \
   --website "https://acme.example" \
@@ -80,9 +100,26 @@ node scripts/install/public-rc.mjs install \
   --json
 ```
 
-The public-RC installer performs the bootstrap dry-run, kit install, intake
-write, EVE boot packet generation, update dry-run and handoff report in one
-bounded flow. It writes EVE's first-run boot packet to:
+Before a live install, run the same command with `--dry-run`. The dry-run checks
+the signup seed, source version, writable target path, existing install state,
+`git`, `python3`, `bun`, AionUI/Hermes pins and start/update command targets
+without writing target state:
+
+```bash
+node scripts/install/command-eve-self-install.mjs install --dry-run \
+  --target /path/to/company-workspace \
+  --company "Acme Systems" \
+  --website "https://acme.example" \
+  --offer "AI operating-system setup" \
+  --buyer "founder-led service firms" \
+  --approval-owner "Jane Founder" \
+  --first-department marketing \
+  --json
+```
+
+The public-RC stage performs the bootstrap dry-run, kit install, intake write,
+EVE boot packet generation, update dry-run and handoff report in one bounded
+flow. It writes EVE's first-run boot packet to:
 
 ```text
 /path/to/company-workspace/.company-os/onboarding/eve-boot-packet.json
@@ -91,7 +128,64 @@ bounded flow. It writes EVE's first-run boot packet to:
 It also writes the release-candidate handoff to:
 
 ```text
-/path/to/company-workspace/reports/company-os-public-rc/YYYY-MM-DD/company-os-public-rc-0.9.0-rc.0.md
+/path/to/company-workspace/reports/company-os-public-rc/YYYY-MM-DD/company-os-public-rc-1.0.0-alpha.3.md
+```
+
+If a remote call needs manual debugging, the two lower-level commands remain
+available:
+
+```bash
+node scripts/install/public-rc.mjs install \
+  --target /path/to/company-workspace \
+  --company "Acme Systems" \
+  --website "https://acme.example" \
+  --offer "AI operating-system setup" \
+  --buyer "founder-led service firms" \
+  --approval-owner "Jane Founder" \
+  --first-department marketing \
+  --json
+
+node scripts/operator-shell/install-command-eve.mjs install \
+  --client-root /path/to/company-workspace \
+  --write-report \
+  --json
+```
+
+This installs the managed sidecars under:
+
+```text
+/path/to/company-workspace/.company-os/operator-shell/
+```
+
+The alpha default is AionUI `v2.1.10` with the Command EVE source overlay,
+AionCore `v0.1.19` prepared as the local backend, local renderer assets built
+for the web UI, plus Hermes Agent `0.15.2` with model profile `openrouter` /
+`minimax/minimax-m3`. The installer writes provider/model config only; the
+operator must authenticate through the provider's official flow. Do not paste
+raw API keys into chat.
+
+Before the first real EVE chat, verify the local model/auth lane:
+
+```bash
+/path/to/company-workspace/.company-os/bin/start_eve --auth-check --json
+```
+
+The auth check reports provider, model, auth mode and readiness proof. If the
+provider key, quota or network blocks the smoke, the result is `BLOCKED_AUTH`.
+Fix that through the provider's official BYOK/API-key flow, then rerun the
+check. Company.OS does not collect or store raw API keys.
+
+Start the local Command EVE shell with the generated launcher:
+
+```bash
+/path/to/company-workspace/.company-os/bin/start_eve
+```
+
+For later public-source updates:
+
+```bash
+/path/to/company-workspace/.company-os/bin/update_eve check
+/path/to/company-workspace/.company-os/bin/update_eve apply
 ```
 
 1. [Fresh Company Setup](./docs/bootstrap/fresh-company-setup.md)
@@ -126,17 +220,19 @@ It also writes the release-candidate handoff to:
 30. [Git Worktree Hygiene Controller](./docs/operations/git-worktree-hygiene-controller.md)
 31. [Company.OS Kit](./kits/company-os-kit/README.md)
 32. [GitHub Repository Strategy](./docs/github/repository-strategy.md)
+33. [Command EVE Marketing Stand](./docs/releases/1.0-command-eve-marketing-stand.md)
+34. [Command EVE Alpha3 Feature Structure Brief](./docs/strategy/command-eve-alpha3-feature-structure-brief.md)
 
 ## Readiness
 
-`0.9.0-rc.0` is the Command EVE remote-install release candidate for the
-install, onboarding and update path. It carries the `0.7.4-rc.0` Supergoal
-Factory substrate forward and closes the public-upstream distribution path for
-remote founders installing a fresh Company.OS target. Existing `0.7.4-rc.0`
-installs are the supported update target when
-`scripts/update/company-os-update.mjs` passes its dry-run.
+`1.0.0-alpha.3` is the Command EVE managed operator-shell alpha for the
+install, onboarding, update and local AionUI/Hermes start path. It carries the
+`0.9.0-rc.0` public remote-install path forward, makes AionUI/Hermes a
+managed install step instead of a separate private sidecar assumption, and
+captures the remaining 0.8/0.9 work as public child contracts before a stable
+claim.
 
-For installs, this is a release candidate and not stable. The public clone or
+For installs, this is an alpha and not stable. The public clone or
 fresh-history mirror is the distribution source, but tags, release uploads,
 unsupported stable rollout, production writes and default-on autonomy remain
 gated. Before any public remote push, tag, package or broader release action,
@@ -288,11 +384,23 @@ generated fresh-history mirror to
 `https://github.com/MathiasHeinke/company-os-public`. Do not push the private
 history to a public remote.
 
-Company.OS 0.9.0-rc.0 is a remote-install release candidate, not a stable
-release. Scheduler-default-on, full department autonomy, autonomous
-publish/schedule/send actions, spend changes, production writes, Plane Done,
-public tags/release uploads and stable unsupported self-serve claims stay
-gated past this cut.
+Company.OS `0.9.0-rc.0` was the remote-install release candidate. The current
+line is `1.0.0-alpha.3`: a managed operator-shell alpha that adds bundled
+AionUI/AionCore/Hermes/EVE local install support on top of the public-upstream
+path and explicitly closes the remaining 0.8/0.9 planning lanes through public
+Plane parent/child contracts. Scheduler-default-on, full department autonomy,
+autonomous publish/schedule/send actions, spend changes, production writes,
+Plane Done and stable unattended self-serve claims stay gated.
+
+`1.0.0-alpha.3` includes the Alpha.2 sidecar path: AionUI `v2.1.10` is cloned
+from source and patched with the Command EVE overlay, AionCore `v0.1.19` is
+prepared as the local AionUI backend, Hermes Agent `0.15.2` is installed into a
+local Python venv, MiniMax M3 is configured through the OpenRouter BYOK profile,
+and the target workspace receives `.company-os/bin/start_eve` plus
+`.company-os/bin/update_eve`. Alpha.3 adds the closure release layer:
+[WORK_ITEM_ID] through [WORK_ITEM_ID], CAO audit/hotfix evidence, idempotent Plane
+materialization and the website-facing feature/structure brief. It is still
+guided alpha, not signed desktop stable or hosted multi-tenant SaaS.
 
 ## Company.OS Kit
 
@@ -388,15 +496,23 @@ should stay reusable, clean, and safe to publish.
 
 Current status:
 
-- `0.9.0-rc.0` is the current Command EVE remote-install release candidate. It
-  includes the 0.6.5 Plane-first runtime substrate, the 0.7.0 AionUI/Hermes/EVE
-  operator-shell packaging, the 0.7.1 install/onboarding/update smoke, the
-  0.7.3 governance spine, goal/supergoal planner, confidence reporting, the
-  0.7.4 post-worker quality / lower-worker scheduler handoff doctrine and the
-  0.9 public-RC install wrapper for remote founders. Public remote push,
-  autonomous publishing, scheduling, outreach sends, spend changes, production
-  writes, regulated claim approvals, direct controller spawning and stable
-  unattended self-serve installs remain gated.
+- `1.0.0-alpha.3` is the current Command EVE managed operator-shell alpha. It
+  includes the 0.9 public-upstream install/update path, bundles AionUI,
+  AionCore and Hermes Agent setup into the local install flow, ships the
+  Command EVE overlay and localization assets, carries the Content Machine plus
+  post-worker quality / lower-worker scheduler handoff substrate, and now
+  materializes the 0.8/0.9 closure lanes as [WORK_ITEM_ID] through [WORK_ITEM_ID].
+  Alpha.3 also exposes BYOK auth preflight, first-run EVE confirmation
+  receipts, CAO audit/hotfix evidence and the website-facing feature/structure
+  brief. Autonomous publishing, scheduling, outreach sends, spend changes,
+  production writes, regulated claim approvals, direct controller spawning,
+  signed desktop distribution and stable unattended self-serve installs remain
+  gated.
+- `1.0.0-alpha.2` was the self-install pilot hardening alpha with one-command
+  install, BYOK auth preflight and first-run EVE confirmation.
+- `1.0.0-alpha.1` was the first managed operator-shell alpha with public
+  security, portability, localization and UI-version hardening.
+- `0.9.0-rc.0` was the Command EVE remote-install release candidate.
 - `0.7.4-rc.0` was the Supergoal Factory and post-worker quality release
   candidate.
 - `0.7.1-rc.0` was the first self-serve install/onboarding/update candidate.

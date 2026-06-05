@@ -1,18 +1,23 @@
 # Company.OS Roadmap
 
-Canonical current version: `0.9.0-rc.0`
+Canonical current version: `1.0.0-alpha.3`
 
 Roadmap headings are planning tracks. The canonical release version lives in
 `VERSION` and `CHANGELOG.md`.
 
-## Release Accounting Snapshot - 2026-05-31
+## Release Accounting Snapshot - 2026-06-05
 
-`0.9.0-rc.0` is the current public self-serve release candidate. It sits on top
-of the `0.7.1-rc.0` install/onboarding/update candidate, the `0.7.3-rc.0`
-governance spine and the `0.7.4-rc.0` Supergoal Factory hardening layer. It
-adds the public-upstream install/update path: a public clone or sanitized
-public mirror can install a fresh target from generic company seed, generate
-EVE's boot packet and write update/handoff provenance.
+`1.0.0-alpha.3` is the current managed operator-shell alpha. It sits on top of
+the `1.0.0-alpha.2` self-install pilot hardening line, the `0.9.0-rc.0`
+public-upstream install/update release candidate, the `0.7.4-rc.0` Supergoal
+Factory and post-worker quality hardening layer, the `0.7.3-rc.0` governance
+spine and the `0.7.1-rc.0` install/onboarding/update candidate. It keeps the
+bundled Command EVE local operator-shell path: public install scripts can
+prepare AionUI, AionCore, Hermes Agent, EVE boot context, Content Machine packs
+and update commands for a guided founder/client install. Alpha.3 additionally
+promotes the 0.8/0.9 closure work into a public parent/child tree with CAO
+security/code-review/hotfix gates and a website-facing feature/structure
+brief.
 
 `0.6.5-beta.5` remains the previous private/guided-beta baseline for bounded
 worker dispatch, CAO/Controller gates, sandbox workspace guards, Raindrop
@@ -23,11 +28,15 @@ Unchecked items below are backlog tracks, not retroactive blockers for the
 current release line, unless a specific `VERSION`/`CHANGELOG.md` release entry
 or release-gate report names them as blockers.
 
-Open after `0.9.0-rc.0`:
+Open after `1.0.0-alpha.3`:
 
 - Public release actions remain gated: public tags, release uploads,
   autonomous publish/schedule/send/spend actions and production writes are not
   released.
+- Stable `1.0.0` still requires signed or otherwise product-grade app
+  packaging, repeatable non-founder install proof, support/privacy gates,
+  hosted-account or local-account provisioning boundaries and a documented
+  rollback/update lifecycle.
 - Private/client installs should now update from the public upstream, with
   dry-run-first provenance reports. Private-to-public backflow is not the
   distribution path.

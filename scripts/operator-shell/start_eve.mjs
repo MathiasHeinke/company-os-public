@@ -15,6 +15,8 @@ function parseArgs(argv) {
   const args = {
     command: command === "--help" || command === "-h" ? "help" : command,
     companyOsRoot: process.cwd(),
+    clientRoot: "",
+    operatorRoot: "",
     privateRoot: "",
     aionuiRoot: "",
     hermesRoot: "",
@@ -48,6 +50,8 @@ function parseArgs(argv) {
       return rest[index];
     };
     if (arg === "--company-os-root") { args.companyOsRoot = nextValue(); continue; }
+    if (arg === "--client-root") { args.clientRoot = nextValue(); continue; }
+    if (arg === "--operator-root") { args.operatorRoot = nextValue(); continue; }
     if (arg === "--private-root") { args.privateRoot = nextValue(); continue; }
     if (arg === "--aionui-root") { args.aionuiRoot = nextValue(); continue; }
     if (arg === "--hermes-root") { args.hermesRoot = nextValue(); continue; }
@@ -94,6 +98,8 @@ Version: ${START_EVE_VERSION}
 function optionsFromArgs(args) {
   return {
     companyOsRoot: args.companyOsRoot,
+    clientRoot: args.clientRoot || undefined,
+    operatorRoot: args.operatorRoot || undefined,
     privateRoot: args.privateRoot || undefined,
     aionuiRoot: args.aionuiRoot || undefined,
     hermesRoot: args.hermesRoot || undefined,

@@ -85,6 +85,7 @@ function writeMinimalIncludeTree(root) {
   write(root, "registries/domain-packs/company-os.schema.json", "{\"title\":\"Domain Pack Registry\"}\n");
   write(root, "registries/plane-templates/company-os.json", "{\"version\":\"plane-template-registry/v0\"}\n");
   write(root, "registries/inference/eve-hermes-brain.json", "{\"version\":\"eve-brain-router/v0\",\"brain_classes\":[],\"routes\":{}}\n");
+  write(root, "registries/operator-shell/command-eve-1.0-alpha.json", "{\"release\":\"1.0.0-alpha.0\"}\n");
   write(root, "registries/sessions/workstream-continuity.json", "{\"version\":\"session-continuity-router/v0\",\"session_classes\":[],\"routes\":{}}\n");
 
   write(root, "kits/company-os-kit/README.md", "# Kit\n");
@@ -193,6 +194,7 @@ test("isIncluded recognizes documented include rules", () => {
   assert.ok(isIncluded("scripts/plane/plane-app-token-rotation.mjs"));
   assert.ok(isIncluded("registries/domain-packs/company-os.json"));
   assert.ok(isIncluded("registries/inference/eve-hermes-brain.json"));
+  assert.ok(isIncluded("registries/operator-shell/command-eve-1.0-alpha.json"));
   assert.ok(isIncluded("registries/sessions/workstream-continuity.json"));
   assert.ok(isIncluded("registries/plane-templates/company-os.json"));
   assert.ok(isIncluded("registries/quality/post-worker-quality-loop.json"));
@@ -215,6 +217,7 @@ test("planPublicMirror returns copied + stripped + missing_fixtures for a synthe
   assert.ok(plan.copied.some((entry) => entry.path === "metrics/agent-events.example.jsonl"));
   assert.ok(plan.copied.some((entry) => entry.path === "registries/capabilities/example.json"));
   assert.ok(plan.copied.some((entry) => entry.path === "registries/inference/eve-hermes-brain.json"));
+  assert.ok(plan.copied.some((entry) => entry.path === "registries/operator-shell/command-eve-1.0-alpha.json"));
   assert.ok(plan.copied.some((entry) => entry.path === "registries/sessions/workstream-continuity.json"));
   assert.ok(plan.copied.some((entry) => entry.path === "registries/domain-packs/company-os.json"));
   assert.ok(plan.copied.some((entry) => entry.path === "registries/plane-templates/company-os.json"));
@@ -336,6 +339,10 @@ test("runBuildPublicMirror full build copies sanitized tree and writes provenanc
   );
   assert.equal(
     fs.existsSync(path.join(outRoot, "registries/inference/eve-hermes-brain.json")),
+    true,
+  );
+  assert.equal(
+    fs.existsSync(path.join(outRoot, "registries/operator-shell/command-eve-1.0-alpha.json")),
     true,
   );
   assert.equal(
@@ -497,14 +504,43 @@ test("verifyPublicMirrorOutput flags planted token-shaped strings as PRIVATE_CON
   );
 });
 
+test("verifyPublicMirrorOutput flags planted Supabase token-shaped strings", async () => {
+  const sourceRoot = fixtureRoot();
+  writeMinimalIncludeTree(sourceRoot);
+  writeFixtures(sourceRoot);
+  const plantedToken = ["su", "test", "abcdefghijklmnopqrstuvwxyz"].join("_");
+  write(
+    sourceRoot,
+    "scripts/orchestration/example.mjs",
+    `// planted: ${plantedToken} // do-not-publish\n`,
+  );
+
+  const outRoot = path.join(fixtureRoot("build-out-"), "mirror");
+  const result = await runBuildPublicMirror({
+    sourceRoot,
+    outRoot,
+    verify: true,
+    sourceSha: "deadbeef",
+    now: () => new Date("2026-05-14T03:00:00.000Z"),
+  });
+
+  assert.equal(result.status, "PRIVATE_CONTENT_DETECTED");
+  assert.equal(result.exit_code, 3);
+  assert.ok(
+    result.invariant_failures.some((entry) => entry.id === "supabase-token"),
+    JSON.stringify(result.invariant_failures),
+  );
+});
+
 test("sanitizePublicMirrorText scrubs safe public mirror fixture tokens and work item ids", () => {
   const githubPatFixture = `ghp_${"A".repeat(20)}`;
   const githubFineGrainedPatFixture = `github_pat_${"A".repeat(24)}`;
   const slackBotFixture = `xoxb-${"1".repeat(20)}`;
+  const supabaseFixture = ["su", "test", "abcdefghijklmnopqrstuvwxyz"].join("_");
   const privateHomePathFixture = ["/Users", "mathiasheinke", "Developer", "Company.OS"].join("/");
   assert.equal(
-    sanitizePublicMirrorText("scripts/orchestration/example.test.mjs", `const token = '${githubPatFixture}';\nconst fine = '${githubFineGrainedPatFixture}';\nconst slack = '${slackBotFixture}';\n`),
-    "const token = '[GITHUB_PAT_EXAMPLE]';\nconst fine = '[GITHUB_FINE_GRAINED_PAT_EXAMPLE]';\nconst slack = '[SLACK_BOT_TOKEN_EXAMPLE]';\n",
+    sanitizePublicMirrorText("scripts/orchestration/example.test.mjs", `const token = '${githubPatFixture}';\nconst fine = '${githubFineGrainedPatFixture}';\nconst slack = '${slackBotFixture}';\nconst supabase = '${supabaseFixture}';\n`),
+    "const token = '[GITHUB_PAT_EXAMPLE]';\nconst fine = '[GITHUB_FINE_GRAINED_PAT_EXAMPLE]';\nconst slack = '[SLACK_BOT_TOKEN_EXAMPLE]';\nconst supabase = '[SUPABASE_TOKEN_EXAMPLE]';\n",
   );
   assert.equal(
     sanitizePublicMirrorText("docs/operations/example.md", "See [WORK_ITEM_ID], [WORK_ITEM_ID], [WORK_ITEM_ID] and [WORK_ITEM_ID].\n"),

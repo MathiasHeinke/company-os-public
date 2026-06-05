@@ -99,7 +99,9 @@ function writeCompletePublicTree(root) {
   write(root, "scripts/release-gates/human-gate-release.mjs", "// stub\n");
   write(root, "scripts/release-gates/productization-readiness.mjs", "// stub\n");
   write(root, "scripts/release-gates/runtime-04-readiness.mjs", "// stub\n");
+  write(root, "scripts/install/command-eve-self-install.mjs", "// stub\n");
   write(root, "scripts/operator-shell/start_eve.mjs", "// stub\n");
+  write(root, "scripts/operator-shell/install-command-eve.mjs", "// stub\n");
 
   write(root, "kits/company-os-kit/README.md", "# Kit\n");
   write(
@@ -119,6 +121,7 @@ function writeCompletePublicTree(root) {
   write(root, "metrics/agent-events.example.jsonl", "{}\n");
   write(root, "registries/capabilities/example.json", "{}\n");
   write(root, "registries/inference/example.json", "{}\n");
+  write(root, "registries/operator-shell/command-eve-1.0-alpha.json", "{}\n");
 
   const index = buildPageIndex(root, {
     source: "filesystem",
@@ -254,6 +257,22 @@ test("planted source-company token forces BLOCKED_SECRET_SCAN exit 3", async () 
   assert.equal(secretCheck.status, "fail");
   assert.ok(secretCheck.evidence.count >= 1);
   assert.equal(fs.existsSync(result.temp_clone), true);
+  cleanupTempClone(result);
+});
+
+test("planted Supabase token forces BLOCKED_SECRET_SCAN exit 3", async () => {
+  const root = fixtureRoot();
+  writeCompletePublicTree(root);
+  const planted = ["su", "test", "abcdefghijklmnopqrstuvwxyz"].join("_");
+  write(root, "scripts/orchestration/planted.mjs", `// planted: ${planted}\n`);
+
+  const result = await runVerifyCleanClone({ root });
+
+  assert.equal(result.status, "BLOCKED_SECRET_SCAN");
+  assert.equal(result.exit_code, 3);
+  const secretCheck = result.checks.find((entry) => entry.id === "secret.scan");
+  assert.equal(secretCheck.status, "fail");
+  assert.ok(secretCheck.evidence.sample.some((entry) => entry.endsWith(":supabase-token")));
   cleanupTempClone(result);
 });
 

@@ -20,6 +20,7 @@ function parseArgs(argv) {
   const args = {
     command: command === "--help" || command === "-h" ? "" : command,
     companyOsRoot: process.cwd(),
+    clientRoot: "",
     privateRoot: "",
     aionuiRoot: "",
     hermesRoot: "",
@@ -47,6 +48,7 @@ function parseArgs(argv) {
       return rest[i];
     };
     if (arg === "--company-os-root") { args.companyOsRoot = nextValue(); continue; }
+    if (arg === "--client-root") { args.clientRoot = nextValue(); continue; }
     if (arg === "--private-root") { args.privateRoot = nextValue(); continue; }
     if (arg === "--aionui-root") { args.aionuiRoot = nextValue(); continue; }
     if (arg === "--hermes-root") { args.hermesRoot = nextValue(); continue; }
@@ -99,6 +101,7 @@ function print(result, json) {
 function commonOptions(args) {
   return {
     companyOsRoot: args.companyOsRoot,
+    clientRoot: args.clientRoot || undefined,
     privateRoot: args.privateRoot || undefined,
     aionuiRoot: args.aionuiRoot || undefined,
     hermesRoot: args.hermesRoot || undefined,

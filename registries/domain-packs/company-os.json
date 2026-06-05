@@ -109,6 +109,67 @@
       ]
     },
     {
+      "id": "content-machine",
+      "name": "Content Machine",
+      "owner_role": "role:cmo",
+      "first_useful_scope": "Source Inventory, FVBM check, content vault, raw founder brief, research dossier, anchor draft, council review and draft-only release packet before social, blog, video or book lanes run.",
+      "intake_questions": [
+        "What company, offer, buyer and primary audience should content support?",
+        "Which first lane matters most: LinkedIn, X, blog, newsletter, book, video or campaign?",
+        "Who approves public founder voice and publishing?",
+        "Does a Founder Voice and Belief Model already exist: missing, M0, M1, M2 or M3?",
+        "Which sources may be inspected: website, docs, repo, transcripts, notes, analytics export, CRM export, call notes or none yet?",
+        "Which topics, claims, customer examples, data classes or private surfaces are off-limits?",
+        "What current lead, revenue, trust or authority goal should content support?",
+        "What would make generated content sound fake or unsafe under the founder's name?"
+      ],
+      "ai_discovery": [
+        "Summarize the company, audience, channels, approval owner and first business goal from provided sources",
+        "Check FVBM status before claiming founder voice fidelity",
+        "Create a Source Inventory with sensitivity, owner, freshness and allowed action ceiling",
+        "Create scored content vault cards from approved sources or manual founder answers",
+        "Route founder-only gaps back to interview instead of hallucinating proof",
+        "Run the Content Machine start command and department-pack evaluator before downstream release lanes are considered"
+      ],
+      "confirmation_steps": [
+        "Present the source boundary and off-limits list before reading optional systems",
+        "Operator confirms target root, approval owner and first channel",
+        "Operator confirms FVBM status or accepts M0 seed interview",
+        "No anchor draft claims founder voice until raw founder brief or FVBM evidence exists",
+        "No publish, schedule, send or connector write occurs until HG-2.5 or higher release"
+      ],
+      "outputs": [
+        "content/content-machine/RUNBOOK.md",
+        "content/content-machine/content-machine.config.json",
+        "content/content-machine/01_source_inventory/SOURCE_INVENTORY.md",
+        "content/content-machine/02_vault/CONTENT_VAULT.md",
+        "content/content-machine/05_raw_briefs/RAW_BRIEF_TEMPLATE.md",
+        "content/content-machine/07_council_reviews/COUNCIL_RUBRIC.md",
+        "content/content-machine/09_release_packets/",
+        "content/content-machine/11_lessons/content-lessons.md",
+        "reports/content-machine/research-report.md",
+        "reports/content-machine/anchor-draft-report.md"
+      ],
+      "default_human_gate": "HG-2.5",
+      "activation_mode": "draft-only",
+      "operator_confirmation_required": true,
+      "blocked_actions": [
+        "public-publish-without-release",
+        "public-upload-without-release",
+        "public-schedule-without-release",
+        "public-send-without-release",
+        "social-cms-newsletter-or-crm-write-without-release",
+        "credential-token-cookie-collection",
+        "private-source-read-without-source-inventory-approval",
+        "regulated-claim-without-gate",
+        "founder-voice-identity-change-without-hg4",
+        "secret-read",
+        "production-write",
+        "durable-memory-write-without-confirmation",
+        "done-transition-by-worker-or-cao"
+      ]
+    },
+    {
       "id": "video-first-content-engine",
       "name": "Video-First Content Engine",
       "owner_role": "role:cmo",

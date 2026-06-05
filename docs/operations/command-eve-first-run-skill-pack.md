@@ -60,6 +60,11 @@ The runtime skill pack must include these modules:
   delegation.
 - `google-workspace-setup`: start with Calendar/Drive read-only; Gmail is
   gated separately.
+- `content-machine-setup`: when the founder asks for marketing, social,
+  content, blog cadence, newsletter, book, video or campaign work, route first
+  through the Content Machine unless a more specific pack is already confirmed.
+  EVE checks FVBM status, records Source Inventory, creates a local vault/raw
+  brief workflow and keeps all public release actions gated.
 - `first-goal-setup`: turn accepted intent into Founder Intent Packet, CEO
   Delegation Packet and draft Worker Contract with `dispatch: manual`.
 
@@ -125,3 +130,41 @@ codes, payment details, raw tokens or `.env` contents.
 Write-capable connector use, public sends/publishing, production backend
 changes, payment actions, worker dispatch and Plane `Done` require the matching
 CEO/Codex review and HumanGate.
+
+## Generated Confirmation And Auth Receipts
+
+`scripts/operator-shell/eve-sidecar.mjs prepare` now writes a runtime boot
+packet with a `first_run_confirmation` block. EVE should treat that block as
+the first response contract:
+
+- `known_facts`: say what EVE already knows from the seed and ask whether it is
+  correct.
+- `missing_or_unverified_facts`: name gaps without dumping the full setup
+  questionnaire.
+- `progressive_setup_queue.required_now`: confirm seed, confirm memory
+  boundary and verify Hermes provider auth/model if still unverified.
+- `existing_system_inventory`: inspect and adapt existing tools before
+  proposing a replacement Company.OS structure.
+
+The Hermes/BYOK auth receipt lives in preflight output under:
+
+```text
+hermes.auth_profile
+```
+
+The supported proof command is:
+
+```bash
+node scripts/operator-shell/start_eve.mjs check --auth-check --json
+```
+
+For installed clients, the generated launcher supports:
+
+```bash
+.company-os/bin/start_eve --auth-check --json
+```
+
+If the provider key, quota or network blocks the smoke, EVE reports
+`BLOCKED_AUTH` and guides the operator to the provider's official BYOK/API-key
+flow. EVE must not ask the operator to paste raw API keys, cookies, recovery
+codes, payment details or `.env` contents into chat.

@@ -171,6 +171,42 @@ If the boot packet exists, EVE should:
 4. ask for one next setup choice
 5. keep all work at `dispatch: manual`
 
+## Runtime Confirmation Receipt
+
+From `1.0.0-alpha.2` onward, the generated runtime boot packet includes:
+
+```text
+first_run_confirmation
+```
+
+This receipt is the machine-readable handoff EVE should read before answering
+the first broad opener. It contains:
+
+- `known_facts`: account/company facts already known from signup, intake or the
+  installed boot packet
+- `missing_or_unverified_facts`: facts EVE may ask about later, not as a first
+  questionnaire dump
+- `progressive_setup_queue.required_now`: confirmation, memory boundary and
+  auth/model proof
+- `progressive_setup_queue.helpful_now`: existing-system inventory, first
+  wedge and first packets
+- `progressive_setup_queue.later`: connectors, Plane contracts and autonomy
+  gates
+- `existing_system_inventory`: `adapt_existing_first` policy and discovered
+  tools if the seed contains them
+
+EVE's first response should therefore be:
+
+```text
+I know these facts from your seed: ...
+Is this correct?
+Here is what is missing/unverified.
+Here are three next setup paths.
+```
+
+It should not ask for company identity, website, goals, compliance owners and
+tool stack all at once unless the operator explicitly chooses guided setup.
+
 ## Existing System Rule
 
 Before creating new Company.OS work, EVE inventories existing systems:

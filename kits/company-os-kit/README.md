@@ -62,7 +62,7 @@ docs/integrations/plane-app-control-plane.md
 
 ## Fresh Project Install
 
-For `0.9.0-rc.0`, the recommended remote-founder install path is:
+For `1.0.0-alpha.1`, the recommended remote-founder install path is:
 
 ```bash
 git clone https://github.com/MathiasHeinke/company-os-public.git
@@ -82,6 +82,37 @@ node scripts/install/public-rc.mjs install \
 
 This wraps the low-level bootstrap installer, writes the first intake, generates
 EVE's boot packet and writes update/handoff provenance from the public source.
+
+Then install the managed local Command EVE operator shell from the same public
+source clone:
+
+```bash
+node scripts/operator-shell/install-command-eve.mjs install \
+  --client-root /path/to/target-workspace \
+  --write-report \
+  --json
+```
+
+This installs pinned local sidecars under
+`.company-os/operator-shell/`: AionUI `v2.1.10` with the Command EVE source
+overlay, AionCore `v0.1.19` prepared as the local backend, locally built
+renderer assets, and Hermes Agent `0.15.2` in a Python venv. It writes
+provider/model defaults only (`openrouter` / `minimax/minimax-m3`);
+authenticate through the provider's official flow and never paste raw API keys
+into chat.
+
+After the operator-shell install passes, use the generated local commands:
+
+```bash
+/path/to/target-workspace/.company-os/bin/start_eve
+/path/to/target-workspace/.company-os/bin/update_eve check
+/path/to/target-workspace/.company-os/bin/update_eve apply
+```
+
+The `start_eve` command launches the patched local AionUI web UI with Hermes as
+the default EVE agent. The `update_eve` command checks or applies updates from
+the public Company.OS source clone, then refreshes the local AionUI/Hermes
+sidecars according to the current operator-shell manifest.
 
 If an operator needs the low-level bootstrap only, run a dry-run first:
 
@@ -117,7 +148,10 @@ The public-RC wrapper also writes:
 - `.company-os/onboarding/company-intake.json`
 - `.company-os/onboarding/intake-record.json`
 - `.company-os/onboarding/eve-boot-packet.json`
-- `reports/company-os-public-rc/YYYY-MM-DD/company-os-public-rc-0.9.0-rc.0.md`
+- `.company-os/bin/start_eve`
+- `.company-os/bin/update_eve`
+- `reports/company-os-public-rc/YYYY-MM-DD/company-os-public-rc-1.0.0-alpha.1.md`
+- `reports/operator-shell/YYYY-MM-DD/command-eve-install-1.0.0-alpha.1.md`
 
 If using the low-level bootstrap path, generate the first-company packet from
 the confirmed signup/report seed before EVE greets the founder for real work:

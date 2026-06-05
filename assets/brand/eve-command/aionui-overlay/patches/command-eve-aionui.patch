@@ -1,3 +1,19 @@
+diff --git a/packages/desktop/src/common/config/i18n-config.json b/packages/desktop/src/common/config/i18n-config.json
+index 375bc9c..8b33d26 100644
+--- a/packages/desktop/src/common/config/i18n-config.json
++++ b/packages/desktop/src/common/config/i18n-config.json
+@@ -3,2 +3,2 @@
+-  "fallbackLanguage": "en-US",
+-  "supportedLanguages": ["zh-CN", "en-US", "ja-JP", "zh-TW", "ko-KR", "tr-TR", "ru-RU", "uk-UA"],
++  "fallbackLanguage": "de-DE",
++  "supportedLanguages": ["de-DE", "en-US"],
+diff --git a/packages/desktop/src/common/config/i18n.ts b/packages/desktop/src/common/config/i18n.ts
+index 73fa3ab..f2fb491 100644
+--- a/packages/desktop/src/common/config/i18n.ts
++++ b/packages/desktop/src/common/config/i18n.ts
+@@ -29,0 +30,2 @@ export function normalizeLanguageCode(language: string): SupportedLanguage {
++    case 'de':
++      return 'de-DE';
 diff --git a/packages/desktop/src/renderer/components/layout/Layout.tsx b/packages/desktop/src/renderer/components/layout/Layout.tsx
 index 6558cd7..41abc7f 100644
 --- a/packages/desktop/src/renderer/components/layout/Layout.tsx
@@ -49,7 +65,7 @@ index dd4f6ce..2eab7b4 100644
 -  const appTitle = useMemo(() => 'AionUi', []);
 +  const appTitle = useMemo(() => 'EVE', []);
 diff --git a/packages/desktop/src/renderer/index.html b/packages/desktop/src/renderer/index.html
-index 70e64f3..4fb6214 100644
+index 70e64f3..6d001e0 100644
 --- a/packages/desktop/src/renderer/index.html
 +++ b/packages/desktop/src/renderer/index.html
 @@ -6 +6 @@
@@ -58,8 +74,15 @@ index 70e64f3..4fb6214 100644
 @@ -9 +9 @@
 -    <meta name="apple-mobile-web-app-title" content="AionUi" />
 +    <meta name="apple-mobile-web-app-title" content="EVE" />
-@@ -15 +15 @@
+@@ -11,2 +11,2 @@
+-    <meta name="theme-color" content="#4E5969" />
+-    <link rel="icon" type="image/png" href="./pwa/icon-192.png" />
++    <meta name="theme-color" content="#2563eb" />
++    <link rel="icon" type="image/svg+xml" href="/command-eve-logo.svg?v=command-eve-favicon-20260604" />
+@@ -14,2 +14,2 @@
+-    <link rel="apple-touch-icon" href="./pwa/icon-180.png" />
 -    <title>AionUi</title>
++    <link rel="apple-touch-icon" href="/command-eve-logo.svg?v=command-eve-favicon-20260604" />
 +    <title>EVE</title>
 diff --git a/packages/desktop/src/renderer/pages/conversation/Messages/components/MessageAgentStatus.tsx b/packages/desktop/src/renderer/pages/conversation/Messages/components/MessageAgentStatus.tsx
 index 5c0c467..450a9ed 100644
@@ -77,39 +100,6 @@ index 5c0c467..450a9ed 100644
 +      : agent_name ||
 +        cliAgents.find((a) => a.backend === backend || a.agent_type === backend)?.name ||
 +        backend.charAt(0).toUpperCase() + backend.slice(1);
-diff --git a/packages/desktop/src/renderer/pages/conversation/components/ChatConversation.tsx b/packages/desktop/src/renderer/pages/conversation/components/ChatConversation.tsx
-index 1a5a891..2359e78 100644
---- a/packages/desktop/src/renderer/pages/conversation/components/ChatConversation.tsx
-+++ b/packages/desktop/src/renderer/pages/conversation/components/ChatConversation.tsx
-@@ -35,0 +36,3 @@ import StarOfficeMonitorCard from '../platforms/openclaw/StarOfficeMonitorCard.t
-+const COMMAND_EVE_AGENT_BACKEND = 'hermes';
-+const COMMAND_EVE_DISPLAY_NAME = 'EVE';
-+
-@@ -203,0 +207,2 @@ const ChatConversation: React.FC<{
-+  const isCommandEveConversation =
-+    conversation?.type === 'acp' && conversation.extra?.backend === COMMAND_EVE_AGENT_BACKEND;
-@@ -212 +217,3 @@ const ChatConversation: React.FC<{
--  const assistantDisplayName = presetAssistantInfo?.name || conversationAgentName;
-+  const assistantDisplayName = isCommandEveConversation
-+    ? COMMAND_EVE_DISPLAY_NAME
-+    : presetAssistantInfo?.name || conversationAgentName;
-@@ -310,0 +318 @@ const ChatConversation: React.FC<{
-+      if (extra.backend === COMMAND_EVE_AGENT_BACKEND) return undefined;
-@@ -349 +357 @@ const ChatConversation: React.FC<{
--          agent_name: conversationAgentName,
-+          agent_name: isCommandEveConversation ? COMMAND_EVE_DISPLAY_NAME : conversationAgentName,
-diff --git a/packages/desktop/src/renderer/pages/conversation/platforms/acp/AcpSendBox.tsx b/packages/desktop/src/renderer/pages/conversation/platforms/acp/AcpSendBox.tsx
-index fa331b4..02a71e4 100644
---- a/packages/desktop/src/renderer/pages/conversation/platforms/acp/AcpSendBox.tsx
-+++ b/packages/desktop/src/renderer/pages/conversation/platforms/acp/AcpSendBox.tsx
-@@ -45,0 +46,2 @@ const EMPTY_UPLOAD_FILES: string[] = [];
-+const COMMAND_EVE_AGENT_BACKEND = 'hermes';
-+const COMMAND_EVE_DISPLAY_NAME = 'EVE';
-@@ -103,0 +106 @@ const AcpSendBox: React.FC<{
-+  const displayBackendName = backend === COMMAND_EVE_AGENT_BACKEND ? COMMAND_EVE_DISPLAY_NAME : agent_name || backend;
-@@ -369 +372 @@ Please check your local CLI tool authentication status`,
--          backend: agent_name || backend,
-+          backend: displayBackendName,
 diff --git a/packages/desktop/src/renderer/pages/guid/GuidPage.tsx b/packages/desktop/src/renderer/pages/guid/GuidPage.tsx
 index e42475c..e609d8a 100644
 --- a/packages/desktop/src/renderer/pages/guid/GuidPage.tsx
@@ -301,20 +291,3735 @@ index b36938d..35068c0 100644
 +    line-height: 30px;
 +  }
 +
+diff --git a/packages/desktop/src/renderer/pages/login/LoginPage.css b/packages/desktop/src/renderer/pages/login/LoginPage.css
+index 00e462b..b9b757c 100644
+--- a/packages/desktop/src/renderer/pages/login/LoginPage.css
++++ b/packages/desktop/src/renderer/pages/login/LoginPage.css
+@@ -7,2 +7 @@
+-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+-  background: linear-gradient(135deg, #97a0c5 0%, #596590 100%);
++  padding: 32px 20px;
+@@ -9,0 +9,19 @@
++  color: #0b1220;
++  font-family:
++    Inter,
++    -apple-system,
++    BlinkMacSystemFont,
++    'Segoe UI',
++    sans-serif;
++  background: #fffdfa;
++}
++
++.login-page::before {
++  content: '';
++  position: absolute;
++  inset: 0;
++  z-index: 0;
++  pointer-events: none;
++  background:
++    radial-gradient(circle at 50% 38%, rgba(249, 115, 22, 0.1), transparent 22%),
++    radial-gradient(circle at 62% 44%, rgba(251, 146, 60, 0.06), transparent 28%);
+@@ -12,2 +30,7 @@
+-body.login-page-active {
+-  overflow: hidden;
++.login-page__hero-field-canvas {
++  position: absolute;
++  inset: 0;
++  z-index: 0;
++  width: 100%;
++  height: 100%;
++  pointer-events: none;
+@@ -16 +39 @@ body.login-page-active {
+-.login-page__background {
++.login-page__hero-field-fade {
+@@ -18,2 +41,3 @@ body.login-page-active {
+-  inset: 0;
+-  overflow: hidden;
++  left: 0;
++  right: 0;
++  bottom: 0;
+@@ -20,0 +45,8 @@ body.login-page-active {
++  height: 176px;
++  pointer-events: none;
++  background: linear-gradient(to top, #fffdfa, rgba(255, 253, 250, 0.72), transparent);
++}
++
++body.login-page-active {
++  overflow: hidden;
++  background: #fbfcfe;
+@@ -22,0 +55 @@ body.login-page-active {
++.login-page__background,
+@@ -24,4 +57 @@ body.login-page-active {
+-  position: absolute;
+-  border-radius: 50%;
+-  background: rgba(255, 255, 255, 0.1);
+-  animation: login-float 20s infinite ease-in-out;
++  display: none;
+@@ -30,6 +60,18 @@ body.login-page-active {
+-.login-page__background-circle--lg {
+-  width: 500px;
+-  height: 500px;
+-  top: -250px;
+-  left: -250px;
+-  animation-delay: 0s;
++.login-page__card {
++  position: relative;
++  z-index: 1;
++  width: min(100%, 424px);
++  overflow: hidden;
++  padding: 38px 32px 30px;
++  border: 1px solid rgba(226, 232, 240, 0.92);
++  border-radius: 20px;
++  background: linear-gradient(180deg, #ffffff 0%, rgba(248, 250, 252, 0.82) 100%);
++  box-shadow:
++    0 1px 2px rgba(15, 23, 42, 0.04),
++    0 30px 80px -42px rgba(37, 99, 235, 0.46),
++    0 20px 48px -36px rgba(15, 23, 42, 0.36);
++  animation: login-slide-up 0.48s ease-out;
++  transition:
++    border-color 0.24s ease,
++    box-shadow 0.24s ease,
++    transform 0.24s ease;
+@@ -38,6 +80,28 @@ body.login-page-active {
+-.login-page__background-circle--md {
+-  width: 350px;
+-  height: 350px;
+-  bottom: -175px;
+-  right: -175px;
+-  animation-delay: 5s;
++.login-page__card::before {
++  content: '';
++  position: absolute;
++  top: 0;
++  left: 20px;
++  right: 20px;
++  z-index: 1;
++  height: 1px;
++  background: linear-gradient(
++    90deg,
++    transparent 0%,
++    rgba(37, 99, 235, 0.5) 32%,
++    rgba(249, 115, 22, 0.58) 70%,
++    transparent 100%
++  );
++}
++
++.login-page__card::after {
++  content: '⌘';
++  position: absolute;
++  right: 24px;
++  bottom: 8px;
++  z-index: 0;
++  pointer-events: none;
++  color: rgba(37, 99, 235, 0.045);
++  font-size: 104px;
++  font-weight: 700;
++  line-height: 1;
+@@ -46,6 +110,9 @@ body.login-page-active {
+-.login-page__background-circle--sm {
+-  width: 250px;
+-  height: 250px;
+-  top: 50%;
+-  right: 10%;
+-  animation-delay: 10s;
++.login-page__card:hover,
++.login-page__card:focus-within {
++  border-color: rgba(37, 99, 235, 0.34);
++  box-shadow:
++    0 0 0 1px rgba(249, 115, 22, 0.14),
++    0 1px 2px rgba(15, 23, 42, 0.04),
++    0 34px 88px -42px rgba(37, 99, 235, 0.56),
++    0 22px 54px -38px rgba(249, 115, 22, 0.36);
++  transform: translateY(-2px);
+@@ -54,14 +121,3 @@ body.login-page-active {
+-@keyframes login-float {
+-  0%,
+-  100% {
+-    transform: translateY(0) translateX(0) scale(1);
+-  }
+-  25% {
+-    transform: translateY(-20px) translateX(10px) scale(1.05);
+-  }
+-  50% {
+-    transform: translateY(-10px) translateX(-10px) scale(0.95);
+-  }
+-  75% {
+-    transform: translateY(10px) translateX(5px) scale(1.02);
+-  }
++.login-page__card:hover .login-page__card-glow,
++.login-page__card:focus-within .login-page__card-glow {
++  opacity: 1;
+@@ -70,11 +126,23 @@ body.login-page-active {
+-.login-page__card {
+-  position: relative;
+-  z-index: 1;
+-  width: 100%;
+-  max-width: 360px;
+-  background: rgba(255, 255, 255, 0.98);
+-  backdrop-filter: blur(18px);
+-  border-radius: 20px;
+-  box-shadow: 0 16px 64px rgba(0, 0, 0, 0.18);
+-  padding: 36px 28px 32px;
+-  animation: login-slide-up 0.6s ease-out;
++.login-page__card-glow {
++  position: absolute;
++  inset: 0;
++  z-index: 3;
++  padding: 1px;
++  border-radius: inherit;
++  background: radial-gradient(
++    260px circle at var(--mouse-x, 50%) var(--mouse-y, 0%),
++    rgba(37, 99, 235, 0.6) 0%,
++    rgba(249, 115, 22, 0.34) 38%,
++    transparent 72%
++  );
++  mask:
++    linear-gradient(#ffffff 0 0) content-box,
++    linear-gradient(#ffffff 0 0);
++  mask-composite: exclude;
++  opacity: 0;
++  pointer-events: none;
++  transition: opacity 0.26s ease-out;
++  -webkit-mask:
++    linear-gradient(#ffffff 0 0) content-box,
++    linear-gradient(#ffffff 0 0);
++  -webkit-mask-composite: xor;
+@@ -86 +154 @@ body.login-page-active {
+-    transform: translateY(30px);
++    transform: translateY(18px);
+@@ -94 +162 @@ body.login-page-active {
+-.login-page__lang-select-wrapper {
++.login-page__lang-toggle {
+@@ -96,5 +164,5 @@ body.login-page-active {
+-  top: 20px;
+-  right: 20px;
+-  display: flex;
+-  flex-direction: column;
+-  align-items: flex-end;
++  top: 18px;
++  right: 18px;
++  z-index: 2;
++  display: inline-flex;
++  align-items: center;
+@@ -102,2 +170,31 @@ body.login-page-active {
+-  font-size: 13px;
+-  color: #555;
++  padding: 4px;
++  border: 1px solid rgba(203, 213, 225, 0.86);
++  border-radius: 999px;
++  background: rgba(255, 255, 255, 0.76);
++  box-shadow:
++    0 1px 2px rgba(15, 23, 42, 0.04),
++    0 16px 32px -26px rgba(15, 23, 42, 0.34);
++  backdrop-filter: blur(14px);
++}
++
++.login-page__lang-option {
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++  gap: 5px;
++  min-width: 58px;
++  height: 30px;
++  padding: 0 9px;
++  border: 0;
++  border-radius: 999px;
++  background: transparent;
++  color: #64748b;
++  font-size: 12px;
++  font-weight: 760;
++  line-height: 1;
++  cursor: pointer;
++  transition:
++    background-color 0.18s ease,
++    color 0.18s ease,
++    box-shadow 0.18s ease,
++    transform 0.18s ease;
+@@ -106,2 +203,5 @@ body.login-page-active {
+-.login-page__lang-label {
+-  font-weight: 500;
++.login-page__lang-option:hover,
++.login-page__lang-option:focus-visible {
++  color: #0f172a;
++  background: rgba(239, 246, 255, 0.9);
++  outline: none;
+@@ -110,12 +210,6 @@ body.login-page-active {
+-.login-page__lang-select {
+-  min-width: 140px;
+-  padding: 6px 12px;
+-  border: 1px solid #ddd;
+-  border-radius: 8px;
+-  background: white;
+-  color: #333;
+-  font-size: 13px;
+-  cursor: pointer;
+-  transition:
+-    border-color 0.2s ease,
+-    box-shadow 0.2s ease;
++.login-page__lang-option--active {
++  background: #0f172a;
++  color: #ffffff;
++  box-shadow:
++    0 8px 18px -10px rgba(15, 23, 42, 0.86),
++    0 0 0 1px rgba(249, 115, 22, 0.18);
+@@ -124,5 +218,4 @@ body.login-page-active {
+-.login-page__lang-select:hover,
+-.login-page__lang-select:focus {
+-  border-color: #667eea;
+-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+-  outline: none;
++.login-page__lang-option--active:hover,
++.login-page__lang-option--active:focus-visible {
++  color: #ffffff;
++  background: #0f172a;
+@@ -131,2 +224,8 @@ body.login-page-active {
+-.login-page__lang-select option {
+-  color: #333;
++.login-page__lang-flag {
++  font-size: 14px;
++  line-height: 1;
++}
++
++.login-page__lang-code {
++  font-size: 11px;
++  line-height: 1;
+@@ -135,0 +235,3 @@ body.login-page-active {
++  position: relative;
++  z-index: 1;
++  margin: 28px 0 26px;
+@@ -137 +238,0 @@ body.login-page-active {
+-  margin-bottom: 28px;
+@@ -146,5 +247,11 @@ body.login-page-active {
+-.login-page__logo svg,
+-.login-page__logo img {
+-  width: 64px;
+-  height: 64px;
+-  animation: login-pulse 3s infinite;
++.login-page__media-frame {
++  position: relative;
++  width: 112px;
++  height: 112px;
++  overflow: hidden;
++  border: 1px solid rgba(37, 99, 235, 0.16);
++  border-radius: 28px;
++  background: #0b1220;
++  box-shadow:
++    0 22px 54px -30px rgba(37, 99, 235, 0.7),
++    0 12px 28px -22px rgba(15, 23, 42, 0.56);
+@@ -153,8 +260,27 @@ body.login-page-active {
+-@keyframes login-pulse {
+-  0%,
+-  100% {
+-    transform: scale(1);
+-  }
+-  50% {
+-    transform: scale(1.05);
+-  }
++.login-page__brand-animation,
++.login-page__brand-video {
++  position: absolute;
++  inset: 0;
++  display: block;
++  width: 100%;
++  height: 100%;
++  object-fit: cover;
++  object-position: center center;
++  pointer-events: none;
++  transition: opacity 0.16s ease;
++}
++
++.login-page__brand-animation {
++  opacity: 1;
++}
++
++.login-page__brand-animation--hidden {
++  opacity: 0;
++}
++
++.login-page__brand-video {
++  opacity: 0;
++}
++
++.login-page__brand-video--playing {
++  opacity: 1;
+@@ -163,0 +290,9 @@ body.login-page-active {
++  margin: 0 0 4px;
++  color: #0b1220;
++  font-family:
++    'Instrument Sans',
++    Inter,
++    -apple-system,
++    BlinkMacSystemFont,
++    'Segoe UI',
++    sans-serif;
+@@ -165,7 +300,16 @@ body.login-page-active {
+-  font-weight: 700;
+-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+-  -webkit-background-clip: text;
+-  -webkit-text-fill-color: transparent;
+-  background-clip: text;
+-  margin: 0 0 8px 0;
+-  letter-spacing: -0.5px;
++  font-weight: 760;
++  letter-spacing: 0;
++  line-height: 1.08;
++}
++
++.login-page__title-command {
++  color: #f97316;
++}
++
++.login-page__version {
++  margin: 0 0 12px;
++  color: #64748b;
++  font-size: 12px;
++  font-weight: 640;
++  letter-spacing: 0;
++  line-height: 1.2;
+@@ -174,0 +319,3 @@ body.login-page-active {
++  max-width: 320px;
++  margin: 0 auto;
++  color: #475569;
+@@ -176,3 +323,2 @@ body.login-page-active {
+-  color: #666;
+-  margin: 0;
+-  font-weight: 400;
++  font-weight: 450;
++  line-height: 1.55;
+@@ -181,0 +328,2 @@ body.login-page-active {
++  position: relative;
++  z-index: 1;
+@@ -186 +334 @@ body.login-page-active {
+-  margin-bottom: 20px;
++  margin-bottom: 18px;
+@@ -192,2 +340 @@ body.login-page-active {
+-  font-weight: 600;
+-  color: #333;
++  color: #0f172a;
+@@ -194,0 +342 @@ body.login-page-active {
++  font-weight: 680;
+@@ -206,3 +354,3 @@ body.login-page-active {
+-  width: 16px;
+-  height: 16px;
+-  color: #999;
++  width: 17px;
++  height: 17px;
++  color: #94a3b8;
+@@ -214,4 +362,6 @@ body.login-page-active {
+-  height: 44px;
+-  padding: 10px 14px 10px 44px;
+-  border: 1px solid #ddd;
+-  border-radius: 12px;
++  height: 48px;
++  padding: 11px 14px 11px 44px;
++  border: 1px solid #cbd5e1;
++  border-radius: 14px;
++  background: #ffffff;
++  color: #0f172a;
+@@ -219,2 +369,8 @@ body.login-page-active {
+-  transition: all 0.3s;
+-  background: white;
++  transition:
++    border-color 0.18s ease,
++    box-shadow 0.18s ease,
++    background-color 0.18s ease;
++}
++
++.login-page__input::placeholder {
++  color: #94a3b8;
+@@ -224 +380 @@ body.login-page-active {
+-  border-color: #667eea;
++  border-color: #94a3b8;
+@@ -227,0 +384,3 @@ body.login-page-active {
++  border-color: #2563eb;
++  background: #ffffff;
++  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+@@ -229,2 +387,0 @@ body.login-page-active {
+-  border-color: #667eea;
+-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+@@ -235,0 +393,3 @@ body.login-page-active {
++  display: flex;
++  align-items: center;
++  justify-content: center;
+@@ -240,0 +401 @@ body.login-page-active {
++  color: #94a3b8;
+@@ -242,5 +403 @@ body.login-page-active {
+-  color: #999;
+-  transition: color 0.3s;
+-  display: flex;
+-  align-items: center;
+-  justify-content: center;
++  transition: color 0.18s ease;
+@@ -249,2 +406,4 @@ body.login-page-active {
+-.login-page__toggle-password:hover {
+-  color: #667eea;
++.login-page__toggle-password:hover,
++.login-page__toggle-password:focus-visible {
++  color: #2563eb;
++  outline: none;
+@@ -256 +415,2 @@ body.login-page-active {
+-  gap: 8px;
++  gap: 9px;
++  margin-top: -4px;
+@@ -258 +417,0 @@ body.login-page-active {
+-  margin-top: -6px;
+@@ -262,2 +421,2 @@ body.login-page-active {
+-  width: 16px;
+-  height: 16px;
++  width: 17px;
++  height: 17px;
+@@ -265 +424 @@ body.login-page-active {
+-  accent-color: #667eea;
++  accent-color: #2563eb;
+@@ -268,0 +428 @@ body.login-page-active {
++  color: #475569;
+@@ -270 +429,0 @@ body.login-page-active {
+-  color: #666;
+@@ -276,11 +434,0 @@ body.login-page-active {
+-  width: 100%;
+-  height: 46px;
+-  margin-top: 6px;
+-  font-size: 15px;
+-  font-weight: 600;
+-  border-radius: 12px;
+-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+-  border: none;
+-  color: white;
+-  cursor: pointer;
+-  transition: all 0.3s;
+@@ -290,0 +439,14 @@ body.login-page-active {
++  width: 100%;
++  height: 48px;
++  margin-top: 6px;
++  border: none;
++  border-radius: 14px;
++  background: #2563eb;
++  color: #ffffff;
++  font-size: 15px;
++  font-weight: 720;
++  cursor: pointer;
++  transition:
++    background-color 0.18s ease,
++    box-shadow 0.18s ease,
++    transform 0.18s ease;
+@@ -294,2 +456,3 @@ body.login-page-active {
+-  transform: translateY(-2px);
+-  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
++  background: #1d4ed8;
++  box-shadow: 0 16px 34px -22px rgba(37, 99, 235, 0.9);
++  transform: translateY(-1px);
+@@ -303 +465,0 @@ body.login-page-active {
+-  opacity: 0.6;
+@@ -304,0 +467 @@ body.login-page-active {
++  opacity: 0.62;
+@@ -320,0 +484 @@ body.login-page-active {
++  display: none;
+@@ -322,2 +486,2 @@ body.login-page-active {
+-  padding: 12px 16px;
+-  border-radius: 8px;
++  padding: 12px 14px;
++  border-radius: 12px;
+@@ -325,2 +489 @@ body.login-page-active {
+-  font-weight: 500;
+-  display: none;
++  font-weight: 580;
+@@ -331 +494 @@ body.login-page-active {
+-  animation: login-fade-in 0.3s ease-out;
++  animation: login-fade-in 0.22s ease-out;
+@@ -337 +500 @@ body.login-page-active {
+-    transform: translateY(-10px);
++    transform: translateY(-6px);
+@@ -346,2 +508,0 @@ body.login-page-active {
+-  background-color: #fef2f2;
+-  color: #dc2626;
+@@ -348,0 +510,2 @@ body.login-page-active {
++  background-color: #fef2f2;
++  color: #b91c1c;
+@@ -352,2 +514,0 @@ body.login-page-active {
+-  background-color: #f0fdf4;
+-  color: #16a34a;
+@@ -354,0 +516,2 @@ body.login-page-active {
++  background-color: #f0fdf4;
++  color: #047857;
+@@ -358 +521,2 @@ body.login-page-active {
+-  text-align: center;
++  position: relative;
++  z-index: 1;
+@@ -360 +524,2 @@ body.login-page-active {
+-  border-top: 1px solid #eee;
++  border-top: 1px solid #e2e8f0;
++  text-align: center;
+@@ -366,0 +532 @@ body.login-page-active {
++  flex-wrap: wrap;
+@@ -367,0 +534 @@ body.login-page-active {
++  color: #64748b;
+@@ -369 +536 @@ body.login-page-active {
+-  color: #999;
++  line-height: 1.4;
+@@ -373 +540 @@ body.login-page-active {
+-  color: #ddd;
++  color: #f97316;
+@@ -376,0 +544,5 @@ body.login-page-active {
++  .login-page {
++    align-items: flex-start;
++    padding: 22px 14px;
++  }
++
+@@ -378,3 +550,23 @@ body.login-page-active {
+-    margin: 20px;
+-    padding: 32px 24px;
+-    border-radius: 16px;
++    width: 100%;
++    padding: 36px 22px 28px;
++    border-radius: 18px;
++  }
++
++  .login-page__lang-toggle {
++    top: 14px;
++    right: 14px;
++  }
++
++  .login-page__lang-option {
++    min-width: 52px;
++    padding: 0 8px;
++  }
++
++  .login-page__header {
++    margin-top: 48px;
++  }
++
++  .login-page__media-frame {
++    width: 96px;
++    height: 96px;
++    border-radius: 24px;
+@@ -384 +576,6 @@ body.login-page-active {
+-    font-size: 28px;
++    font-size: 25px;
++  }
++
++  .login-page__footer-content {
++    flex-wrap: wrap;
++    gap: 6px;
+@@ -385,0 +583 @@ body.login-page-active {
++}
+@@ -387,2 +585,5 @@ body.login-page-active {
+-  .login-page__subtitle {
+-    font-size: 14px;
++@media (prefers-reduced-motion: reduce) {
++  .login-page__card,
++  .login-page__message--visible,
++  .login-page__spinner {
++    animation: none;
+@@ -391,3 +592,5 @@ body.login-page-active {
+-  .login-page__logo svg {
+-    width: 60px;
+-    height: 60px;
++  .login-page__card,
++  .login-page__card-glow,
++  .login-page__lang-option,
++  .login-page__submit {
++    transition: none;
+@@ -396,2 +599,3 @@ body.login-page-active {
+-  .login-page__background-circle {
+-    display: none;
++  .login-page__card:hover,
++  .login-page__card:focus-within {
++    transform: none;
 diff --git a/packages/desktop/src/renderer/pages/login/index.tsx b/packages/desktop/src/renderer/pages/login/index.tsx
-index b856259..503ebce 100644
+index b856259..4a3f00b 100644
 --- a/packages/desktop/src/renderer/pages/login/index.tsx
 +++ b/packages/desktop/src/renderer/pages/login/index.tsx
 @@ -1 +0,0 @@
 -import loginLogo from '@renderer/assets/logos/brand/app.png';
-@@ -17,0 +17 @@ const REMEMBERED_PASSWORD_KEY = 'rememberedPassword';
-+const loginLogo = '/command-eve-logo.svg?v=command-eve-20260526';
+@@ -14,0 +14,7 @@ type MessageState = {
++type CommandEveLanguage = {
++  code: string;
++  label: string;
++  short: string;
++  flag: string;
++};
++
+@@ -17,0 +24,10 @@ const REMEMBERED_PASSWORD_KEY = 'rememberedPassword';
++const COMMAND_EVE_DEFAULT_LANGUAGE = 'de-DE';
++const COMMAND_EVE_LANGUAGE_BOOTSTRAPPED_KEY = 'commandEveLanguageBootstrapped';
++const COMMAND_EVE_DEFAULT_VERSION = 'v1.x';
++const COMMAND_EVE_BRAND_CONFIG_URL = '/command-eve-brand.json?v=command-eve-brand-20260604';
++const COMMAND_EVE_LOGIN_VIDEO = '/eve-wait-focus.mp4?v=command-eve-login-20260604';
++const COMMAND_EVE_LOGIN_ANIMATION = '/eve-wait-focus-loop.gif?v=command-eve-login-20260604';
++const COMMAND_EVE_LOGIN_POSTER = '/eve-wait-focus-anchor.png?v=command-eve-login-20260604';
++const COMMAND_EVE_HERO_FIELD_GAP = 32;
++const COMMAND_EVE_HERO_FIELD_RADIUS = 175;
++const COMMAND_EVE_HERO_FIELD_AMPLITUDE = 9;
+@@ -33,0 +50,203 @@ const deobfuscate = (text: string): string => {
++const CommandEveHeroField: React.FC = () => {
++  const canvasRef = useRef<HTMLCanvasElement | null>(null);
++
++  useEffect(() => {
++    const canvas = canvasRef.current;
++    if (!canvas) return;
++
++    const ctx = canvas.getContext('2d');
++    if (!ctx) return;
++
++    const dpr = Math.min(window.devicePixelRatio || 1, 2);
++    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
++    const orb = { x: 0, y: 0 };
++    const mouse = { x: -9999, y: -9999, active: false };
++
++    let width = 0;
++    let height = 0;
++    let cols = 0;
++    let rows = 0;
++    let baseX = new Float32Array(0);
++    let baseY = new Float32Array(0);
++    let pointX = new Float32Array(0);
++    let pointY = new Float32Array(0);
++    let pointAlpha = new Float32Array(0);
++    let pointWarmth = new Float32Array(0);
++    let pointCrest = new Float32Array(0);
++    let raf = 0;
++
++    const buildField = () => {
++      const rect = canvas.getBoundingClientRect();
++      width = Math.max(1, rect.width);
++      height = Math.max(1, rect.height);
++      canvas.width = Math.round(width * dpr);
++      canvas.height = Math.round(height * dpr);
++      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
++
++      cols = Math.ceil(width / COMMAND_EVE_HERO_FIELD_GAP) + 2;
++      rows = Math.ceil(height / COMMAND_EVE_HERO_FIELD_GAP) + 2;
++      const count = cols * rows;
++
++      baseX = new Float32Array(count);
++      baseY = new Float32Array(count);
++      pointX = new Float32Array(count);
++      pointY = new Float32Array(count);
++      pointAlpha = new Float32Array(count);
++      pointWarmth = new Float32Array(count);
++      pointCrest = new Float32Array(count);
++
++      for (let row = 0; row < rows; row += 1) {
++        for (let col = 0; col < cols; col += 1) {
++          const index = row * cols + col;
++          baseX[index] = col * COMMAND_EVE_HERO_FIELD_GAP + (row % 2 ? COMMAND_EVE_HERO_FIELD_GAP / 2 : 0);
++          baseY[index] = row * COMMAND_EVE_HERO_FIELD_GAP;
++        }
++      }
++
++      if (orb.x === 0) {
++        orb.x = width * 0.5;
++        orb.y = height * 0.45;
++      }
++    };
++
++    const drawCommandEveHeroField = (time: number) => {
++      const t = time * 0.001;
++      ctx.clearRect(0, 0, width, height);
++
++      const driftX = width * (0.5 + 0.26 * Math.sin(t * 0.18));
++      const driftY = height * (0.46 + 0.3 * Math.sin(t * 0.24 + 1.2));
++      const inside = mouse.active && mouse.x >= 0 && mouse.x <= width && mouse.y >= 0 && mouse.y <= height;
++      const targetX = inside ? mouse.x : driftX;
++      const targetY = inside ? mouse.y : driftY;
++
++      orb.x += (targetX - orb.x) * (inside ? 0.08 : 0.035);
++      orb.y += (targetY - orb.y) * (inside ? 0.08 : 0.035);
++
++      const glow = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, COMMAND_EVE_HERO_FIELD_RADIUS * 1.15);
++      glow.addColorStop(0, 'rgba(249, 115, 22, 0.15)');
++      glow.addColorStop(0.5, 'rgba(251, 146, 60, 0.08)');
++      glow.addColorStop(1, 'rgba(249, 115, 22, 0)');
++      ctx.fillStyle = glow;
++      ctx.beginPath();
++      ctx.arc(orb.x, orb.y, COMMAND_EVE_HERO_FIELD_RADIUS * 1.15, 0, Math.PI * 2);
++      ctx.fill();
++
++      const count = cols * rows;
++      const focusX = inside ? mouse.x : orb.x;
++      const focusY = inside ? mouse.y : orb.y;
++
++      for (let index = 0; index < count; index += 1) {
++        const x = baseX[index];
++        const y = baseY[index];
++        const heightWave =
++          (Math.sin(x * 0.013 + t * 0.45) * 0.6 +
++            Math.sin(y * 0.017 - t * 0.38) * 0.5 +
++            Math.sin((x + y) * 0.01 + t * 0.55) * 0.45) /
++          1.55;
++        const mouseDx = x - focusX;
++        const mouseDy = y - focusY;
++        const mouseDistance = Math.sqrt(mouseDx * mouseDx + mouseDy * mouseDy);
++        const swell = Math.max(0, 1 - mouseDistance / COMMAND_EVE_HERO_FIELD_RADIUS);
++        const swell2 = swell * swell;
++        const orbDx = x - orb.x;
++        const orbDy = y - orb.y;
++        const orbSwell = Math.max(
++          0,
++          1 - Math.sqrt(orbDx * orbDx + orbDy * orbDy) / (COMMAND_EVE_HERO_FIELD_RADIUS * 1.3)
++        );
++        const crest = (heightWave + 1) / 2;
++        const lift = heightWave + swell2 * 1.6 + orbSwell * 0.5;
++        const warm = Math.min(1, swell2 * 1.1 + orbSwell * 0.35 + Math.max(0, crest - 0.82) * 1.2);
++
++        pointX[index] = x;
++        pointY[index] = y - lift * COMMAND_EVE_HERO_FIELD_AMPLITUDE;
++        pointCrest[index] = crest;
++        pointWarmth[index] = warm;
++        pointAlpha[index] = Math.min(0.92, 0.1 + crest * 0.26 + swell2 * 0.55 + orbSwell * 0.12);
++      }
++
++      ctx.lineWidth = 1;
++      for (let row = 0; row < rows; row += 1) {
++        for (let col = 0; col < cols; col += 1) {
++          const index = row * cols + col;
++          if (col < cols - 1) {
++            const nextIndex = index + 1;
++            const alpha =
++              (pointCrest[index] + pointCrest[nextIndex]) * 0.0425 +
++              (pointWarmth[index] + pointWarmth[nextIndex]) * 0.05;
++            if (alpha > 0.02) {
++              ctx.strokeStyle = `rgba(${pointWarmth[index] + pointWarmth[nextIndex] > 0.7 ? '249, 115, 22' : '59, 130, 246'}, ${alpha})`;
++              ctx.beginPath();
++              ctx.moveTo(pointX[index], pointY[index]);
++              ctx.lineTo(pointX[nextIndex], pointY[nextIndex]);
++              ctx.stroke();
++            }
++          }
++          if (row < rows - 1) {
++            const nextIndex = index + cols;
++            const alpha =
++              (pointCrest[index] + pointCrest[nextIndex]) * 0.0425 +
++              (pointWarmth[index] + pointWarmth[nextIndex]) * 0.05;
++            if (alpha > 0.02) {
++              ctx.strokeStyle = `rgba(${pointWarmth[index] + pointWarmth[nextIndex] > 0.7 ? '249, 115, 22' : '59, 130, 246'}, ${alpha})`;
++              ctx.beginPath();
++              ctx.moveTo(pointX[index], pointY[index]);
++              ctx.lineTo(pointX[nextIndex], pointY[nextIndex]);
++              ctx.stroke();
++            }
++          }
++        }
++      }
++
++      for (let index = 0; index < count; index += 1) {
++        const warm = pointWarmth[index];
++        const crest = pointCrest[index];
++        const size = 0.85 + crest * 1.7 + warm * 1.7;
++        const color =
++          warm > 0.7 ? '249, 115, 22' : warm > 0.38 ? '251, 146, 60' : crest > 0.8 ? '96, 165, 250' : '37, 99, 235';
++
++        ctx.fillStyle = `rgba(${color}, ${pointAlpha[index]})`;
++        ctx.beginPath();
++        ctx.arc(pointX[index], pointY[index], size, 0, Math.PI * 2);
++        ctx.fill();
++      }
++
++      if (!reduceMotion) {
++        raf = requestAnimationFrame(drawCommandEveHeroField);
++      }
++    };
++
++    const handleResize = () => {
++      buildField();
++      if (reduceMotion) {
++        drawCommandEveHeroField(0);
++      }
++    };
++
++    const handlePointerMove = (event: PointerEvent) => {
++      const rect = canvas.getBoundingClientRect();
++      mouse.x = event.clientX - rect.left;
++      mouse.y = event.clientY - rect.top;
++      mouse.active = true;
++    };
++
++    buildField();
++    window.addEventListener('resize', handleResize);
++    window.addEventListener('pointermove', handlePointerMove, { passive: true });
++
++    if (reduceMotion) {
++      drawCommandEveHeroField(0);
++    } else {
++      raf = requestAnimationFrame(drawCommandEveHeroField);
++    }
++
++    return () => {
++      cancelAnimationFrame(raf);
++      window.removeEventListener('resize', handleResize);
++      window.removeEventListener('pointermove', handlePointerMove);
++    };
++  }, []);
++
++  return <canvas ref={canvasRef} className='login-page__hero-field-canvas' aria-hidden='true' />;
++};
++
+@@ -44,0 +264,2 @@ const LoginPage: React.FC = () => {
++  const [commandEveVersion, setCommandEveVersion] = useState(COMMAND_EVE_DEFAULT_VERSION);
++  const [commandEveVideoPlaying, setCommandEveVideoPlaying] = useState(false);
+@@ -47,0 +269 @@ const LoginPage: React.FC = () => {
++  const commandEveLoginVideoRef = useRef<HTMLVideoElement | null>(null);
+@@ -49,0 +272,65 @@ const LoginPage: React.FC = () => {
++  const startCommandEveLoginVideo = useCallback(() => {
++    const video = commandEveLoginVideoRef.current;
++    if (!video) return;
++
++    video.muted = true;
++    video.defaultMuted = true;
++    video.loop = true;
++    video.setAttribute('muted', '');
++    video.setAttribute('playsinline', 'true');
++
++    const playPromise = video.play();
++    if (playPromise && typeof playPromise.then === 'function') {
++      playPromise
++        .then(() => {
++          setCommandEveVideoPlaying(true);
++        })
++        .catch(() => {
++          setCommandEveVideoPlaying(false);
++          window.setTimeout(() => {
++            const retryPromise = video.play();
++            if (retryPromise && typeof retryPromise.then === 'function') {
++              retryPromise
++                .then(() => {
++                  setCommandEveVideoPlaying(true);
++                })
++                .catch(() => {
++                  setCommandEveVideoPlaying(false);
++                });
++            }
++          }, 250);
++        });
++    } else {
++      window.setTimeout(() => {
++        if (!video.paused) {
++          setCommandEveVideoPlaying(true);
++        }
++      }, 0);
++    }
++  }, []);
++
++  useEffect(() => {
++    const retry = window.setTimeout(() => {
++      if (!commandEveVideoPlaying) {
++        startCommandEveLoginVideo();
++      }
++    }, 600);
++    return () => {
++      window.clearTimeout(retry);
++    };
++  }, [commandEveVideoPlaying, startCommandEveLoginVideo]);
++
++  useEffect(() => {
++    const visibilityHandler = () => {
++      if (document.visibilityState === 'visible') {
++        window.setTimeout(() => {
++          startCommandEveLoginVideo();
++        }, 250);
++      }
++    };
++    document.addEventListener('visibilitychange', visibilityHandler);
++    return () => {
++      document.removeEventListener('visibilitychange', visibilityHandler);
++    };
++  }, [startCommandEveLoginVideo]);
++
+@@ -59,0 +347,33 @@ const LoginPage: React.FC = () => {
++  useEffect(() => {
++    startCommandEveLoginVideo();
++  }, [startCommandEveLoginVideo]);
++
++  useEffect(() => {
++    const alreadyBootstrapped = localStorage.getItem(COMMAND_EVE_LANGUAGE_BOOTSTRAPPED_KEY) === 'true';
++    if (alreadyBootstrapped) return;
++    localStorage.setItem(COMMAND_EVE_LANGUAGE_BOOTSTRAPPED_KEY, 'true');
++    const storedLanguage = localStorage.getItem('i18nextLng');
++    if (!storedLanguage || storedLanguage === 'en-US') {
++      changeLanguage(COMMAND_EVE_DEFAULT_LANGUAGE).catch((error: Error) => {
++        console.error('Failed to initialize Command EVE language:', error);
++      });
++    }
++  }, []);
++
++  useEffect(() => {
++    let active = true;
++    fetch(COMMAND_EVE_BRAND_CONFIG_URL)
++      .then((response) => (response.ok ? response.json() : null))
++      .then((data: unknown) => {
++        if (!active || !data || typeof data !== 'object') return;
++        const version = (data as { version?: unknown }).version;
++        if (typeof version !== 'string' || !version.trim()) return;
++        const normalizedVersion = version.trim().startsWith('v') ? version.trim() : `v${version.trim()}`;
++        setCommandEveVersion(normalizedVersion);
++      })
++      .catch(() => {});
++    return () => {
++      active = false;
++    };
++  }, []);
++
+@@ -113 +433 @@ const LoginPage: React.FC = () => {
+-  const supportedLanguages = useMemo<{ code: string; label: string }[]>(
++  const supportedLanguages = useMemo<CommandEveLanguage[]>(
+@@ -115,7 +435,2 @@ const LoginPage: React.FC = () => {
+-      { code: 'zh-CN', label: '简体中文' },
+-      { code: 'zh-TW', label: '繁體中文' },
+-      { code: 'ja-JP', label: '日本語' },
+-      { code: 'ko-KR', label: '한국어' },
+-      { code: 'tr-TR', label: 'Türkçe' },
+-      { code: 'uk-UA', label: 'Українська' },
+-      { code: 'en-US', label: 'English' },
++      { code: 'de-DE', label: 'Deutsch', short: 'DE', flag: '🇩🇪' },
++      { code: 'en-US', label: 'English', short: 'EN', flag: '🇬🇧' },
+@@ -126,2 +441 @@ const LoginPage: React.FC = () => {
+-  const handleLanguageChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
+-    const nextLanguage = event.target.value;
++  const handleLanguageChange = useCallback((nextLanguage: string) => {
+@@ -132,0 +447,6 @@ const LoginPage: React.FC = () => {
++  const handleCardPointerMove = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
++    const rect = event.currentTarget.getBoundingClientRect();
++    event.currentTarget.style.setProperty('--mouse-x', `${event.clientX - rect.left}px`);
++    event.currentTarget.style.setProperty('--mouse-y', `${event.clientY - rect.top}px`);
++  }, []);
++
+@@ -195,0 +516,3 @@ const LoginPage: React.FC = () => {
++      <CommandEveHeroField />
++      <div className='login-page__hero-field-fade' aria-hidden='true' />
++
+@@ -202,15 +525,22 @@ const LoginPage: React.FC = () => {
+-      <div className='login-page__card'>
+-        <label className='login-page__lang-select-wrapper' htmlFor='lang-select'>
+-          <select
+-            id='lang-select'
+-            className='login-page__lang-select'
+-            value={i18n.language}
+-            onChange={handleLanguageChange}
+-          >
+-            {supportedLanguages.map((lang) => (
+-              <option key={lang.code} value={lang.code}>
+-                {lang.label}
+-              </option>
+-            ))}
+-          </select>
+-        </label>
++      <div className='login-page__card' onPointerMove={handleCardPointerMove}>
++        <div className='login-page__card-glow' aria-hidden='true' />
++        <div className='login-page__lang-toggle' role='group' aria-label={t('login.languageToggle')}>
++          {supportedLanguages.map((lang) => {
++            const active = i18n.language === lang.code || i18n.resolvedLanguage === lang.code;
++            return (
++              <button
++                key={lang.code}
++                type='button'
++                className={`login-page__lang-option ${active ? 'login-page__lang-option--active' : ''}`}
++                onClick={() => handleLanguageChange(lang.code)}
++                aria-label={lang.label}
++                aria-pressed={active}
++              >
++                <span className='login-page__lang-flag' aria-hidden='true'>
++                  {lang.flag}
++                </span>
++                <span className='login-page__lang-code'>{lang.short}</span>
++              </button>
++            );
++          })}
++        </div>
+@@ -220 +550,25 @@ const LoginPage: React.FC = () => {
+-            <img src={loginLogo} alt={t('login.brand')} />
++            <div className='login-page__media-frame' aria-label={t('login.brand')}>
++              <img
++                src={COMMAND_EVE_LOGIN_ANIMATION}
++                className={`login-page__brand-animation ${commandEveVideoPlaying ? 'login-page__brand-animation--hidden' : ''}`}
++                alt=''
++                aria-hidden='true'
++              />
++              <video
++                ref={commandEveLoginVideoRef}
++                src={COMMAND_EVE_LOGIN_VIDEO}
++                poster={COMMAND_EVE_LOGIN_POSTER}
++                className={`login-page__brand-video ${commandEveVideoPlaying ? 'login-page__brand-video--playing' : ''}`}
++                aria-hidden='true'
++                autoPlay
++                loop
++                muted
++                playsInline
++                preload='auto'
++                onCanPlay={startCommandEveLoginVideo}
++                onLoadedMetadata={startCommandEveLoginVideo}
++                onPlaying={() => setCommandEveVideoPlaying(true)}
++                onPause={() => setCommandEveVideoPlaying(false)}
++                onError={() => setCommandEveVideoPlaying(false)}
++              />
++            </div>
+@@ -222 +576,7 @@ const LoginPage: React.FC = () => {
+-          <h1 className='login-page__title'>{t('login.brand')}</h1>
++          <h1 className='login-page__title' aria-label={t('login.brand')}>
++            <span className='login-page__title-command' aria-hidden='true'>
++              ⌘
++            </span>
++            <span> EVE</span>
++          </h1>
++          <p className='login-page__version'>{commandEveVersion}</p>
 diff --git a/packages/desktop/src/renderer/services/i18n/i18n-keys.d.ts b/packages/desktop/src/renderer/services/i18n/i18n-keys.d.ts
 index 73d8737..7166c7d 100644
 --- a/packages/desktop/src/renderer/services/i18n/i18n-keys.d.ts
 +++ b/packages/desktop/src/renderer/services/i18n/i18n-keys.d.ts
 @@ -624,0 +625 @@ export type I18nKey =
 +  | 'guid.commandEve.prompt'
+diff --git a/packages/desktop/src/renderer/services/i18n/index.ts b/packages/desktop/src/renderer/services/i18n/index.ts
+index 2388098..3b0f02f 100644
+--- a/packages/desktop/src/renderer/services/i18n/index.ts
++++ b/packages/desktop/src/renderer/services/i18n/index.ts
+@@ -16,0 +17 @@ import enUS from './locales/en-US/index';
++import deDE from './locales/de-DE/index';
+@@ -34,0 +36 @@ const localeData: LocaleData = {
++  'de-DE': deDE,
+@@ -101 +103 @@ async function initLanguage(): Promise<void> {
+-    const language = savedLanguage || normalizeLanguageCode(navigator.language || DEFAULT_LANGUAGE);
++    const language = savedLanguage || DEFAULT_LANGUAGE;
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/de-DE/acp.json b/packages/desktop/src/renderer/services/i18n/locales/de-DE/acp.json
+new file mode 100644
+index 0000000..203ec89
+--- /dev/null
++++ b/packages/desktop/src/renderer/services/i18n/locales/de-DE/acp.json
+@@ -0,0 +1,25 @@
++{
++  "auth": {
++    "failed": "{{backend}}-Authentifizierung fehlgeschlagen:\n\n{{error}}\n\nBitte prüfe den Authentifizierungsstatus deines lokalen CLI-Tools",
++    "console_error": "ACP-Authentifizierungsfehler – Details:",
++    "failed_confirm": "ACP-{{backend}}-Authentifizierung fehlgeschlagen:\n\n{{error}}\n\nMöchtest du sie jetzt auf der Einstellungsseite konfigurieren?"
++  },
++  "send": {
++    "failed": "Nachricht konnte nicht gesendet werden: {{error}}"
++  },
++  "sendbox": {
++    "placeholder": "Nachricht an {{backend}} senden..."
++  },
++  "status": {
++    "connecting": "Verbinde mit {{agent}}...",
++    "connected": "Mit {{agent}} verbunden",
++    "authenticated": "Bei {{agent}} authentifiziert",
++    "session_active": "Aktive Sitzung mit {{agent}}",
++    "error": "Verbindungsfehler",
++    "unknown": "Unbekannter Status"
++  },
++  "config": {
++    "reasoning_effort": "Denkaufwand",
++    "default": "Standard"
++  }
++}
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/de-DE/agent.json b/packages/desktop/src/renderer/services/i18n/locales/de-DE/agent.json
+new file mode 100644
+index 0000000..a38638e
+--- /dev/null
++++ b/packages/desktop/src/renderer/services/i18n/locales/de-DE/agent.json
+@@ -0,0 +1,34 @@
++{
++  "health": {
++    "detectedError": "Fehler beim aktuellen Agenten erkannt ({{agent}})",
++    "autoSwitching": ". Das System versucht automatisch zu wechseln.",
++    "evaluating": "Netzwerklatenz und Modellverfügbarkeit werden geprüft...",
++    "checking": "{{agent}}-Endpunkt wird geprüft...",
++    "foundBest": "Beste Alternative gefunden",
++    "recommendSwitch": "Empfohlen",
++    "available": "Verfügbar",
++    "lowLatency": "Niedrige Latenz",
++    "mediumLatency": "Mittlere Latenz",
++    "highLatency": "Hohe Latenz",
++    "bestMatch": "Beste Übereinstimmung",
++    "noAvailable": "Keine verfügbaren Agenten in der aktuellen Umgebung",
++    "checkConfig": "Bitte prüfe die Konfiguration oder versuche es später erneut"
++  },
++  "setup": {
++    "connectionError": "Verbindungsfehler",
++    "notConfigured": "{{agent}} ist nicht konfiguriert",
++    "authRequired": "Zur Nutzung dieses Agenten ist eine Authentifizierung oder ein API-Key erforderlich.",
++    "findingAlternatives": "Verfügbare Alternativen werden gesucht...",
++    "checkingAgent": "{{agent}} wird geprüft...",
++    "alternativesFound": "{{count}} verfügbare Alternativen gefunden",
++    "autoSwitching": "Automatischer Wechsel zum besten verfügbaren Agenten...",
++    "configError": "Konfigurationsfehler. Bitte prüfe deine Einstellungen oder wähle eine Alternative:",
++    "noAlternatives": "Keine verfügbaren Agenten gefunden",
++    "configureFirst": "Bitte konfiguriere zuerst einen Agenten in den Einstellungen.",
++    "switching": "Agent wird gewechselt..."
++  },
++  "model": {
++    "switchSuccess": "Modell erfolgreich gewechselt",
++    "switchFailed": "Modellwechsel fehlgeschlagen"
++  }
++}
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/de-DE/agentMode.json b/packages/desktop/src/renderer/services/i18n/locales/de-DE/agentMode.json
+new file mode 100644
+index 0000000..37a1a29
+--- /dev/null
++++ b/packages/desktop/src/renderer/services/i18n/locales/de-DE/agentMode.json
+@@ -0,0 +1,19 @@
++{
++  "plan": "Plan-Modus",
++  "default": "Standard",
++  "acceptEdits": "Änderungen übernehmen",
++  "autoEdit": "Auto-Bearbeitung",
++  "auto_edit": "Auto-Bearbeitung",
++  "yolo": "YOLO",
++  "yoloNoSandbox": "Voll-Auto (ohne Sandbox)",
++  "auto": "Auto",
++  "dontAsk": "Nicht fragen",
++  "bypass": "Bypass (YOLO)",
++  "bypassPermissions": "YOLO",
++  "smart": "Smart",
++  "build": "Build-Modus",
++  "permission": "Berechtigung",
++  "switchMode": "Berechtigungsmodus",
++  "switchSuccess": "Modus erfolgreich gewechselt",
++  "switchFailed": "Moduswechsel fehlgeschlagen"
++}
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/de-DE/codex.json b/packages/desktop/src/renderer/services/i18n/locales/de-DE/codex.json
+new file mode 100644
+index 0000000..d972ba2
+--- /dev/null
++++ b/packages/desktop/src/renderer/services/i18n/locales/de-DE/codex.json
+@@ -0,0 +1,133 @@
++{
++  "sendbox": {},
++  "network": {
++    "cloudflare_blocked": "Der Cloudflare-Schutz hat den Zugriff auf {{service}} blockiert. Vorschläge: 1) VPN verwenden 2) Netzwerk wechseln 3) Später erneut versuchen 4) Zu anderen KI-Diensten wechseln",
++    "network_timeout": "Netzwerk-Timeout, Verbindung wird automatisch erneut versucht …",
++    "connection_refused": "Verbindung abgelehnt. Bitte prüfe, ob der Codex-Dienst korrekt läuft.",
++    "unknown_error": "Netzwerkverbindungsfehler. Bitte prüfe die Netzwerkeinstellungen.",
++    "retry_attempt": "Erneuter Versuch {{current}} …",
++    "cloudflare_blocked_title": "🚫 {{service}}-Dienst durch Cloudflare-Schutz blockiert",
++    "network_timeout_title": "⏱️ Netzwerkverbindungs-Timeout",
++    "connection_refused_title": "❌ Dienstverbindung abgelehnt",
++    "unknown_error_title": "🔌 Netzwerkverbindungsfehler",
++    "recovery_suggestions": "**Lösungsvorschläge:**",
++    "technical_info": "**Technische Informationen:**",
++    "error_type": "Fehlertyp",
++    "retry_count": "Anzahl Wiederholungen",
++    "error_details": "Fehlerdetails",
++    "quick_switch_title": "💡 **Optionen zum schnellen Wechsel:**",
++    "quick_switch_content": "Wenn der aktuelle Dienst auf Netzwerkbeschränkungen stößt, kannst du:\n\n1. **KI-Assistent sofort wechseln**: Wähle andere verfügbare Assistenten im linken Bereich\n2. **Dienststatus prüfen**: Die Verfügbarkeit verschiedener KI-Dienste kann je nach Region variieren\n3. **Netzwerkoptimierung**: Nutze eine stabile Netzwerkumgebung, um die Erfolgsrate der Verbindung zu erhöhen\n4. **Später erneut versuchen**: Netzwerkbeschränkungen sind meist nur vorübergehend\n\n**Tipp**: Es empfiehlt sich, mehrere KI-Dienste als Alternativen einzurichten, um die Arbeit nicht zu unterbrechen.",
++    "recovery_actions": {
++      "cloudflare_blocked": [
++        "• VPN- oder Proxy-Dienst verwenden",
++        "• Netzwerkumgebung wechseln (z. B. mobiler Hotspot)",
++        "• 10–30 Minuten warten und erneut versuchen",
++        "• Browser-Cache und Cookies leeren",
++        "• Zu anderen verfügbaren Diensten wechseln: ChatGPT, Claude, Qwen, Gemini"
++      ],
++      "network_timeout": [
++        "• Prüfen, ob die Netzwerkverbindung stabil ist",
++        "• Verbindung erneut versuchen",
++        "• Zu einer stabileren Netzwerkumgebung wechseln",
++        "• Firewall-Einstellungen prüfen"
++      ],
++      "connection_refused": [
++        "• Prüfen, ob das Codex CLI korrekt installiert ist",
++        "• Dienstkonfiguration und API-Schlüssel überprüfen",
++        "• Anwendung neu starten",
++        "• Prüfen, ob lokale Ports belegt sind"
++      ],
++      "unknown": [
++        "• Status der Netzwerkverbindung prüfen",
++        "• Aktuellen Vorgang erneut versuchen",
++        "• Netzwerkumgebung wechseln",
++        "• Technischen Support kontaktieren"
++      ]
++    }
++  },
++  "thinking": {
++    "processing": "🤔 Codex denkt nach …",
++    "completed": "💭 Denkprozess abgeschlossen",
++    "analyzing": "Analysiere das Problem und entwickle Lösungen …",
++    "composing": "Erstelle die Antwort …"
++  },
++  "error": {
++    "system_init_failed": "Initialisierung des Codex-Systems fehlgeschlagen",
++    "invalid_message_format": "Ungültiges Nachrichtenformat",
++    "invalid_input": "Ungültige Eingabe",
++    "session_timeout": "Sitzung abgelaufen, bitte erneut versuchen",
++    "permission_denied": "Berechtigung für diesen Vorgang verweigert",
++    "context_error": "Fehler in {{context}}, bitte aktualisieren oder erneut versuchen.",
++    "generic": "In der Codex-Komponente ist eine Ausnahme aufgetreten, bitte später erneut versuchen.",
++    "troubleshooting": "Vorschläge zur Fehlerbehebung",
++    "suggestion_1": "Prüfen, ob die Netzwerkverbindung stabil ist",
++    "suggestion_2": "Sicherstellen, dass der Codex-Dienst korrekt läuft",
++    "suggestion_3": "Anwendung neu starten",
++    "suggestion_4": "Browser-Cache und lokalen Speicher leeren"
++  },
++  "performance": {
++    "virtualization_enabled": "Listen-Virtualisierung ist für bessere Performance aktiviert",
++    "virtualization_disabled": "Listen-Virtualisierung ist deaktiviert, alle Einträge werden angezeigt",
++    "debounce_enabled": "Eingabe-Entprellung ist aktiviert ({{delay}} ms Verzögerung)",
++    "debounce_disabled": "Eingabe-Entprellung ist deaktiviert"
++  },
++  "config": {
++    "loaded": "Konfiguration erfolgreich geladen",
++    "updated": "Konfiguration erfolgreich aktualisiert",
++    "reset": "Konfiguration auf Standardwerte zurückgesetzt",
++    "validation_failed": "Konfigurationsvalidierung fehlgeschlagen",
++    "import_success": "Konfiguration erfolgreich importiert",
++    "import_failed": "Import der Konfiguration fehlgeschlagen",
++    "export_success": "Konfiguration erfolgreich exportiert"
++  },
++  "permissions": {
++    "allow_once": "Einmal erlauben",
++    "allow_always": "Immer erlauben",
++    "reject_once": "Einmal ablehnen",
++    "reject_always": "Immer ablehnen",
++    "allow_once_desc": "Berechtigung nur für diese Anfrage erteilen",
++    "allow_always_desc": "Berechtigung für ähnliche Anfragen immer erteilen",
++    "reject_once_desc": "Nur diese Anfrage ablehnen",
++    "reject_always_desc": "Ähnliche Anfragen immer ablehnen",
++    "processing": "Wird verarbeitet …",
++    "response_sent": "Antwort erfolgreich gesendet",
++    "choose_action": "Aktion auswählen:",
++    "titles": {
++      "exec_approval_request": "Berechtigung zur Befehlsausführung",
++      "apply_patch_approval_request": "Berechtigung zum Anwenden von Dateiänderungen",
++      "command_execution": "Berechtigung zur Befehlsausführung",
++      "file_write": "Berechtigung zum Schreiben von Dateien",
++      "file_read": "Berechtigung zum Lesen von Dateien"
++    },
++    "labels": {
++      "command": "Befehl:",
++      "directory": "Verzeichnis:",
++      "reason": "Grund:",
++      "files_to_modify": "Zu ändernde Dateien",
++      "summary": "Zusammenfassung:"
++    },
++    "descriptions": {
++      "command_execution": "Codex fordert die Ausführung von Systembefehlen an",
++      "file_write": "Codex fordert das Ändern oder Erstellen von Dateien an",
++      "file_read": "Codex fordert das Lesen von Dateiinhalten an"
++    },
++    "command_execution": {
++      "allow_once_desc": "Nur diese Befehlsausführung erlauben",
++      "allow_always_desc": "Alle Anfragen zur Befehlsausführung immer erlauben",
++      "reject_once_desc": "Nur diese Befehlsausführung ablehnen",
++      "reject_always_desc": "Alle Anfragen zur Befehlsausführung immer ablehnen"
++    },
++    "file_write": {
++      "allow_once_desc": "Nur dieses Schreiben der Datei erlauben",
++      "allow_always_desc": "Alle Anfragen zum Schreiben von Dateien immer erlauben",
++      "reject_once_desc": "Nur dieses Schreiben der Datei ablehnen",
++      "reject_always_desc": "Alle Anfragen zum Schreiben von Dateien immer ablehnen"
++    },
++    "file_read": {
++      "allow_once_desc": "Nur dieses Lesen der Datei erlauben",
++      "allow_always_desc": "Alle Anfragen zum Lesen von Dateien immer erlauben",
++      "reject_once_desc": "Nur dieses Lesen der Datei ablehnen",
++      "reject_always_desc": "Alle Anfragen zum Lesen von Dateien immer ablehnen"
++    }
++  }
++}
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/de-DE/common.json b/packages/desktop/src/renderer/services/i18n/locales/de-DE/common.json
+new file mode 100644
+index 0000000..0012743
+--- /dev/null
++++ b/packages/desktop/src/renderer/services/i18n/locales/de-DE/common.json
+@@ -0,0 +1,106 @@
++{
++  "send": "Senden",
++  "cancel": "Abbrechen",
++  "save": "Speichern",
++  "delete": "Löschen",
++  "confirm": "Bestätigen",
++  "file": "Datei",
++  "folder": "Ordner",
++  "upload": "Hochladen",
++  "model": "Modell",
++  "skills": "Skills",
++  "workspace": "Projekt",
++  "settings": "Einstellungen",
++  "system": "System",
++  "about": "Über uns",
++  "back": "Zurück zum Chat",
++  "add": "Hinzufügen",
++  "edit": "Bearbeiten",
++  "website": "Website",
++  "version": "Version",
++  "contact": "Kontakt",
++  "github": "Github",
++  "loading": "Bitte warten...",
++  "copy": "Kopieren",
++  "reply": "Antworten",
++  "copySuccess": "Kopiert",
++  "copyFailed": "Kopieren fehlgeschlagen",
++  "download": "Herunterladen",
++  "close": "Schließen",
++  "retry": "Erneut versuchen",
++  "reload": "Neu laden",
++  "technical_details": "Technische Details",
++  "error_details": "Fehlerdetails",
++  "troubleshooting": "Fehlerbehebung",
++  "select": "Auswählen",
++  "expandMore": "Mehr anzeigen",
++  "collapse": "Einklappen",
++  "viewMoreLines": "Mehr anzeigen ({{count}} Zeilen)",
++  "success": "Erfolg",
++  "error": "Fehler",
++  "saveSuccess": "Erfolgreich gespeichert",
++  "saveFailed": "Speichern fehlgeschlagen",
++  "unknownError": "Unbekannter Fehler",
++  "confirmDelete": "Löschen bestätigen",
++  "deleteSuccess": "Erfolgreich gelöscht",
++  "deleteFailed": "Löschen fehlgeschlagen",
++  "default": "Standard",
++  "defaultModel": "Standardmodell",
++  "escToCancel": "esc zum Abbrechen",
++  "create": "Erstellen",
++  "createSuccess": "Erfolgreich erstellt",
++  "failed": "Fehlgeschlagen",
++  "browse": "Durchsuchen",
++  "remove": "Entfernen",
++  "show": "Anzeigen",
++  "hide": "Ausblenden",
++  "goToSettings": "Zu den Einstellungen",
++  "forward": "Weiterleiten",
++  "historyBack": "Zurück",
++  "more": "Mehr",
++  "refresh": "Aktualisieren",
++  "tray.showWindow": "AionUi anzeigen",
++  "tray.newChat": "Neuer Chat",
++  "tray.closeToTray": "In Tray minimieren",
++  "tray.about": "Über AionUi",
++  "tray.restart": "App neu starten",
++  "tray.quit": "Beenden",
++  "tray.runningTasks": "Laufende Aufgaben",
++  "tray.pauseAll": "Alle Aufgaben pausieren",
++  "tray.checkUpdate": "Auf Updates prüfen",
++  "tray.recentChats": "Letzte Chats",
++  "tray.untitled": "Ohne Titel",
++  "backendStartup": {
++    "incompatibleRuntime": {
++      "title": "Dieses System wird vom mitgelieferten Backend nicht unterstützt",
++      "description": "AionUi wurde geöffnet, aber das lokale AionCore-Backend kann auf dieser Linux-Version nicht ausgeführt werden. Bitte aktualisieren Sie auf eine unterstützte Linux-Distribution und starten Sie AionUi neu.",
++      "requiredVersions": "Erforderliche Runtime-Symbole: {{versions}}"
++    },
++    "incompleteInstallation": {
++      "title": "Die AionUi-Installation ist unvollständig",
++      "description": "Dieser Installation fehlen erforderliche lokale Ressourcen, daher kann AionCore nicht starten. Bitte laden Sie die neueste Version von AionUi herunter und installieren Sie sie neu. Falls das Problem nach der Neuinstallation erneut auftritt, prüfen Sie, ob eine Sicherheits- oder Antivirensoftware AionCore in Quarantäne verschoben hat.",
++      "downloadLatest": "Neueste Version herunterladen",
++      "sendDiagnostics": "Diagnose senden"
++    }
++  },
++  "fileAttach.addFiles": "Dateien hinzufügen",
++  "fileAttach.myDevice": "Vom Gerät hochladen",
++  "fileAttach.failed": "Hochladen fehlgeschlagen",
++  "fileAttach.uploading": "Wird hochgeladen...",
++  "fileAttach.uploadSuccess": "Hochladen erfolgreich",
++  "fileAttach.cancelUpload": "Hochladen abbrechen",
++  "expand": "Ausklappen",
++  "name": "Name",
++  "added": "Hinzugefügt",
++  "status": "Status",
++  "agentMode": "Agent-Modus",
++  "refreshSuccess": "Aktualisiert",
++  "import": "Importieren",
++  "processing": "Wird verarbeitet...",
++  "optional": "(optional)",
++  "clear": "Leeren",
++  "unit": {
++    "minute_short": "Min",
++    "second_short": "Sek"
++  }
++}
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/de-DE/conversation.json b/packages/desktop/src/renderer/services/i18n/locales/de-DE/conversation.json
+new file mode 100644
+index 0000000..ff2980d
+--- /dev/null
++++ b/packages/desktop/src/renderer/services/i18n/locales/de-DE/conversation.json
+@@ -0,0 +1,481 @@
++{
++  "welcome": {
++    "title": "Hi, was hast du heute vor?",
++    "placeholder": "Nachricht senden, Dateien hochladen, Ordner öffnen oder geplante Aufgabe erstellen ...",
++    "linkFolder": "Ordner öffnen",
++    "newConversation": "Neuer Chat",
++    "selectModel": "Modell auswählen",
++    "useCliModel": "Modell auswählen",
++    "modelSwitchNotSupported": "Die Modellliste ist nach der ersten Verbindung verfügbar. Sende eine Nachricht, um eine Verbindung herzustellen und verfügbare Modelle zu laden.",
++    "specifyWorkspace": "Im Projekt chatten",
++    "currentWorkspace": "Aktuelles Projekt",
++    "clearWorkspace": "Projekt entfernen",
++    "openFolder": "Ordner öffnen",
++    "none": "Keine",
++    "quickActionsTitle": "Was kann AionUi?",
++    "quickActionFeedback": "Problem melden",
++    "quickActionStar": "Gefällt es dir? Gib uns einen Stern!",
++    "skillsMarket": "AionUi Skills Market",
++    "skillsMarketDesc": "Community-Skills bei Bedarf suchen und aktivieren. Einmal konfigurieren, für alle Agenten verfügbar.",
++    "skillsMarketDetails": "Mehr anzeigen >>"
++  },
++  "history": {
++    "recents": "Zuletzt verwendet",
++    "noHistory": "Kein Chatverlauf",
++    "deleteTitle": "Löschen",
++    "deleteConfirm": "Möchtest du diesen Chat wirklich löschen?",
++    "confirmDelete": "Löschen",
++    "cancelDelete": "Abbrechen",
++    "editName": "Name bearbeiten",
++    "saveName": "Speichern",
++    "cancelEdit": "Abbrechen",
++    "rename": "Umbenennen",
++    "renameTitle": "Chat umbenennen",
++    "renamePlaceholder": "Bitte gib einen neuen Namen ein",
++    "renameSuccess": "Erfolgreich umbenannt",
++    "renameFailed": "Umbenennen fehlgeschlagen",
++    "batchManage": "Stapelverwaltung",
++    "batchModeExit": "Stapelmodus beenden",
++    "selectAll": "Alle auswählen",
++    "selectedCount": "{{count}} ausgewählt",
++    "batchExport": "Stapelexport",
++    "batchExportConfirm": "{{count}} ausgewählte Themen exportieren?",
++    "batchDelete": "Stapellöschung",
++    "batchDeleteConfirm": "{{count}} ausgewählte Themen löschen?",
++    "batchDeleteSuccess": "{{count}} Themen gelöscht",
++    "batchNoSelection": "Bitte wähle zuerst Themen aus",
++    "export": "Exportieren",
++    "exportDialogTitle": "Themen exportieren",
++    "exportDialogSingleDescription": "Exportiert die Gesprächsverläufe des aktuellen Themas (JSON + Markdown) und die Projektdateien in ein ZIP-Paket.",
++    "exportDialogBatchDescription": "Exportiert die Gesprächsverläufe von {{count}} ausgewählten Themen (JSON + Markdown) und die Projektdateien in ein ZIP-Paket.",
++    "exportTargetFolder": "In Ordner exportieren",
++    "exportSelectFolder": "Bitte wähle einen Exportordner aus",
++    "exportDialogHint": "Die Ordnerauswahl funktioniert wie beim Wechseln des Projekts.",
++    "exporting": "Wird exportiert ...",
++    "exportSuccess": "Export erfolgreich",
++    "exportCanceled": "Export abgebrochen",
++    "exportFailed": "Export fehlgeschlagen",
++    "pin": "Anheften",
++    "unpin": "Lösen",
++    "pinned": "Angeheftet",
++    "pinFailed": "Anheften fehlgeschlagen",
++    "pinnedSection": "Angeheftet",
++    "deleteSuccess": "Erfolgreich gelöscht",
++    "deleteFailed": "Löschen fehlgeschlagen",
++    "today": "Heute",
++    "yesterday": "Gestern",
++    "recent7Days": "Letzte 7 Tage",
++    "earlier": "Früher",
++    "projectsSection": "Projekte",
++    "conversationsSection": "Gespräche",
++    "removeProjectTitle": "Projekt entfernen",
++    "removeProject": "Projekt entfernen",
++    "removeProjectConfirm": "Projekt „{{name}}“ entfernen? Die {{count}} zugehörigen Gespräche werden ebenfalls entfernt.",
++    "newConversationInProject": "Neuer Chat in diesem Projekt"
++  },
++  "historySearch": {
++    "tooltip": "Nachrichten durchsuchen",
++    "title": "Gesprächsinhalt durchsuchen",
++    "shortTitle": "Suchen",
++    "description": "Durchsuche frühere Nachrichten nach Stichwort, lade beim Scrollen mehr und springe zur passenden Nachricht.",
++    "placeholder": "Nachrichteninhalt durchsuchen ...",
++    "idle": "Gib Stichwörter ein, um Nachrichten zu durchsuchen",
++    "empty": "Keine passenden Nachrichten gefunden",
++    "loadingMore": "Mehr wird geladen ...",
++    "untitled": "Unbenanntes Gespräch"
++  },
++  "dropdown": {
++    "cliAgents": "CLI-Agenten",
++    "presetAssistants": "Vordefinierte Assistenten"
++  },
++  "noAgentsAvailable": "Keine Agenten verfügbar",
++  "noModelConfigured": "Kein Modell konfiguriert. Bitte konfiguriere es in den Einstellungen.",
++  "createFailed": "Gespräch konnte nicht erstellt werden",
++  "createError": {
++    "pathVariants": {
++      "WORKSPACE_PATH_CONTAINS_WHITESPACE_UNSUPPORTED": "Der ausgewählte Workspace-Pfad „{{workspacePath}}“ enthält einen Ordnernamen mit Leerzeichen oder anderen Leerraumzeichen. Benenne den betroffenen Ordner um oder wähle einen Workspace-Pfad, dessen Verzeichnisnamen keine Leerraumzeichen enthalten."
++    }
++  },
++  "agentError": {
++    "fallbackTitle": "Der Agent konnte nicht antworten",
++    "errorCode": "Fehlercode",
++    "retryable": "Wiederholbar",
++    "notRetryable": "Konfiguration erforderlich",
++    "resolutionPrefix": "Vorschlag: ",
++    "resolution": {
++      "retry": "Versuche es später erneut oder sende diese Nachricht noch einmal.",
++      "wait_for_current_response": "Warte, bis die aktuelle Antwort abgeschlossen ist, bevor du eine weitere Nachricht sendest.",
++      "start_new_session": "Starte ein neues Gespräch, bevor du fortfährst.",
++      "reconnect_agent": "Starte den ausgewählten Agenten neu oder verbinde ihn erneut und versuche es dann erneut.",
++      "check_agent_login": "Melde dich beim ausgewählten Agenten an oder aktualisiere seine Anmeldedaten.",
++      "check_agent_installation": "Überprüfe die Agenteninstallation und die lokale Befehlskonfiguration.",
++      "check_agent_version": "Aktualisiere den Agenten oder behebe die Inkompatibilität der Protokollversion.",
++      "check_local_command": "Installiere den fehlenden Befehl oder stelle sicher, dass er zum PATH hinzugefügt wurde.",
++      "check_provider_credentials": "Überprüfe den API-Schlüssel des Modellanbieters oder die Kontoanmeldedaten in den Einstellungen.",
++      "check_provider_billing": "Überprüfe Guthaben, Credits oder Kontingent des Modellanbieters.",
++      "check_provider_base_url": "Überprüfe Base-URL, API-Pfad, Proxy und API-Kompatibilität des Modellanbieters.",
++      "change_model": "Wähle ein Modell, das für das aktuelle Konto verfügbar ist und diese Anfrage unterstützt.",
++      "reduce_context": "Reduziere den Nachrichteninhalt, die referenzierten Dateien oder die Kontextgröße und versuche es erneut.",
++      "send_feedback": "Sende Feedback mit Logs, damit das Team das Problem untersuchen kann."
++    },
++    "ownership": {
++      "aionui": "App",
++      "user_agent": "Agent",
++      "user_llm_provider": "Modellanbieter",
++      "unknown_upstream": "Upstream"
++    },
++    "codes": {
++      "AIONUI_STREAM_BROKEN": {
++        "title": "Antwort-Stream wurde unterbrochen",
++        "body": "Die App hat deine Nachricht angenommen, aber der Antwort-Stream wurde unerwartet beendet. Bitte versuche es erneut; wenn es erneut auftritt, sende Feedback."
++      },
++      "AIONUI_STATE_INCONSISTENT": {
++        "title": "Gesprächsstatus ist nicht synchron",
++        "body": "Der Gesprächsstatus ist nicht synchron. Starte diesen Chat neu oder lade die App neu, bevor du es erneut versuchst."
++      },
++      "AIONUI_PERMISSION_ERROR": {
++        "title": "Auf die angeforderte Ressource konnte nicht zugegriffen werden",
++        "body": "Eine lokale Berechtigungs- oder Dateisystemprüfung ist fehlgeschlagen. Überprüfe den Projektpfad und die App-Berechtigungen und versuche es erneut."
++      },
++      "AIONUI_INTERNAL_ERROR": {
++        "title": "Anfrage in der App fehlgeschlagen",
++        "body": "Die Anfrage ist fehlgeschlagen, während die App sie verarbeitet hat. Bitte versuche es einmal erneut; wenn es sich wiederholt, sende Feedback."
++      },
++      "AIONUI_CONVERSATION_BUSY": {
++        "title": "Gespräch ist beschäftigt",
++        "body": "Eine andere Antwort läuft noch. Warte, bis sie abgeschlossen ist, bevor du eine neue Nachricht sendest."
++      },
++      "USER_AGENT_NOT_INSTALLED": {
++        "title": "Der ausgewählte Agent ist nicht installiert",
++        "body": "Installiere die von diesem Agenten benötigte CLI oder App und verbinde ihn dann in den Einstellungen erneut."
++      },
++      "USER_AGENT_STARTUP_FAILED": {
++        "title": "Der ausgewählte Agent konnte nicht gestartet werden",
++        "body": "Der Agentenprozess wurde beendet, bevor er bereit war. Überprüfe Installation, Anmeldestatus und lokale Befehlskonfiguration."
++      },
++      "USER_AGENT_DISCONNECTED": {
++        "title": "Der ausgewählte Agent wurde getrennt",
++        "body": "Die Verbindung zum Agenten wurde während der Verarbeitung dieser Nachricht geschlossen. Starte den Agenten neu oder verbinde ihn erneut und versuche es dann erneut."
++      },
++      "USER_AGENT_AUTH_REQUIRED": {
++        "title": "Der ausgewählte Agent benötigt eine Authentifizierung",
++        "body": "Melde dich beim ausgewählten Agenten an oder aktualisiere seine Anmeldedaten und sende die Nachricht dann erneut."
++      },
++      "USER_AGENT_SESSION_NOT_FOUND": {
++        "title": "Die Agentensitzung wurde verloren",
++        "body": "Der Agent erkennt diese Sitzung nicht mehr. Starte einen neuen Chat oder verbinde den Agenten erneut."
++      },
++      "USER_AGENT_UNSUPPORTED_METHOD": {
++        "title": "Der ausgewählte Agent unterstützt diese Aktion nicht",
++        "body": "Dieser Agent kann den angeforderten Vorgang nicht ausführen. Versuche einen anderen Agenten oder aktualisiere den aktuellen."
++      },
++      "USER_AGENT_INVALID_PARAMS": {
++        "title": "Der ausgewählte Agent hat die Anfrage abgelehnt",
++        "body": "Der Agent meldete, dass das Anfrageformat ungültig war. Versuche, die Nachricht zu vereinfachen, oder wechsle den Agenten."
++      },
++      "USER_AGENT_HANDSHAKE_FAILED": {
++        "title": "Agenten-Handshake fehlgeschlagen",
++        "body": "Der ausgewählte Agent konnte seinen Start-Handshake nicht abschließen. Starte den Agenten neu oder verbinde ihn erneut und versuche es dann erneut."
++      },
++      "USER_AGENT_HANDSHAKE_TIMEOUT": {
++        "title": "Zeitüberschreitung beim Agenten-Handshake",
++        "body": "Der ausgewählte Agent hat seinen Start-Handshake nicht rechtzeitig abgeschlossen. Prüfe, ob er noch startet oder blockiert ist, und versuche es dann erneut."
++      },
++      "USER_AGENT_ACP_INIT_FAILED": {
++        "title": "Initialisierung des Agentenprotokolls fehlgeschlagen",
++        "body": "Die App konnte die Agent-Client-Protocol-Sitzung mit diesem Agenten nicht initialisieren. Überprüfe die Agentenversion und verbinde ihn erneut."
++      },
++      "USER_AGENT_PROTOCOL_MISMATCH": {
++        "title": "Agentenprotokollversionen sind inkompatibel",
++        "body": "Der ausgewählte Agent verwendet eine inkompatible Protokollversion. Aktualisiere den Agenten oder wechsle zu einem kompatiblen."
++      },
++      "USER_AGENT_NO_PREVIOUS_SESSION": {
++        "title": "Vorherige Agentensitzung ist nicht verfügbar",
++        "body": "Der Agent kann die vorherige Sitzung nicht fortsetzen. Starte ein neues Gespräch, um fortzufahren."
++      },
++      "USER_AGENT_COMMAND_NOT_FOUND": {
++        "title": "Agentenbefehl wurde nicht gefunden",
++        "body": "Der konfigurierte Agentenbefehl konnte nicht gefunden werden. Installiere ihn oder aktualisiere den Befehlspfad in den Einstellungen."
++      },
++      "USER_AGENT_MISSING_ENV": {
++        "title": "Der Agentenumgebung fehlen erforderliche Variablen",
++        "body": "Der Agent benötigt Umgebungsvariablen, die nicht konfiguriert sind. Füge sie in den Einstellungen oder in deiner Shell-Umgebung hinzu und verbinde ihn dann erneut."
++      },
++      "USER_LLM_PROVIDER_AUTH_FAILED": {
++        "title": "Authentifizierung beim Modellanbieter fehlgeschlagen",
++        "body": "Der ausgewählte Anbieter hat den API-Schlüssel oder die Kontoanmeldedaten abgelehnt. Überprüfe die Anbietereinstellungen und versuche es erneut."
++      },
++      "USER_LLM_PROVIDER_CONFIG_ERROR": {
++        "title": "Konfiguration des Modellanbieters ist ungültig",
++        "body": "Die Anbieteranfrage konnte aus den aktuellen Einstellungen nicht erstellt werden. Überprüfe Anmeldedaten, Region, Base-URL und anbieterspezifische Konfiguration, bevor du es erneut versuchst."
++      },
++      "USER_LLM_PROVIDER_MODEL_NOT_FOUND": {
++        "title": "Das ausgewählte Modell wurde nicht gefunden",
++        "body": "Der Anbieter kennt diesen Modellnamen nicht. Wähle in den Einstellungen ein verfügbares Modell aus und versuche es erneut."
++      },
++      "USER_LLM_PROVIDER_RATE_LIMITED": {
++        "title": "Ratenlimit des Modellanbieters erreicht",
++        "body": "Der Anbieter begrenzt vorübergehend die Anfragen. Warte einen Moment, reduziere die Anfragehäufigkeit oder wechsle das Modell."
++      },
++      "USER_LLM_PROVIDER_TIMEOUT": {
++        "title": "Zeitüberschreitung bei der Anfrage an den Modellanbieter",
++        "body": "Der Anbieter hat nicht rechtzeitig geantwortet. Versuche es später erneut oder wechsle zu einem stabileren Anbieter."
++      },
++      "USER_LLM_PROVIDER_NETWORK_ERROR": {
++        "title": "Modellanbieter konnte nicht erreicht werden",
++        "body": "Ein Netzwerk- oder DNS-Fehler hat den Zugriff auf den Anbieter verhindert. Überprüfe dein Netzwerk, deinen Proxy und die Base-URL."
++      },
++      "USER_LLM_PROVIDER_GATEWAY_ERROR": {
++        "title": "Dienst des Modellanbieters ist nicht verfügbar",
++        "body": "Der Anbieter hat einen Gateway- oder Dienstfehler zurückgegeben. Versuche es später erneut oder verwende einen anderen Anbieter."
++      },
++      "USER_LLM_PROVIDER_PERMISSION_DENIED": {
++        "title": "Zugriff vom Modellanbieter verweigert",
++        "body": "Das Anbieterkonto hat keine Berechtigung für dieses Modell oder diesen Vorgang. Überprüfe die Kontoberechtigungen oder wähle ein anderes Modell."
++      },
++      "USER_LLM_PROVIDER_BILLING_REQUIRED": {
++        "title": "Abrechnung beim Modellanbieter erforderlich",
++        "body": "Der ausgewählte Anbieter benötigt eine aktive Abrechnung, Credits oder ein Kontingent, bevor diese Anfrage abgeschlossen werden kann."
++      },
++      "USER_LLM_PROVIDER_UNSUPPORTED_MODEL": {
++        "title": "Modell unterstützt diese Anfrage nicht",
++        "body": "Das ausgewählte Modell ist nicht verfügbar oder unterstützt die angeforderte Funktion nicht. Wähle ein unterstütztes Modell und versuche es erneut."
++      },
++      "USER_LLM_PROVIDER_ENDPOINT_NOT_FOUND": {
++        "title": "Endpunkt des Modellanbieters wurde nicht gefunden",
++        "body": "Der Anbieter-Endpunkt oder API-Pfad wurde nicht gefunden. Überprüfe die Base-URL, den Bereitstellungsnamen und die API-Kompatibilität."
++      },
++      "USER_LLM_PROVIDER_INVALID_REQUEST": {
++        "title": "Modellanbieter hat die Anfrage abgelehnt",
++        "body": "Der Anbieter meldete, dass die Anfrage ungültig war. Vereinfache die Nachricht oder überprüfe die Modell-/Anbietereinstellungen."
++      },
++      "USER_LLM_PROVIDER_INVALID_TOOL_SCHEMA": {
++        "title": "Tool-Schema wurde vom Anbieter abgelehnt",
++        "body": "Der Anbieter hat eine Tool-Definition in dieser Anfrage abgelehnt. Aktualisiere den Agenten oder deaktiviere das inkompatible Tool und versuche es dann erneut."
++      },
++      "USER_LLM_PROVIDER_CONTEXT_TOO_LARGE": {
++        "title": "Kontext ist zu groß für das Modell",
++        "body": "Die Anfrage überschreitet das Kontextlimit des Modells. Reduziere den Nachrichteninhalt, die referenzierten Dateien oder den Gesprächsverlauf und versuche es erneut."
++      },
++      "USER_LLM_PROVIDER_EMPTY_RESPONSE": {
++        "title": "Modellanbieter hat eine leere Antwort zurückgegeben",
++        "body": "Der Anbieter hat die Anfrage ohne verwertbaren Inhalt abgeschlossen. Versuche es einmal erneut oder wechsle den Anbieter, wenn es sich wiederholt."
++      },
++      "WORKSPACE_PATH_CONTAINS_WHITESPACE_RUNTIME_UNSUPPORTED": {
++        "title": "Dieser Workspace-Pfad wird für die Ausführung nicht mehr unterstützt",
++        "body": "Dieses bestehende Gespräch bzw. diese Aufgabe verwendet einen Workspace-Pfad, dessen Verzeichnisnamen Leerzeichen oder andere Leerraumzeichen enthalten. AionUi unterstützt das Senden von Nachrichten über solche Pfade nicht mehr. Erstelle ein neues Gespräch oder eine neue Aufgabe mit einem Workspace-Pfad ohne Leerraumzeichen.",
++        "bodyWithPath": "Der bestehende Workspace-Pfad „{{workspacePath}}“ enthält Leerzeichen oder andere Leerraumzeichen. AionUi unterstützt das Senden von Nachrichten in Gesprächen oder Aufgaben, die diesen Pfad verwenden, nicht mehr. Erstelle ein neues Gespräch oder eine neue Aufgabe mit einem Workspace-Pfad ohne Leerraumzeichen."
++      },
++      "UNKNOWN_UPSTREAM_ERROR": {
++        "title": "Der vorgelagerte Agent oder Anbieter ist fehlgeschlagen",
++        "body": "Die App hat einen Upstream-Fehler erhalten, konnte ihn aber nicht zuverlässig einordnen. Sieh dir die Details unten an oder sende Feedback."
++      }
++    }
++  },
++  "workspace": {
++    "title": "Projekt",
++    "pasteConfirm_title": "Dateien einfügen",
++    "pasteConfirm_message": "Möchtest du „{{name}}“ wirklich in den ausgewählten Ordner ({{target}}) einfügen?",
++    "pasteConfirm_paste": "Einfügen",
++    "pasteConfirm_cancel": "Abbrechen",
++    "pasteConfirm_noAsk": "Nicht mehr fragen",
++    "pasteConfirm_fileName": "Dateiname",
++    "pasteConfirm_targetFolder": "Zielordner",
++    "pasteConfirm_multipleFiles": "{{count}} Dateien",
++    "empty": "Es ist leer",
++    "emptyDescription": "Dateien erscheinen hier, nachdem du Dateien hochgeladen oder einen Ordner geöffnet hast",
++    "searchPlaceholder": "Dateien durchsuchen ...",
++    "createNewConversation": "Neuen Chat im aktuellen Projekt erstellen",
++    "search.empty": "Das Suchergebnis ist leer",
++    "addFile": "Datei hinzufügen",
++    "refresh": "Aktualisieren",
++    "temporarySpace": "Temporärer Bereich",
++    "dragOverlayTitle": "Zum Importieren ablegen",
++    "dragOverlayDesc": "Ziehe Dateien oder Ordner hierher, um sie in dieses Projekt zu kopieren.",
++    "dragOverlayHint": "Tipp: Lege Dateien irgendwo ab, um sie in den ausgewählten Ordner zu importieren.",
++    "dragNoFiles": "Keine gültigen Dateien erkannt. Bitte ziehe sie aus dem Finder/Explorer.",
++    "dragFailed": "Import der abgelegten Dateien fehlgeschlagen.",
++    "contextMenu": {
++      "open": "Öffnen",
++      "openLocation": "Im Ordner anzeigen",
++      "preview": "Vorschau",
++      "previewFailed": "Vorschau fehlgeschlagen",
++      "deleteTitle": "Datei löschen",
++      "deleteConfirm": "Dadurch wird die Datei von deinem System gelöscht. Fortfahren?",
++      "deleteSuccess": "Erfolgreich gelöscht",
++      "deleteFailed": "Löschen fehlgeschlagen",
++      "rename": "Umbenennen",
++      "renameTitle": "Umbenennen",
++      "renamePlaceholder": "Neuen Namen eingeben",
++      "renameSuccess": "Erfolgreich umbenannt",
++      "renameFailed": "Umbenennen fehlgeschlagen",
++      "renameEmpty": "Der Name darf nicht leer sein",
++      "renameTimeout": "Zeitüberschreitung bei der Umbenennungsanfrage, bitte versuche es erneut",
++      "addToChat": "Zum Chat hinzufügen",
++      "addedToChat": "Zum Chat hinzugefügt",
++      "openFailed": "Öffnen fehlgeschlagen",
++      "revealFailed": "Übergeordneter Ordner konnte nicht geöffnet werden",
++      "download": "Herunterladen",
++      "downloadSuccess": "Download erfolgreich",
++      "downloadFailed": "Download fehlgeschlagen"
++    },
++    "preview": {
++      "errors": {
++        "outsideSandbox": "Die Datei liegt außerhalb der Projekt-Sandbox und kann nicht in der Vorschau angezeigt werden.",
++        "notFound": "Die Datei existiert nicht oder wurde gelöscht.",
++        "timeout": "Zeitüberschreitung beim Lesen der Datei. Bitte versuche es erneut."
++      }
++    },
++    "changes": {
++      "tab": "Änderungen",
++      "filesTab": "Dateien",
++      "currentBranchLabel": "Aktueller Branch",
++      "summary": "{{count}} Datei(en) geändert",
++      "insertions": "+{{count}} Einfügungen",
++      "deletions": "-{{count}} Löschungen",
++      "empty": "Noch keine Änderungen",
++      "emptyDescription": "Dateiänderungen erscheinen hier, wenn die KI Dateien ändert",
++      "refresh": "Aktualisieren",
++      "staged": "Bereitgestellte Änderungen",
++      "unstaged": "Änderungen",
++      "changedFiles": "Geänderte Dateien",
++      "stage": "Bereitstellen",
++      "stageAll": "Alle Änderungen bereitstellen",
++      "unstage": "Bereitstellung aufheben",
++      "unstageAll": "Bereitstellung aller Änderungen aufheben",
++      "discard": "Änderungen verwerfen",
++      "reset": "Änderungen zurücksetzen",
++      "noUnstaged": "Keine nicht bereitgestellten Änderungen",
++      "noStaged": "Keine bereitgestellten Änderungen"
++    },
++    "openWorkspace": "Projektordner öffnen",
++    "openWith": {
++      "vscode": "VS Code",
++      "terminal": "Terminal",
++      "explorer": "Datei-Explorer"
++    }
++  },
++  "minimap": {
++    "searchAria": "Gespräch durchsuchen",
++    "searchHint": "Hier klicken, um nach Stichwörtern zu suchen",
++    "empty": "Noch keine Frage-Antwort-Runden",
++    "noMatch": "Kein passender Inhalt gefunden",
++    "count": "{{count}} Runden"
++  },
++  "chat": {
++    "noModelSelected": "Für die aktuelle Sitzung ist kein Modell ausgewählt, Nachricht kann nicht gesendet werden",
++    "sendMessageTo": "Nachricht an {{model}} senden",
++    "processing": "Wird verarbeitet ...",
++    "quotaExceededTitle": "Modellkontingent erreicht",
++    "quotaExceededBody": "Das aktuelle Modellkontingent ist aufgebraucht. Zu {{model}} wechseln, um fortzufahren?",
++    "quotaExceededNoFallback": "Modellkontingent erreicht. Bitte wechsle zu einem anderen verfügbaren Modell.",
++    "quotaSwitched": "Zu {{model}} gewechselt.",
++    "apiErrorNoCli": "API-Fehler aufgetreten. Kein CLI-Agent für den Fallback verfügbar.",
++    "apiErrorSwitchFailed": "Fallback-Gespräch konnte nicht erstellt werden.",
++    "apiErrorSwitched": "API-Fehler, automatisch zu {{cli}} CLI gewechselt",
++    "confirmationLoadError": "Bestätigungsdialog konnte nicht geladen werden",
++    "tryAnotherAgent": "Anderen Agenten versuchen:",
++    "switchedToAgent": "Zu {{agent}} gewechselt",
++    "switchAgentFailed": "Agentenwechsel fehlgeschlagen",
++    "speech": {
++      "recordTooltip": "Spracheingabe starten",
++      "pickFileTooltip": "Audiodatei auswählen",
++      "stopTooltip": "Aufnahme stoppen",
++      "processing": "Audio wird transkribiert ...",
++      "unsupported": "Spracheingabe ist in dieser Umgebung nicht verfügbar",
++      "startShort": "Mikro",
++      "stopShort": "Stopp",
++      "transcribingShort": "...",
++      "audioCaptureError": "Kein Mikrofon erkannt",
++      "emptyTranscript": "Keine Sprache erkannt",
++      "fileTooLarge": "Audiodatei ist zu groß",
++      "networkError": "Netzwerkfehler beim Transkribieren des Audios",
++      "notConfigured": "Sprache-zu-Text ist noch nicht konfiguriert",
++      "permissionDenied": "Mikrofonberechtigung wurde verweigert",
++      "recordingUnsupported": "Live-Aufnahme wird hier nicht unterstützt. Bitte lade stattdessen eine Audiodatei hoch",
++      "transcriptionFailed": "Audiotranskription fehlgeschlagen",
++      "genericError": "Spracheingabe fehlgeschlagen. Bitte versuche es erneut"
++    }
++  },
++  "sideQuestion": {
++    "title": "Zwischenfrage",
++    "description": "Stelle eine kurze Frage zum aktuellen Gespräch",
++    "started": "Zwischenfrage wird gestartet ...",
++    "answered": "Zwischenfrage beantwortet.",
++    "noAnswer": "Die Zwischenfrage hatte im aktuellen Gespräch keine eindeutige Antwort.",
++    "loading": "Denkt nach ...",
++    "parentTaskRunning": "Hauptaufgabe läuft weiterhin im Hintergrund.",
++    "dismissHint": "Drücke Escape, Enter oder Leertaste zum Schließen",
++    "unsupported": "Zwischenfragen sind für dieses Gespräch nicht verfügbar.",
++    "alreadyRunning": "Es läuft bereits eine Zwischenfrage.",
++    "attachmentsNotAllowed": "Zwischenfragen können keine Dateien oder DOM-Snippets enthalten.",
++    "emptyQuestion": "Bitte gib nach /btw eine Zwischenfrage ein.",
++    "toolsRequired": "/btw kann nur Fragen auf Basis dessen beantworten, was bereits in diesem Gespräch enthalten ist. Es hat keinen Zugriff, um neue Informationen zu suchen, zu durchsuchen oder abzurufen.",
++    "error": "Die Zwischenfrage konnte nicht beantwortet werden."
++  },
++  "commandQueue": {
++    "title": "Befehle in der Warteschlange",
++    "clear": "Warteschlange leeren",
++    "edit": "Bearbeiten",
++    "editing": "Wird bearbeitet",
++    "editPlaceholder": "Aktualisiere den Befehl in der Warteschlange, bevor er ausgeführt wird.",
++    "cancelEdit": "Abbrechen",
++    "saveEdit": "Speichern",
++    "moreActions": "Weitere Aktionen",
++    "reorder": "Ziehen, um den Befehl in der Warteschlange neu anzuordnen",
++    "remove": "Entfernen",
++    "files": "{{count}} Dateien",
++    "pausedAfterFailure": "Der nächste Befehl in der Warteschlange konnte nicht gestartet werden. Bearbeite, ordne neu an oder entferne ihn, um fortzufahren.",
++    "emptyInput": "Befehle in der Warteschlange dürfen nicht leer sein.",
++    "queueFull": "Die Warteschlange ist voll. Entferne einen Befehl, bevor du weitere hinzufügst.",
++    "inputTooLong": "Dieser Befehl in der Warteschlange ist zu lang. Kürze ihn vor dem Senden.",
++    "tooManyFiles": "An diesen Befehl in der Warteschlange sind zu viele Dateien angehängt.",
++    "queueTooLarge": "Die Warteschlangendaten sind zu groß, um sie sicher zu speichern. Entferne zuerst einige Befehle aus der Warteschlange."
++  },
++  "contextUsage": {
++    "contextUsed": "Kontext verwendet"
++  },
++  "skill_generator": {
++    "title": "Skill/Regel generieren",
++    "generate": "Generieren",
++    "description": "Gesprächsverlauf analysieren, um Folgendes zu generieren:",
++    "type_skill": "Skill (Python)",
++    "type_rule": "Regel (JSON/MD)",
++    "name_label": "Agentenname:",
++    "name_placeholder": "z. B. Excel Translator",
++    "menu_generate": "Aus Verlauf generieren",
++    "menu_load": "Regel/Skill laden",
++    "load_title": "Regel/Skill laden",
++    "load_error": "Dateien konnten nicht geladen werden",
++    "no_files": "Keine relevanten Dateien im Projekt gefunden",
++    "read_error": "Datei konnte nicht gelesen werden",
++    "rule_loaded": "Regel erfolgreich geladen",
++    "no_workspace": "Kein Projekt konfiguriert",
++    "name_required": "Bitte gib einen Namen für die Vorlage ein",
++    "no_history": "Kein Gesprächsverlauf gefunden",
++    "request_sent": "Anfrage an den Agenten gesendet",
++    "failed": "Generierung fehlgeschlagen",
++    "preset_registered": "Agentenvorlage erfolgreich registriert!"
++  },
++  "thinking": {
++    "complete": "Gedanke abgeschlossen",
++    "label": "Denkt nach ..."
++  },
++  "skills": {
++    "loaded": "Geladene Skills"
++  },
++  "mcp": {
++    "loaded": "Geladenes MCP",
++    "managementHint": "Wenn ein MCP ungewöhnlich aussieht, liegt das meist an der MCP-JSON-Konfiguration. Gehe zu den Tool-Einstellungen und teste es dort.",
++    "openSettings": "Tool-Einstellungen öffnen",
++    "status": {
++      "loaded": "Geladen",
++      "failed": "Fehlgeschlagen",
++      "unsupported": "Nicht unterstützt"
++    }
++  },
++  "sendbox": {
++    "hint": "Tippe / für Befehle, @ um Dateien zu referenzieren"
++  },
++  "notFound": "Gespräch nicht gefunden oder wurde gelöscht"
++}
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/de-DE/cron.json b/packages/desktop/src/renderer/services/i18n/locales/de-DE/cron.json
+new file mode 100644
+index 0000000..66a8987
+--- /dev/null
++++ b/packages/desktop/src/renderer/services/i18n/locales/de-DE/cron.json
+@@ -0,0 +1,146 @@
++{
++  "scheduledTasks": "Geplante Aufgaben",
++  "taskCount": "{{count}} Aufgabe(n)",
++  "schedule": "Zeitplan",
++  "nextRun": "Nächste Ausführung",
++  "lastRun": "Letzte Ausführung",
++  "lastError": "Fehler",
++  "message": "Nachricht",
++  "goToConversation": "Zur Unterhaltung",
++  "status": {
++    "active": "Aktiv",
++    "paused": "Pausiert",
++    "error": "Fehler",
++    "unread": "Neue Ausführung",
++    "unconfigured": "Keine geplante Aufgabe",
++    "unconfiguredHint": "Noch keine geplante Aufgabe. Erstelle eine mit deinem Agent!",
++    "createNow": "Jetzt erstellen",
++    "defaultPrompt": "Suche jeden Tag um 10 Uhr nach den neuesten KI-News, fasse sie zusammen und erstelle einen Insight-Bericht."
++  },
++  "actions": {
++    "goTo": "Chat ansehen",
++    "pause": "Pausieren",
++    "resume": "Fortsetzen",
++    "delete": "Löschen"
++  },
++  "confirmDeleteWithConversations": "Möchtest du diese geplante Aufgabe wirklich löschen? Alle Unterhaltungen aus dieser Aufgabe werden ebenfalls gelöscht.",
++  "deleteSuccess": "Aufgabe gelöscht",
++  "pauseSuccess": "Aufgabe pausiert",
++  "resumeSuccess": "Aufgabe fortgesetzt",
++  "message.badge": "Geplant",
++  "allScheduledTasks": "Alle geplanten Aufgaben",
++  "noTasks": "Keine geplanten Aufgaben",
++  "runNowSuccess": "Aufgabenausführung ausgelöst",
++  "detail": {
++    "backToAll": "Alle geplanten Aufgaben",
++    "runNow": "Jetzt ausführen",
++    "description": "Beschreibung",
++    "agent": "Agent",
++    "instructions": "Anweisungen",
++    "repeats": "Wiederholungen",
++    "history": "Verlauf",
++    "noHistory": "Noch keine Ausführungen",
++    "notFound": "Aufgabe nicht gefunden",
++    "executionModeDescriptionNew": "Jede Ausführung startet eine neue Unterhaltung, sodass der vorherige Kontext nicht übernommen wird. Ideal für wiederkehrende Berichte oder Prüfungen, die unabhängig bleiben sollen.",
++    "executionModeDescriptionExisting": "Jede Ausführung setzt dieselbe Unterhaltung fort, sodass früherer Kontext und Ergebnisse erhalten bleiben. Ideal für Folgeaufgaben, die auf vorherigen Ausführungen aufbauen."
++  },
++  "notification": {
++    "taskComplete": "Aufgabe abgeschlossen",
++    "scheduledTask": "Geplante Aufgabe",
++    "scheduledTaskComplete": "{{title}} – Geplante Aufgabe abgeschlossen",
++    "taskDone": "Aufgabe erledigt"
++  },
++  "page": {
++    "newTask": "Neue Aufgabe",
++    "description": "Führe Aufgaben nach einem Zeitplan aus. Du kannst AionUi auch in jeder Unterhaltung bitten, eine für dich zu erstellen.",
++    "awakeBanner": "Geplante Aufgaben laufen nur, während dein Computer eingeschaltet ist.",
++    "keepAwake": "Wach halten",
++    "keepAwakeTooltip": "Wenn aktiviert, verhindert AionUi, dass dein Computer in den Ruhezustand wechselt",
++    "createTask": "Geplante Aufgabe erstellen",
++    "editTask": "Geplante Aufgabe bearbeiten",
++    "createSuccess": "Aufgabe erfolgreich erstellt",
++    "updateSuccess": "Aufgabe erfolgreich aktualisiert",
++    "scheduleHint": "Geplante Aufgaben verwenden eine zufällige Verzögerung von einigen Minuten zur Serverentlastung.",
++    "customCronWarning": "Diese Aufgabe hat einen benutzerdefinierten Zeitplan, der hier nicht bearbeitet werden kann. Eine Änderung der Häufigkeit ersetzt ihn.",
++    "weekday": {
++      "monday": "Montag",
++      "tuesday": "Dienstag",
++      "wednesday": "Mittwoch",
++      "thursday": "Donnerstag",
++      "friday": "Freitag",
++      "saturday": "Samstag",
++      "sunday": "Sonntag"
++    },
++    "save": "Speichern",
++    "cancel": "Abbrechen",
++    "form": {
++      "name": "Name",
++      "nameRequired": "Name ist erforderlich",
++      "namePlaceholder": "Aufgabennamen eingeben",
++      "description": "Beschreibung",
++      "descriptionPlaceholder": "Kurze Beschreibung der Aufgabe",
++      "prompt": "Prompt",
++      "promptRequired": "Prompt ist erforderlich",
++      "promptPlaceholder": "Anweisungen, die der Agent ausführen soll",
++      "frequency": "Häufigkeit",
++      "cronExpr": "Cron-Ausdruck",
++      "cronExprRequired": "Cron-Ausdruck ist erforderlich",
++      "scheduleDesc": "Zeitplanbeschreibung",
++      "scheduleDescRequired": "Zeitplanbeschreibung ist erforderlich",
++      "scheduleDescPlaceholder": "z. B. Jeden Montag um 9:00 Uhr",
++      "descriptionRequired": "Beschreibung ist erforderlich",
++      "agent": "Agent",
++      "agentRequired": "Bitte wähle einen Agent",
++      "agentPlaceholder": "Wähle den Agent, der diese Aufgabe ausführt",
++      "executionMode": "Ausführungsmodus",
++      "newConversation": "Neue Unterhaltung",
++      "existingConversation": "Laufende Unterhaltung",
++      "newConversationHint": "Bei jeder Ausführung neu starten",
++      "existingConversationHint": "In einer Unterhaltung weiterarbeiten",
++      "executionModeEditHint": "Der Ausführungsmodus kann nach der Erstellung nicht geändert werden. Lösche die Aufgabe und erstelle sie neu, um den Modus zu wechseln.",
++      "advancedSettings": "Erweiterte Einstellungen",
++      "workspace": "Projekt",
++      "workspacePlaceholder": "Ordner auswählen",
++      "workspaceHint": "Optional: Lege einen Projektordner für Dateioperationen fest",
++      "selectFolder": "Ordner auswählen",
++      "clearFolder": "Löschen",
++      "model": "Modell",
++      "aionrsModelRequired": "Bitte wähle ein Modell für Aion CLI",
++      "aionrsNoProvider": "Keine verfügbaren Modelle"
++    },
++    "freq": {
++      "manual": "Manuell",
++      "hourly": "Stündlich",
++      "daily": "Täglich",
++      "weekdays": "Wochentags",
++      "weekly": "Wöchentlich",
++      "custom": "Benutzerdefiniert"
++    },
++    "scheduleDesc": {
++      "manual": "Manuell",
++      "hourly": "Jede Stunde",
++      "dailyAt": "Jeden Tag um {{time}}",
++      "weekdaysAt": "Wochentags um {{time}}",
++      "weeklyAt": "Jeden {{day}} um {{time}}"
++    }
++  },
++  "trigger": {
++    "runScheduledTask": "Geplante Aufgabe ausführen: {{name}}"
++  },
++  "skill": {
++    "turnIntoSkill": "Diese Aufgabe in einen Skill umwandeln",
++    "save": "Als Skill speichern",
++    "dismiss": "Verwerfen",
++    "preview": "Skill-Inhalt vorschauen",
++    "saveSuccess": "Skill gespeichert – künftige Ausführungen verwenden ihn",
++    "saveFailed": "Skill konnte nicht gespeichert werden"
++  },
++  "error": {
++    "alreadyExists": "Diese Unterhaltung hat bereits eine geplante Aufgabe „{{name}}“ (ID: {{id}}). Bitte aktualisiere die bestehende Aufgabe, anstatt eine neue zu erstellen.",
++    "missedJob": "⏰ Geplante Aufgabe „{{name}}“ wurde während des Ruhezustands des Systems nicht ausgeführt.\nGeplante Zeit: {{time}}\nDer Timer wurde neu gestartet und läuft zur nächsten geplanten Zeit.",
++    "jobNotFound": "Aufgabe nicht gefunden: {{id}}",
++    "conversationNotFound": "Unterhaltung nicht gefunden",
++    "scheduledTimePassed": "Geplante Zeit ist verstrichen",
++    "conversationBusy": "Unterhaltung nach {{count}} Wiederholungen ausgelastet"
++  }
++}
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/de-DE/fileSelection.json b/packages/desktop/src/renderer/services/i18n/locales/de-DE/fileSelection.json
+new file mode 100644
+index 0000000..c6362ea
+--- /dev/null
++++ b/packages/desktop/src/renderer/services/i18n/locales/de-DE/fileSelection.json
+@@ -0,0 +1,6 @@
++{
++  "selectFile": "Datei auswählen",
++  "selectDirectory": "Verzeichnis auswählen",
++  "pleaseSelectFile": "Bitte eine Datei auswählen",
++  "pleaseSelectDirectory": "Bitte ein Verzeichnis auswählen"
++}
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/de-DE/google.json b/packages/desktop/src/renderer/services/i18n/locales/de-DE/google.json
+new file mode 100644
+index 0000000..70c71b1
+--- /dev/null
++++ b/packages/desktop/src/renderer/services/i18n/locales/de-DE/google.json
+@@ -0,0 +1,7 @@
++{
++  "mode": {
++    "autoGemini3Desc": "Gemini CLI das beste Modell für die Aufgabe wählen lassen: gemini-3-pro, gemini-3-flash",
++    "autoGemini25Desc": "Gemini CLI das beste Modell für die Aufgabe wählen lassen: gemini-2.5-pro, gemini-2.5-flash",
++    "manualDesc": "Modell manuell auswählen"
++  }
++}
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/de-DE/guid.json b/packages/desktop/src/renderer/services/i18n/locales/de-DE/guid.json
+new file mode 100644
+index 0000000..1c7d783
+--- /dev/null
++++ b/packages/desktop/src/renderer/services/i18n/locales/de-DE/guid.json
+@@ -0,0 +1,33 @@
++{
++  "agentFallbackNotice": "{{original}} ist nicht verfügbar, stattdessen wird {{fallback}} verwendet.",
++  "noAgentAvailable": "Kein Haupt-Agent verfügbar. Bitte bei Google anmelden oder Claude/Codex CLI installieren. Zu den Einstellungen?",
++  "noAgentAvailableShort": "Kein Haupt-Agent verfügbar. Zum Konfigurieren klicken.",
++  "agentTabAutoSwitch": "Modell nicht mit Gemini kompatibel, automatisch zu {{fallback}} gewechselt",
++  "autoSwitchToAgent": "Gemini ist nicht konfiguriert, automatischer Wechsel zu {{agent}}",
++  "autoSwitchedAgent": "{{from}} ist nicht verfügbar, zu {{to}} gewechselt",
++  "promptExamplesHint": "Beispiel-Prompts ausprobieren:",
++  "selectAssistantHint": "Assistenten auswählen, um eine Aufgabe zu starten",
++  "agentSwitcherLabel": "Agent",
++  "switchedToAgent": "Zu {{agent}} gewechselt",
++  "commandEve": {
++    "prompt": "Was ist heute dein Plan?"
++  },
++  "workspace": {
++    "workInProject": "In einem Projekt arbeiten",
++    "optional": "Optional",
++    "clearWorkspace": "Leeren",
++    "specifyWorkspace": "Projektordner auswählen",
++    "searchPlaceholder": "Projekte durchsuchen…",
++    "noProject": "Kein Projekt"
++  },
++  "scanning": {
++    "initialMessage": "Aktueller Agent ist nicht verfügbar, andere verfügbare Agents werden erkannt...",
++    "scanningMessage": "Lokal verfügbare Agents werden gescannt...",
++    "connectingMessage": "Erfolgreich verbunden, bitte warten...",
++    "establishingConnection": "Verbindung wird hergestellt...",
++    "statusQueued": "In Warteschlange",
++    "statusTesting": "Latenz wird getestet...",
++    "statusUnreachable": "Nicht erreichbar",
++    "statusAvailable": "Verfügbar"
++  }
++}
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/de-DE/index.ts b/packages/desktop/src/renderer/services/i18n/locales/de-DE/index.ts
+new file mode 100644
+index 0000000..df989bc
+--- /dev/null
++++ b/packages/desktop/src/renderer/services/i18n/locales/de-DE/index.ts
+@@ -0,0 +1,48 @@
++/**
++ * de-DE locale module index
++ * Exports all translation modules for Command EVE's German-first AionUI pack.
++ */
++
++import common from './common.json';
++import agentMode from './agentMode.json';
++import update from './update.json';
++import login from './login.json';
++import fileSelection from './fileSelection.json';
++import preview from './preview.json';
++import conversation from './conversation.json';
++import settings from './settings.json';
++import messages from './messages.json';
++import mcp from './mcp.json';
++import acp from './acp.json';
++import codex from './codex.json';
++import tools from './tools.json';
++import google from './google.json';
++import cron from './cron.json';
++import starOffice from './starOffice.json';
++import guid from './guid.json';
++import agent from './agent.json';
++import team from './team.json';
++import pet from './pet.json';
++
++export default {
++  common,
++  agentMode,
++  update,
++  login,
++  fileSelection,
++  preview,
++  conversation,
++  settings,
++  messages,
++  mcp,
++  acp,
++  codex,
++  tools,
++  google,
++  cron,
++  starOffice,
++  guid,
++  agent,
++  team,
++  pet,
++};
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/de-DE/login.json b/packages/desktop/src/renderer/services/i18n/locales/de-DE/login.json
+new file mode 100644
+index 0000000..4ea9b43
+--- /dev/null
++++ b/packages/desktop/src/renderer/services/i18n/locales/de-DE/login.json
+@@ -0,0 +1,26 @@
++{
++  "pageTitle": "⌘ EVE - Anmeldung",
++  "brand": "⌘ EVE",
++  "subtitle": "Willkommen zurück. Melde dich an, um Command EVE zu starten.",
++  "username": "Benutzername",
++  "usernamePlaceholder": "Benutzernamen eingeben",
++  "password": "Passwort",
++  "passwordPlaceholder": "Passwort eingeben",
++  "rememberMe": "Angemeldet bleiben",
++  "submit": "Anmelden",
++  "submitting": "Anmeldung läuft...",
++  "success": "Anmeldung erfolgreich! Weiterleitung...",
++  "showPassword": "Passwort anzeigen",
++  "hidePassword": "Passwort verbergen",
++  "languageToggle": "Sprache ändern",
++  "footerPrimary": "Command EVE Operator Shell",
++  "footerSecondary": "Company.OS mit Human-Gates",
++  "errors": {
++    "empty": "Bitte Benutzernamen und Passwort eingeben",
++    "invalidCredentials": "Ungültiger Benutzername oder Passwort",
++    "tooManyAttempts": "Zu viele Versuche, bitte später erneut versuchen",
++    "networkError": "Verbindung fehlgeschlagen, bitte erneut versuchen",
++    "serverError": "Serverfehler, bitte später erneut versuchen",
++    "unknown": "Anmeldung fehlgeschlagen, bitte erneut versuchen"
++  }
++}
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/de-DE/mcp.json b/packages/desktop/src/renderer/services/i18n/locales/de-DE/mcp.json
+new file mode 100644
+index 0000000..8088b30
+--- /dev/null
++++ b/packages/desktop/src/renderer/services/i18n/locales/de-DE/mcp.json
+@@ -0,0 +1,75 @@
++{
++  "integration": {
++    "title": "MCP-Integration",
++    "description": "Model Context Protocol-Server und -Tools verwalten"
++  },
++  "label": "MCP",
++  "servers": "Server",
++  "tools": "Tools",
++  "executionHistory": "Ausführungsverlauf",
++  "addServer": "Server hinzufügen",
++  "connect": "Verbinden",
++  "disconnect": "Trennen",
++  "refresh": "Aktualisieren",
++  "settings": "Einstellungen",
++  "delete": "Löschen",
++  "deleteConfirm": "Server löschen",
++  "deleteMessage": "Möchten Sie {{name}} wirklich löschen?",
++  "execute": "Ausführen",
++  "approve": "Genehmigen",
++  "reject": "Ablehnen",
++  "executing": "Wird ausgeführt …",
++  "executingTool": "Tool wird ausgeführt …",
++  "parameters": "Parameter",
++  "parametersJson": "Parameter (JSON)",
++  "result": "Ergebnis",
++  "noParameters": "Dieses Tool hat keine Parameter",
++  "noServers": "Keine MCP-Server konfiguriert",
++  "noServersFound": "Keine Server gefunden, die Ihren Kriterien entsprechen",
++  "noTools": "Keine Tools verfügbar",
++  "noExecutions": "Kein Ausführungsverlauf",
++  "searchServers": "Server suchen …",
++  "searchTools": "Tools suchen …",
++  "filterByStatus": "Nach Status filtern",
++  "transport": "Transport",
++  "lastCheck": "Letzte Prüfung",
++  "capabilities": "Fähigkeiten",
++  "noCapabilities": "Keine Fähigkeiten gemeldet",
++  "never": "Nie",
++  "justNow": "Gerade eben",
++  "minutesAgo": "vor {{count}} Minuten",
++  "hoursAgo": "vor {{count}} Stunden",
++  "daysAgo": "vor {{count}} Tagen",
++  "connectedSince": "Verbunden seit {{time}}",
++  "status": {
++    "all": "Alle",
++    "connected": "Verbunden",
++    "disconnected": "Getrennt",
++    "error": "Fehler",
++    "authenticating": "Authentifizierung läuft"
++  },
++  "stats": {
++    "totalServers": "Server gesamt",
++    "connectedServers": "Verbunden",
++    "totalTools": "Verfügbare Tools",
++    "executions": "Ausführungen"
++  },
++  "execution": {
++    "completed": "Abgeschlossen",
++    "failed": "Fehlgeschlagen",
++    "running": "Läuft",
++    "cancelled": "Abgebrochen",
++    "pending": "Ausstehend"
++  },
++  "executionSuccess": "Ausführung erfolgreich",
++  "executionFailed": "Ausführung fehlgeschlagen",
++  "error": "MCP-Fehler",
++  "advancedOptions": "Erweiterte Optionen",
++  "timeout": "Timeout",
++  "priority": {
++    "low": "Niedrig",
++    "normal": "Normal",
++    "high": "Hoch",
++    "urgent": "Dringend"
++  }
++}
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/de-DE/messages.json b/packages/desktop/src/renderer/services/i18n/locales/de-DE/messages.json
+new file mode 100644
+index 0000000..59eddaf
+--- /dev/null
++++ b/packages/desktop/src/renderer/services/i18n/locales/de-DE/messages.json
+@@ -0,0 +1,70 @@
++{
++  "fileChanges": "Dateiänderungen",
++  "fileChangesCount": "{{count}} Dateiänderungen",
++  "conversationInProgress": "Eine Unterhaltung läuft gerade...",
++  "confirm": "Bestätigen",
++  "canceledExecution": "Ausführung abgebrochen",
++  "openLinkFailed": "Link konnte nicht geöffnet werden",
++  "imageGenerationModelDetected": "Bildmodell erkannt, Bild-Tool wurde automatisch aktiviert. Standardmodell: {{platform}}:{{model}}",
++  "auto_handling_permissions": "Berechtigungsanfrage wird automatisch bearbeitet: {{request}}",
++  "copy": "Kopieren",
++  "copySuccess": "Erfolgreich kopiert",
++  "copyFailed": "Kopieren fehlgeschlagen",
++  "copyLastOutput.empty": "Noch keine Antwort zum Kopieren",
++  "copiedToClipboard": "In Zwischenablage kopiert",
++  "downloadSuccess": "Download erfolgreich",
++  "downloadFailed": "Download fehlgeschlagen",
++  "imageLoadFailed": "Bild konnte nicht geladen werden",
++  "scrollToBottom": "Nach unten scrollen",
++  "availableCommands": "{{count}} verfügbare Befehle",
++  "atFile.hint": "Tippen, um nach Dateien zu suchen",
++  "atFile.menuLabel": "Datei-Erwähnungen",
++  "atFile.loading": "Wird geladen...",
++  "slash.title": "Befehle",
++  "slash.hint": "/ eingeben, um das Befehlsmenü zu öffnen",
++  "slash.empty": "Keine Befehle gefunden",
++  "export.commandDescription": "Aktuelle Unterhaltung in eine Datei oder Zwischenablage exportieren",
++  "export.conversationLabel": "Unterhaltung",
++  "export.conversationIdLabel": "Unterhaltungs-ID",
++  "export.exportedAtLabel": "Exportiert am",
++  "export.typeLabel": "Typ",
++  "export.noMessages": "Keine Nachrichten",
++  "export.userLabel": "Benutzer",
++  "export.assistantLabel": "Assistent",
++  "export.systemLabel": "System",
++  "export.menuTitle": "Unterhaltung exportieren",
++  "export.menuHint": "Wählen, wie die aktuelle Unterhaltung exportiert werden soll",
++  "export.copyLabel": "In Zwischenablage kopieren",
++  "export.copyDescription": "Unterhaltung in die System-Zwischenablage kopieren",
++  "export.saveLabel": "In Datei speichern",
++  "export.saveDescription": "Unterhaltung in eine Datei im aktuellen Projekt speichern",
++  "export.fileNameLabel": "Dateinamen eingeben",
++  "export.fileNamePlaceholder": "conversation-export.txt",
++  "export.pathLabel": "Speicherpfad",
++  "export.copySuccess": "Unterhaltung in Zwischenablage kopiert",
++  "export.copyFailed": "Unterhaltung konnte nicht kopiert werden",
++  "export.saveSuccess": "Unterhaltung exportiert nach: {{path}}",
++  "export.saveFailed": "Unterhaltung konnte nicht exportiert werden",
++  "export.prepareFailed": "Export der Unterhaltung konnte nicht vorbereitet werden",
++  "export.unavailable": "Unterhaltungsexport ist nicht verfügbar",
++  "unknownMessageType": "Unbekannter Nachrichtentyp: {{type}}",
++  "permissionRequest": "Berechtigungsanfrage",
++  "agentRequestingPermission": "Der Agent fordert eine Berechtigung an.",
++  "command": "Befehl:",
++  "chooseAction": "Aktion wählen:",
++  "option": "Option",
++  "noOptionsAvailable": "Keine Optionen verfügbar",
++  "processing": "Wird verarbeitet...",
++  "responseSentSuccessfully": "Antwort erfolgreich gesendet",
++  "confirmation": {
++    "applyChange": "Diese Änderung anwenden?",
++    "allowExecution": "Ausführung zulassen?",
++    "proceed": "Möchten Sie fortfahren?",
++    "allowMCPTool": "Ausführung des MCP-Tools \"{{toolName}}\" vom Server \"{{serverName}}\" zulassen?",
++    "yesAllowOnce": "Ja, einmal zulassen",
++    "yesAllowAlways": "Ja, immer zulassen",
++    "yesAlwaysAllowTool": "Ja, Tool \"{{toolName}}\" vom Server \"{{serverName}}\" immer zulassen",
++    "yesAlwaysAllowServer": "Ja, immer alle Tools vom Server \"{{serverName}}\" zulassen",
++    "no": "Nein (esc)"
++  }
++}
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/de-DE/pet.json b/packages/desktop/src/renderer/services/i18n/locales/de-DE/pet.json
+new file mode 100644
+index 0000000..1835102
+--- /dev/null
++++ b/packages/desktop/src/renderer/services/i18n/locales/de-DE/pet.json
+@@ -0,0 +1,17 @@
++{
++  "desktopPet": "Desktop-Pet",
++  "enable": "Desktop-Pet aktivieren",
++  "size": "Pet-Größe",
++  "sizeSmall": "Klein ({{px}}px)",
++  "sizeMedium": "Mittel ({{px}}px)",
++  "sizeLarge": "Groß ({{px}}px)",
++  "dnd": "Nicht stören",
++  "dndDescription": "Pet bleibt inaktiv und ignoriert KI-Ereignisse",
++  "confirmBubble": "Autorisierungen am Pet anzeigen",
++  "confirmBubbleDescription": "Wenn deaktiviert, bleiben KI-Tool-Autorisierungen im Hauptchatfenster",
++  "pat": "Streicheln",
++  "resetPosition": "Position zurücksetzen",
++  "hide": "Ausblenden",
++  "showHide": "Anzeigen/Ausblenden",
++  "desktopOnly": "Das Desktop-Pet ist nur in der Desktop-Anwendung verfügbar. Es kann nicht im WebUI-Browsermodus genutzt werden."
++}
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/de-DE/preview.json b/packages/desktop/src/renderer/services/i18n/locales/de-DE/preview.json
+new file mode 100644
+index 0000000..3009988
+--- /dev/null
++++ b/packages/desktop/src/renderer/services/i18n/locales/de-DE/preview.json
+@@ -0,0 +1,134 @@
++{
++  "historyVersions": "Versionsverlauf",
++  "currentFile": "Aktuelle Datei",
++  "loading": "Wird geladen...",
++  "loadHistoryFailed": "Verlauf konnte nicht geladen werden",
++  "noHistory": "Keine Verlaufsversionen",
++  "snapshotSaved": "Snapshot gespeichert",
++  "snapshotSaveFailed": "Snapshot konnte nicht gespeichert werden",
++  "historyLoaded": "Verlaufsversion geladen",
++  "historyLoadFailed": "Verlaufsversion konnte nicht geladen werden",
++  "tooFrequent": "Zu häufig, bitte später erneut versuchen",
++  "saveSnapshot": "Aktuellen Snapshot speichern",
++  "snapshotNotSupported": "Der aktuelle Inhalt unterstützt keine Snapshots",
++  "history": "Verlauf",
++  "historyNotSupported": "Der aktuelle Inhalt unterstützt keinen Verlauf",
++  "downloadFile": "Datei herunterladen",
++  "closePreview": "Vorschau schließen",
++  "collapsePanel": "Panel einklappen",
++  "source": "Quelle",
++  "code": "Code",
++  "preview": "Vorschau",
++  "editor": "Editor",
++  "previewEffect": "Vorschau",
++  "snapshot": "Snapshot",
++  "downloadMarkdown": "Markdown-Datei herunterladen",
++  "downloadCode": "{{language}}-Datei herunterladen",
++  "downloadDiff": "Diff-Datei herunterladen",
++  "addToChat": "Zum Chat hinzufügen",
++  "openSplitScreen": "Geteilte Ansicht öffnen",
++  "closeSplitScreen": "Geteilte Ansicht schließen",
++  "edit": "Bearbeiten",
++  "exitEdit": "Bearbeitung beenden",
++  "unsavedChangesTitle": "Ungespeicherte Änderungen",
++  "unsavedChangesMessage": "Du hast ungespeicherte Änderungen. Möchtest du die Bearbeitung wirklich beenden?",
++  "confirmExit": "Beenden bestätigen",
++  "continueEdit": "Weiter bearbeiten",
++  "closeTabTitle": "Tab schließen",
++  "closeTabMessage": "Der aktuelle Inhalt wurde nicht gespeichert. Möchtest du vor dem Schließen speichern?",
++  "saveAndClose": "Speichern und schließen",
++  "closeWithoutSave": "Nicht speichern",
++  "pptTitle": "PowerPoint-Präsentation",
++  "pptOpenHint": "Klicke auf den Button unten, um die Datei in der System-App vollständig anzuzeigen",
++  "pptOpenFile": "Datei öffnen",
++  "pptShowLocation": "Speicherort anzeigen",
++  "pptSystemAppHint": "Wird mit der Standard-System-App geöffnet (PowerPoint, Keynote oder WPS)",
++  "openWithApp": "In {{app}} öffnen",
++  "openInSystemApp": "In System-App öffnen",
++  "openInSystemSuccess": "In der Standard-System-App geöffnet",
++  "openInSystemFailed": "Öffnen mit System-App fehlgeschlagen",
++  "closeLeft": "Links schließen",
++  "closeRight": "Rechts schließen",
++  "closeOthers": "Andere schließen",
++  "closeAll": "Alle schließen",
++  "readOnlyLabel": "Schreibgeschützte Vorschau",
++  "pathLabel": "Pfad",
++  "noTabs": "Keine Tabs geöffnet",
++  "openInPanelTooltip": "Im Vorschau-Panel anzeigen",
++  "mermaidTitle": "Mermaid-Diagramm",
++  "largeTextTruncatedHint": "Vorschaumodus für große Dateien: Aus Performance-Gründen werden die ersten {{count}} Zeichen angezeigt.",
++  "truncatedBanner": "Der Vorschauinhalt wurde gekürzt. Klicke auf Herunterladen, um die vollständige Datei anzusehen.",
++  "errors": {
++    "missingFilePath": "Dateipfad fehlt",
++    "openWithoutPath": "Öffnen nicht möglich: Es wurde kein Dateipfad angegeben",
++    "conversionFailed": "Konvertierung fehlgeschlagen",
++    "emptySnapshot": "Snapshot-Inhalt ist leer"
++  },
++  "office": {
++    "installLinkText": "officecli-Installationsanleitung öffnen",
++    "errors": {
++      "officecliNotFound": "officecli ist nicht installiert.",
++      "installFailed": "officecli konnte nicht automatisch installiert werden. Prüfe die Backend-Logs und versuche es erneut.",
++      "portTimeout": "Der Vorschau-Service wurde gestartet, war aber nicht rechtzeitig bereit. Erneut versuchen.",
++      "startFailed": "Der Office-Vorschau-Service konnte nicht gestartet werden.",
++      "outsideSandbox": "Diese Datei liegt außerhalb der aktuellen Projekt-Sandbox."
++    }
++  },
++  "word": {
++    "title": "Word-Dokument",
++    "loading": "Word-Dokument wird geladen...",
++    "invalid": "Bitte bestätige, dass die Datei ein gültiges Word-Dokument ist",
++    "loadFailed": "Word-Dokument konnte nicht geladen werden",
++    "watch": {
++      "loading": "Word-Dokument wird geladen...",
++      "installing": "officecli wird installiert...",
++      "startFailed": "Word-Vorschau konnte nicht gestartet werden",
++      "installHint": "Erfordert officecli. Es wird automatisch installiert."
++    }
++  },
++  "excel": {
++    "title": "Excel-Tabelle",
++    "loading": "Excel-Arbeitsmappe wird geladen...",
++    "invalid": "Bitte bestätige, dass die Datei ein gültiges Excel-Dokument ist",
++    "noSheets": "In dieser Excel-Datei wurden keine Arbeitsblätter gefunden",
++    "sheetCount": "{{count}} Arbeitsblatt/Arbeitsblätter",
++    "convertFailed": "Excel-Konvertierung fehlgeschlagen",
++    "loadFailed": "Excel-Arbeitsmappe konnte nicht geladen werden",
++    "emptySheet": "Dieses Arbeitsblatt enthält keine Daten",
++    "emptySheetHint": "Prüfe, ob das Arbeitsblatt Daten oder Bilder enthält",
++    "watch": {
++      "loading": "Excel-Datei wird geladen...",
++      "installing": "officecli wird installiert...",
++      "startFailed": "Excel-Vorschau konnte nicht gestartet werden",
++      "installHint": "Erfordert officecli. Es wird automatisch installiert."
++    }
++  },
++  "pdf": {
++    "title": "PDF-Dokument",
++    "pathMissing": "PDF-Dateipfad fehlt",
++    "loadFailed": "PDF-Dokument konnte nicht geladen werden",
++    "unableDisplay": "PDF-Datei kann nicht angezeigt werden"
++  },
++  "html": {
++    "elementSelected": "Ausgewähltes Element: {{path}}",
++    "copySuccess": "HTML-Snippet kopiert",
++    "inspectorEnabled": "Element-Inspector aktiviert. Klicke Elemente in der Vorschau an, um sie hervorzuheben.",
++    "inspectorButton": "Element-Inspector",
++    "inspecting": "Prüft...",
++    "selectedLabel": "Ausgewählt:",
++    "inspectorTooltip": "Klicke Vorschau-Elemente an, um ihr HTML zu prüfen",
++    "downloadHtml": "HTML-Datei herunterladen",
++    "copyElementHtml": "Element-HTML kopieren",
++    "viewElementInfo": "Elementinfo anzeigen",
++    "printedToConsole": "Elementinfo in die Konsole geschrieben",
++    "inspectElement": "Element prüfen",
++    "inspectElementEnable": "Element-Inspector aktivieren",
++    "inspectElementDisable": "Element-Inspector deaktivieren"
++  },
++  "ppt": {
++    "loading": "PPT-Vorschau wird gestartet...",
++    "installing": "Vorschau-Komponente wird installiert...",
++    "startFailed": "PPT-Vorschau konnte nicht gestartet werden",
++    "installHint": "Stelle sicher, dass officecli installiert ist: npm run postinstall"
++  }
++}
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/de-DE/settings.json b/packages/desktop/src/renderer/services/i18n/locales/de-DE/settings.json
+new file mode 100644
+index 0000000..c254c26
+--- /dev/null
++++ b/packages/desktop/src/renderer/services/i18n/locales/de-DE/settings.json
+@@ -0,0 +1,963 @@
++{
++  "title": "Einstellungen",
++  "skillsHub": {
++    "title": "Skills Hub",
++    "description": "Skills für KI-Agenten zentral verwalten. Einmal installieren, in allen Assistenten nutzen.",
++    "mySkillsTitle": "Meine Skills",
++    "noSkills": "Keine Skills gefunden. Importiere welche, um loszulegen.",
++    "custom": "Benutzerdefiniert",
++    "builtin": "Integriert",
++    "manualImport": "Skills importieren",
++    "tipTitle": "Tipp zur Nutzung:",
++    "tipContent": "Hier konfigurierte Skills lassen sich auf der Einrichtungsseite „Assistenten“ für jeden Assistenten aktivieren; importiere einen Skill-Ordner, einen übergeordneten Ordner oder ein ZIP-Archiv.",
++    "fetchError": "Skills konnten nicht abgerufen werden",
++    "importSuccess": "Skill erfolgreich importiert",
++    "importSuccessDetailed": "{{count}} Skill(s) importiert: {{names}}",
++    "importFailed": "Skill konnte nicht importiert werden",
++    "importError": "Fehler beim Importieren des Skills",
++    "deleteSuccess": "Skill gelöscht",
++    "deleteFailed": "Skill konnte nicht gelöscht werden",
++    "deleteError": "Fehler beim Löschen des Skills",
++    "deleteConfirmTitle": "Skill löschen",
++    "deleteConfirmContent": "Möchtest du „{{name}}“ wirklich löschen?",
++    "manageInHub": "Im Skills Hub verwalten",
++    "recommend": "Skills empfehlen",
++    "recommendSuccess": "Erfolgreich empfohlen: {{count}} Skills regelbasiert ausgewählt",
++    "noRecommendations": "Keine passenden Skills gefunden, bitte manuell auswählen",
++    "addCustomPath": "Benutzerdefinierten Skill-Pfad hinzufügen",
++    "customPathNamePlaceholder": "z. B. Meine eigenen Skills",
++    "customPathLabel": "Pfad zum Skill-Verzeichnis",
++    "customPathPlaceholder": "z. B. C:\\Users\\me\\.mytools\\skills",
++    "searchPlaceholder": "Skills suchen …",
++    "noSearchResults": "Keine passenden Skills gefunden"
++  },
++  "authMethod": "Authentifizierung",
++  "geminiApiKey": "Gemini API-Schlüssel",
++  "vertexApiKey": "Vertex AI",
++  "personalAuth": "Google-Konto",
++  "googleLogin": "Mit Google anmelden",
++  "googleLoginSuccess": "Erfolgreich angemeldet",
++  "googleLoginFailed": "Anmeldung fehlgeschlagen. Bitte erneut versuchen.",
++  "googleLogout": "Abmelden",
++  "openai": "OpenAI",
++  "proxyConfig": "Proxy",
++  "yoloMode": "YOLO (automatisch erlauben)",
++  "claudeYoloMode": "Claude YOLO (Berechtigungen überspringen)",
++  "claudeYoloModeDesc": "Alle Berechtigungsprüfungen von Claude Code umgehen (entspricht --dangerously-skip-permissions).",
++  "customCss": "Benutzerdefiniertes CSS",
++  "customCssDesc": "Gib hier benutzerdefinierte CSS-Stile ein, um das Erscheinungsbild der Oberfläche anzupassen. Das System fügt automatisch !important hinzu, um höchste Priorität sicherzustellen. Änderungen werden sofort wirksam.",
++  "assistants": "Assistenten",
++  "agents": "Agenten",
++  "assistantsList": "Verfügbare Assistenten",
++  "assistantsEmpty": "Keine Assistenten konfiguriert.",
++  "pdfToPptAssistantName": "PDF zu PPT",
++  "pdfToPptAssistantDesc": "PDF in PPT umwandeln mit Regeln zur Wasserzeichenentfernung.",
++  "game3dAssistantName": "3D-Spiel",
++  "game3dAssistantDesc": "Ein vollständiges 3D-Plattform-Sammelspiel in einer einzigen HTML-Datei erzeugen.",
++  "editAssistant": "Assistenten-Details",
++  "assistantNameAvatar": "Name & Avatar",
++  "assistantDescription": "Assistenten-Beschreibung",
++  "assistantDescriptionPlaceholder": "Wobei kann dieser Assistent helfen?",
++  "assistantPrompt": "Prompt",
++  "assistantPromptPlaceholder": "Prompt oder Regeln eingeben …",
++  "saveAssistant": "Einstellungen speichern",
++  "createAssistant": "Assistenten erstellen",
++  "assistantsListDescription": "Erstelle aufgabenspezifische Assistenten, indem du einen KI-Agenten mit eigenen Regeln und Skills kombinierst.",
++  "assistantFilterAll": "Alle",
++  "assistantFilterBuiltin": "System",
++  "assistantFilterCustom": "Benutzerdefiniert",
++  "assistantSourceCustom": "Benutzerdefiniert",
++  "assistantSectionEnabled": "Aktiviert",
++  "assistantSectionDisabled": "Deaktiviert",
++  "searchAssistants": "Assistenten nach Name oder Beschreibung suchen",
++  "assistantNoMatch": "Keine Assistenten passen zu den aktuellen Filtern.",
++  "assistantCreated": "Assistent erstellt",
++  "assistantNameRequired": "Name ist erforderlich",
++  "assistantPromptRequired": "Prompt ist erforderlich",
++  "assistantPromptHint": "Gib Regeln für diesen Assistenten ein. Hinweis: Gemini unterstützt derzeit nur Regeln.",
++  "assistantRules": "Regeln",
++  "assistantRulesHint": "Definiere zusätzliche Regeln für das Verhalten des Assistenten.",
++  "assistantRulesPlaceholder": "Regeln im Markdown-Format eingeben …",
++  "assistantModels": "Verfügbare Modelle",
++  "assistantModelsHint": "Wähle aus, welche Modelle dieser Assistent verwenden darf.",
++  "assistantSkills": "Skills",
++  "assistantSkillsHint": "Liste bevorzugte Tools/Skills für den Assistenten auf.",
++  "assistantSkillsPlaceholder": "Skills im Markdown-Format eingeben …",
++  "promptEdit": "Bearbeiten",
++  "promptPreview": "Vorschau",
++  "promptPreviewEmpty": "Kein Inhalt für die Vorschau",
++  "deleteAssistantTitle": "Assistenten löschen",
++  "deleteAssistantConfirm": "Möchtest du diesen Assistenten wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
++  "cannotDeleteBuiltin": "Integrierte Assistenten können nicht gelöscht werden",
++  "duplicateAssistant": "Duplizieren",
++  "assistantMainAgent": "Haupt-Agent",
++  "assistantBuiltinReadonlyTip": "Dies ist ein integrierter Assistent. Nur der Haupt-Agent kann geändert werden. Um andere Felder anzupassen, ",
++  "assistantBuiltinReadonlyDuplicateLink": "dupliziere ihn",
++  "assistantBuiltinReadonlyTipSuffix": ".",
++  "addSkills": "Skills hinzufügen",
++  "customSkills": "Benutzerdefinierte Skills",
++  "builtinSkills": "Integrierte Skills",
++  "noCustomSkills": "Keine benutzerdefinierten Skills hinzugefügt",
++  "noBuiltinSkills": "Keine integrierten Skills verfügbar",
++  "autoInjectedSkills": "Automatisch eingefügte Skills",
++  "autoInjectedSkillsBadge": "Auto",
++  "skillFolderPath": "Pfad zum Skill-Ordner",
++  "skillPathPlaceholder": "Pfad(e) zum Skill-Ordner eingeben oder durchsuchen, durch Komma getrennt",
++  "pleaseSelectSkillPath": "Bitte wähle einen Pfad zum Skill-Ordner",
++  "skillAlreadyExists": "Skill „{{name}}“ existiert bereits",
++  "skillAdded": "Skill „{{name}}“ hinzugefügt und ausgewählt",
++  "skillReadFailed": "Skill-Informationen konnten nicht gelesen werden",
++  "deletePendingSkillTitle": "Ausstehenden Skill löschen",
++  "deletePendingSkillConfirm": "Möchtest du „{{name}}“ wirklich entfernen? Dieser Skill wurde noch nicht importiert.",
++  "deletePendingSkillNote": "Dadurch wird der Skill nur aus der Warteliste entfernt. Du kannst ihn über die Funktion „Skills hinzufügen“ erneut hinzufügen.",
++  "skillDeleted": "Skill aus der Warteliste entfernt",
++  "removeCustomSkillTitle": "Skill aus Assistent entfernen",
++  "removeCustomSkillConfirm": "Möchtest du „{{name}}“ wirklich aus diesem Assistenten entfernen?",
++  "removeCustomSkillNote": "Dadurch wird der Skill nur aus diesem Assistenten entfernt. Der Skill bleibt unter den integrierten Skills erhalten und kann später wieder hinzugefügt werden.",
++  "skillRemovedFromAssistant": "Skill aus diesem Assistenten entfernt",
++  "pending": "Ausstehend",
++  "removeFromAssistant": "Aus Assistent entfernen",
++  "noRecentEmojis": "Keine zuletzt verwendeten Emojis",
++  "preset_agents": "Benutzerdefinierte Voreinstellungen (Regeln)",
++  "no_presets": "Noch keine benutzerdefinierten Voreinstellungen erstellt.",
++  "edit_preset": "Voreinstellung bearbeiten",
++  "agent_name": "Agentenname",
++  "rule_content": "Regelinhalt / Anweisungen",
++  "delete_preset_confirm": "Möchtest du diese Voreinstellung wirklich löschen?",
++  "cssSettings": "CSS-Einstellungen",
++  "cssTheme": {
++    "selectOrCustomize": "Voreingestelltes Theme oder benutzerdefiniertes CSS auswählen",
++    "addManually": "Manuell hinzufügen",
++    "default": "Standard",
++    "addToPreset": "Theme hinzufügen",
++    "editTheme": "Theme bearbeiten",
++    "previewCover": "Hintergrundbild",
++    "name": "Name",
++    "namePlaceholder": "Namen der Voreinstellung eingeben",
++    "cssCode": "CSS-Code",
++    "applied": "Angewendetes Theme: {{name}}",
++    "applyFailed": "Theme konnte nicht angewendet werden",
++    "cleared": "Auf Standardstil zurückgesetzt",
++    "deleteConfirm": "Möchtest du dieses Theme wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden."
++  },
++  "geminiBaseUrl": "Gemini API Base URL",
++  "cacheDir": "Cache-Verzeichnis",
++  "workDir": "Arbeitsverzeichnis",
++  "logDir": "Log-Verzeichnis",
++  "dirNotConfigured": "Noch nicht konfiguriert",
++  "cacheClean": "Cache-Bereinigung",
++  "clean": "Bereinigen",
++  "cacheClearSuccess": "Cache erfolgreich geleert",
++  "cacheClearFailed": "Cache konnte nicht geleert werden",
++  "language": "Sprache",
++  "saveUploadToWorkspace": "Uploads im Projektordner speichern",
++  "autoPreviewOfficeFiles": "Neue Office-Dateien automatisch in der Vorschau anzeigen",
++  "autoPreviewOfficeFilesDesc": "Neu erstellte Word-, Excel- und PowerPoint-Dateien automatisch im aktuellen Projekt öffnen. Temporäre Office-Sperrdateien werden ignoriert.",
++  "startOnBoot": "Beim Start ausführen",
++  "startOnBootDesc": "AionUi automatisch starten, wenn du dich bei macOS oder Windows anmeldest.",
++  "startOnBootUnsupported": "Nur in den paketierten macOS- und Windows-Apps verfügbar.",
++  "startOnBootUpdateFailed": "Einstellung „Beim Start ausführen“ konnte nicht aktualisiert werden",
++  "closeToTray": "In den Infobereich minimieren",
++  "hardwareAcceleration": "Hardwarebeschleunigung",
++  "hardwareAccelerationDesc": "Die GPU zum Rendern der Oberfläche verwenden. Deaktivieren, falls die App beim Start abstürzt oder die Grafik flackert.",
++  "hardwareAccelerationAutoDisabled": "Nach wiederholten GPU-Abstürzen automatisch deaktiviert.",
++  "hardwareAccelerationRestartConfirm": "AionUi neu starten, um die neue Einstellung zur Hardwarebeschleunigung anzuwenden?",
++  "hardwareAccelerationUpdateFailed": "Einstellung zur Hardwarebeschleunigung konnte nicht aktualisiert werden",
++  "notification": "Benachrichtigungen",
++  "cronNotificationEnabled": "Abschluss geplanter Aufgaben",
++  "promptTimeout": "LLM-Prompt-Timeout (s)",
++  "groupAiCore": "KI-Kern",
++  "groupApp": "Anwendung",
++  "groupAbout": "Sonstiges",
++  "agentIdleTimeout": "Leerlauf-Timeout des Agenten (Min.)",
++  "agentIdleTimeoutDesc": "Inaktive Agentenprozesse nach dieser Dauer beenden, um Speicher freizugeben",
++  "gemini": "Gemini CLI",
++  "model": "Modell",
++  "system": "System",
++  "about": "Über",
++  "advancedSettings": "Erweiterte Einstellungen",
++  "addModel": "Modell hinzufügen",
++  "editModel": "Modellplattform bearbeiten",
++  "modelPlatform": "Modellplattform",
++  "modelProvider": "Modellanbieter",
++  "platformName": "Plattformname",
++  "modelName": "Modellname",
++  "baseUrl": "base url",
++  "apiEndpoint": "API-Endpunkt",
++  "fullUrl": "Vollständige URL",
++  "fullUrlMode": "Vollständige URL",
++  "fullUrlHint": "Diese Adresse direkt verwenden, kein Pfad wird angehängt",
++  "baseUrlHint": "Das System hängt den Anfragepfad automatisch an",
++  "apiKey": "API-Schlüssel",
++  "deleteModelConfirm": "Möchtest du dieses Modell wirklich löschen?",
++  "deleteAllModelConfirm": "Möchtest du wirklich alle Modelle löschen?",
++  "modelCount": "Modell",
++  "apiKeyCount": "API-Schlüssel",
++  "pleaseEnterBaseUrlAndApiKey": "Bitte base url und API-Schlüssel eingeben",
++  "pleaseEnterApiKey": "Bitte API-Schlüssel eingeben",
++  "pleaseEnterBaseUrl": "Bitte Base URL eingeben",
++  "pleaseSelectProvider": "Bitte einen Modellanbieter auswählen",
++  "multiApiKeyTip": "💡 Um mehrere API-Schlüssel für die automatische Rotation hinzuzufügen, konfiguriere dies später in der Plattformbearbeitung",
++  "multiApiKeyEditTip": "Mehrere API-Schlüssel werden unterstützt, einer pro Zeile, das System rotiert automatisch",
++  "apiKeyPlaceholder": "API-Schlüssel eingeben, für mehrere Schlüssel einen pro Zeile",
++  "editApiKey": "API-Schlüssel bearbeiten",
++  "testKey": "Schlüssel testen",
++  "multiKeyTip": "Mehrere Schlüssel durch Komma getrennt",
++  "deleteInvalidKeys": "Ungültige Schlüssel löschen",
++  "testAllKeys": "Alle Schlüssel testen",
++  "addModelPlaceholder": "Modell-ID auswählen oder eingeben",
++  "customModelSupportNote": "Hinweis: Derzeit unterstützt nur Aion CLI benutzerdefinierte Modelle.",
++  "addModelHint": "Wähle oder tippe eine Modell-ID, sie wird diesem Anbieter hinzugefügt.",
++  "addModelSelectedHint": "Bereit zum Hinzufügen des Modells: {{model}}",
++  "currentModelsLabel": "Aktuelle Modelle",
++  "addModelNoExisting": "Für diesen Anbieter wurden noch keine Modelle hinzugefügt. Sie erscheinen hier, sobald sie hinzugefügt wurden.",
++  "addModelMoreCount": "+{{count}} weitere",
++  "addModelTips": "Du kannst jeden Modellnamen direkt einfügen. Halte ihn für beste Kompatibilität mit der Anbieterkonsole konsistent.",
++  "customOpenAI": "Benutzerdefiniert (OpenAI-kompatibel)",
++  "platformCustom": "Benutzerdefiniert",
++  "platformNewApi": "New API",
++  "modelProtocol": "Anfrageprotokoll",
++  "modelProtocolTip": "Wähle das API-Anfrageformat für dieses Modell. Das new-api-Gateway leitet die Anfrage über das ausgewählte Protokoll an den Upstream weiter.",
++  "platformBedrock": "AWS Bedrock",
++  "bedrock": {
++    "authMethod": "Authentifizierungsmethode",
++    "authMethodAccessKey": "Access Key",
++    "authMethodProfile": "AWS-Profil",
++    "region": "AWS-Region",
++    "regionHint": "Wähle die AWS-Region für Bedrock-Modelle",
++    "accessKeyId": "Access Key ID",
++    "secretAccessKey": "Secret Access Key",
++    "profile": "AWS-Profil",
++    "profileHint": "Profilname aus ~/.aws/config (z. B. „default“)",
++    "testConnection": "Verbindung testen",
++    "connectionSuccess": "Verbindung erfolgreich! Die AWS-Anmeldedaten sind gültig.",
++    "connectionFailed": "Verbindung fehlgeschlagen. Bitte überprüfe deine Anmeldedaten.",
++    "fillRequiredFields": "Bitte fülle zuerst alle Pflichtfelder aus."
++  },
++  "proxyHttpOnly": "Es wird nur das Protokoll http/https unterstützt",
++  "baseUrlAutoFix": "base_url automatisch korrigiert zu: {{base_url}}",
++  "updateConfirm": "Änderungen bestätigen",
++  "restartConfirm": "Die Änderungen starten die Anwendung neu. Fortfahren?",
++  "theme": "Theme",
++  "fontSize": "Skalierung",
++  "fontSizeDescription": "Passe die Zoomstufe der Oberfläche an, damit die gesamte Oberfläche deiner bevorzugten Größe entspricht.",
++  "fontSizeReset": "Zoom zurücksetzen",
++  "lightMode": "Hell",
++  "darkMode": "Dunkel",
++  "agent": "Agent",
++  "tools": "Tools",
++  "capabilities": "Fähigkeiten",
++  "capabilitiesTab": {
++    "skills": "Skills",
++    "tools": "Tools"
++  },
++  "webui": "Remote",
++  "installed": "Installiert",
++  "builtin": "Integriert",
++  "channels": "Kanäle",
++  "webui.description": "Nutze AionUi als deinen „24/7-Remote-Assistenten“ – arrangiere Aufgaben von jedem entfernten Gerät, jederzeit und überall.",
++  "webui.steps": "Schritt 1: WebUI aktivieren; Schritt 2: Zugangs-URL kopieren; Schritt 3: Im entfernten Browser öffnen",
++  "webui.configuration": "WebUI-Konfiguration",
++  "webui.enable": "WebUI aktivieren",
++  "webui.enableDesc": "Den Webdienst starten, um Browserzugriff zu ermöglichen",
++  "webui.port": "Port",
++  "webui.portDesc": "Listening-Port des WebUI-Dienstes",
++  "webui.allowRemote": "Remote-Zugriff erlauben",
++  "webui.allowRemoteDesc": "Remote-Software/-Server für sicheren Remote-Zugriff verwenden",
++  "webui.viewGuide": "Anleitung ansehen",
++  "webui.accessInfo": "Zugangs-URLs",
++  "webui.localUrl": "Lokale URL",
++  "webui.networkUrl": "Netzwerk-URL",
++  "webui.qrLogin": "QR-Code-Anmeldung",
++  "webui.qrLoginTitle": "Zum Anmelden scannen",
++  "webui.qrLoginHint": "Scanne den QR-Code mit deinem Telefon, um dich im mobilen Browser automatisch anzumelden",
++  "webui.qrExpires": "Läuft ab um {{time}}",
++  "webui.refreshQr": "QR-Code aktualisieren",
++  "webui.copyQrLink": "Link kopieren",
++  "webui.qrGenerateFailed": "QR-Code konnte nicht erstellt werden",
++  "webui.accountInfo": "Kontoinformationen",
++  "webui.username": "Benutzername",
++  "webui.initialPassword": "Initiales Passwort",
++  "webui.initialPasswordDesc": "Beim ersten Start erstelltes Passwort, bitte ändern",
++  "webui.changePassword": "Passwort ändern",
++  "webui.currentPassword": "Aktuelles Passwort",
++  "webui.currentPasswordPlaceholder": "Aktuelles Passwort eingeben",
++  "webui.currentPasswordRequired": "Bitte aktuelles Passwort eingeben",
++  "webui.newPassword": "Neues Passwort",
++  "webui.newPasswordPlaceholder": "Neues Passwort eingeben (mindestens 8 Zeichen)",
++  "webui.newPasswordRequired": "Bitte neues Passwort eingeben",
++  "webui.confirmPassword": "Passwort bestätigen",
++  "webui.confirmPasswordPlaceholder": "Neues Passwort erneut eingeben",
++  "webui.confirmPasswordRequired": "Bitte neues Passwort bestätigen",
++  "webui.passwordMinLength": "Das Passwort muss mindestens 8 Zeichen lang sein",
++  "webui.passwordMismatch": "Die Passwörter stimmen nicht überein",
++  "webui.passwordTooShort": "Das Passwort muss mindestens 8 Zeichen lang sein",
++  "webui.passwordTooLong": "Das Passwort muss weniger als 128 Zeichen lang sein",
++  "webui.passwordTooCommon": "Das Passwort ist zu häufig, bitte wähle ein stärkeres",
++  "webui.passwordChanged": "Passwort erfolgreich geändert",
++  "webui.passwordChangeFailed": "Passwort konnte nicht geändert werden",
++  "webui.usernameChanged": "Benutzername erfolgreich aktualisiert",
++  "webui.usernameChangeFailed": "Benutzername konnte nicht aktualisiert werden",
++  "webui.editUsernameTooltip": "Benutzername bearbeiten",
++  "webui.setNewUsername": "Neuen Benutzernamen festlegen",
++  "webui.newUsername": "Neuer Benutzername",
++  "webui.newUsernameRequired": "Bitte einen Benutzernamen eingeben",
++  "webui.usernameMinLength": "Der Benutzername muss mindestens 3 Zeichen lang sein",
++  "webui.usernameMaxLength": "Der Benutzername darf maximal 32 Zeichen lang sein",
++  "webui.usernameFormatError": "Nur Buchstaben, Zahlen, Bindestriche oder Unterstriche verwenden",
++  "webui.usernameEdgeError": "Der Benutzername darf nicht mit einem Bindestrich oder Unterstrich beginnen oder enden",
++  "webui.newUsernamePlaceholder": "Einen neuen Benutzernamen eingeben",
++  "webui.resetPassword": "Passwort zurücksetzen",
++  "webui.setNewPassword": "Neues Passwort festlegen",
++  "webui.resetPasswordTooltip": "Passwort vergessen? Klicken, um ein neues festzulegen (kein aktuelles Passwort erforderlich)",
++  "webui.copyPasswordTooltip": "Zum Kopieren des Passworts klicken",
++  "webui.forgotPassword": "Vergessen? Zum Zurücksetzen klicken",
++  "webui.resetPasswordHint": "Passwort vergessen? Klicke auf „Zurücksetzen“, um ein neues zufälliges Passwort zu erzeugen",
++  "webui.passwordResetSuccess": "Passwort zurückgesetzt. Das neue Passwort wird oben angezeigt",
++  "webui.passwordResetAndCopied": "Passwort zurückgesetzt und in die Zwischenablage kopiert",
++  "webui.passwordResetAndFilled": "Passwort zurückgesetzt und ins Formular eingetragen, bitte speichern",
++  "webui.clickCopyToGet": "Auf Kopieren klicken, um das Passwort zu erhalten",
++  "webui.passwordResetFailed": "Passwort konnte nicht zurückgesetzt werden",
++  "webui.startSuccess": "WebUI erfolgreich gestartet",
++  "webui.restartSuccess": "WebUI neu gestartet",
++  "webui.startFailed": "WebUI konnte nicht gestartet werden",
++  "webui.stopSuccess": "WebUI gestoppt",
++  "webui.stopFailed": "WebUI konnte nicht gestoppt werden",
++  "webui.operationFailed": "Vorgang fehlgeschlagen",
++  "webui.running": "Läuft",
++  "webui.starting": "Wird gestartet …",
++  "webui.accessUrl": "Zugangs-URL",
++  "webui.loginInfo": "Anmeldeinformationen",
++  "webui.randomPassword": "[Zufälliges Passwort]",
++  "webui.noPasswordToCopy": "Kein Passwort zum Kopieren",
++  "webui.passwordHint": "Das Passwort wird beim ersten Start in der Konsole angezeigt. Verwende „Passwort ändern“ zum Zurücksetzen",
++  "webui.checkConsoleForPassword": "Prüfe die Anwendungskonsole auf das initiale Passwort",
++  "webui.browserNotSupported": "WebUI-Einstellungen sind im Browser nicht verfügbar",
++  "webui.browserNotSupportedDesc": "Aus Sicherheitsgründen können WebUI-Einstellungen nur in der Desktop-Anwendung verwaltet werden. Bitte öffne das Einstellungsfenster in der AionUi-Desktop-App zur Konfiguration.",
++  "webui.passwordHidden": "******",
++  "webui.passwordOnlyFirstTime": "Das Passwort wird nur beim ersten Start angezeigt und danach ausgeblendet",
++  "webui.resetPasswordWarning": "Bitte bewahre das zurückgesetzte Passwort sicher auf!",
++  "webui.featureRemoteDesc": "Aktiviere WebUI, damit dein Telefon oder ein entfernter Browser auf AionUi zugreifen kann.",
++  "webui.featureChannelsTitle": "Messaging-Steuerung",
++  "webui.featureChannelsDesc": "Verbinde Telegram, Lark, DingTalk und WeChat, um AionUi aus IM-Apps zu bedienen.",
++  "webui.goToChannels": "Zu den Kanälen",
++  "assistant.telegramConfig": "Telegram-Bot-Konfiguration",
++  "assistant.botToken": "Bot-Token",
++  "assistant.botTokenDesc": "Öffne Telegram, suche @BotFather und sende /newbot, um deinen Bot-Token zu erhalten.",
++  "assistant.testConnection": "Testen",
++  "assistant.connectionSuccess": "Verbunden! Bot: @{{username}}",
++  "assistant.connectionFailed": "Verbindung fehlgeschlagen",
++  "assistant.tokenRequired": "Bitte einen Bot-Token eingeben",
++  "assistant.tokenConfigured": "Token konfiguriert",
++  "assistant.enableBot": "Bot aktivieren",
++  "assistant.enableBotDesc": "Den Telegram-Bot starten, um Nachrichten zu empfangen",
++  "assistant.connected": "Verbunden",
++  "assistant.disconnected": "Getrennt",
++  "assistant.pluginEnabled": "Telegram-Bot aktiviert",
++  "assistant.pluginDisabled": "Telegram-Bot deaktiviert",
++  "assistant.enableFailed": "Plugin konnte nicht aktiviert werden",
++  "assistant.disableFailed": "Plugin konnte nicht deaktiviert werden",
++  "assistant.pendingPairings": "Ausstehende Kopplungsanfragen",
++  "assistant.noPendingPairings": "Keine ausstehenden Kopplungsanfragen",
++  "assistant.pairingCode": "Code",
++  "assistant.expiresIn": "Läuft ab in",
++  "assistant.approve": "Genehmigen",
++  "assistant.reject": "Ablehnen",
++  "assistant.pairingApproved": "Kopplung genehmigt",
++  "assistant.pairingRejected": "Kopplung abgelehnt",
++  "assistant.approveFailed": "Kopplung konnte nicht genehmigt werden",
++  "assistant.rejectFailed": "Kopplung konnte nicht abgelehnt werden",
++  "assistant.authorizedUsers": "Autorisierte Benutzer",
++  "assistant.noAuthorizedUsers": "Noch keine autorisierten Benutzer",
++  "assistant.platform": "Plattform",
++  "assistant.authorizedAt": "Autorisiert",
++  "assistant.revokeAccess": "Zugriff widerrufen",
++  "assistant.userRevoked": "Benutzerzugriff widerrufen",
++  "assistant.revokeFailed": "Benutzer konnte nicht widerrufen werden",
++  "assistant.copyCode": "Kopplungscode kopieren",
++  "assistant.modelSaved": "Modell gespeichert",
++  "assistant.modelSaveFailed": "Modell konnte nicht gespeichert werden",
++  "assistant.tokenLocked": "Bitte schließe den Kanal und lösche alle autorisierten Benutzer, bevor du die Konfiguration änderst",
++  "assistant.tokenValid": "Token gültig",
++  "assistant.defaultModel": "Standardmodell",
++  "assistant.defaultModelDesc": "Modell für Telegram-Konversationen. Standardmäßig wird GEMINI CLI als Agent verwendet",
++  "assistant.noAvailableModels": "Keine Gemini-Modelle konfiguriert",
++  "assistant.selectModel": "Modell auswählen",
++  "assistant.nextSteps": "Nächste Schritte",
++  "assistant.step1": "Öffne Telegram und suche nach deinem Bot",
++  "assistant.step2": "Sende eine beliebige Nachricht oder klicke auf /start, um die Kopplung zu starten",
++  "assistant.step3": "Unten erscheint eine Kopplungsanfrage. Klicke auf „Genehmigen“, um den Benutzer zu autorisieren.",
++  "assistant.step4": "Sobald genehmigt, kannst du über Telegram mit Gemini chatten!",
++  "channels.title": "Kanäle",
++  "channels.telegramTitle": "Telegram",
++  "channels.telegramDesc": "Über Telegram mit dem AionUi-Assistenten chatten",
++  "channels.slackTitle": "Slack",
++  "channels.slackDesc": "Über Slack mit dem AionUi-Assistenten chatten",
++  "channels.discordTitle": "Discord",
++  "channels.discordDesc": "Über Discord mit dem AionUi-Assistenten chatten",
++  "channels.larkTitle": "Lark",
++  "channels.larkDesc": "Über Lark mit dem AionUi-Assistenten chatten",
++  "channels.dingtalkTitle": "DingTalk",
++  "channels.dingtalkDesc": "Über DingTalk mit dem AionUi-Assistenten chatten",
++  "channels.weixinTitle": "WeChat",
++  "channels.weixinDesc": "Über WeChat mit dem AionUi-Assistenten chatten",
++  "channels.wecomTitle": "WeCom",
++  "channels.wecomDesc": "Über WeCom (Enterprise-WeChat-KI-Bot) mit dem AionUi-Assistenten chatten",
++  "channels.comingSoon": "Demnächst verfügbar",
++  "channels.comingSoonDesc": "Unterstützung für {{channel}} ist bald verfügbar",
++  "channels.notConfigured": "Nicht konfiguriert",
++  "channels.configured": "Konfiguriert",
++  "channels.guide": "Verbinde Telegram, Lark, DingTalk und mehr, um deinen ständig verfügbaren AionUi-KI-Agenten aus jeder Chat-App zu steuern.",
++  "channels.selectFirst": "Wähle einen Kanal aus und konfiguriere die Anmeldedaten.",
++  "channels.enableAfterConfig": "Aktiviere den Kanal und beginne mit deinem KI-Agenten zu chatten.",
++  "channels.extension.requiredField": "Bitte Pflichtfeld ausfüllen: {{field}}",
++  "channels.extension.enabled": "Kanal aktiviert",
++  "channels.extension.enableFailed": "Kanal konnte nicht aktiviert werden",
++  "channels.extension.disabled": "Kanal deaktiviert",
++  "channels.extension.disableFailed": "Kanal konnte nicht deaktiviert werden",
++  "channels.extension.noConfig": "Keine zusätzliche Konfiguration erforderlich.",
++  "channels.extension.selectPlaceholder": "Bitte auswählen",
++  "channels.extension.defaultDesc": "Erweiterungskanal-Plugin",
++  "channels.mediaSendFailed": "{{name}} konnte nicht gesendet werden",
++  "channels.mediaPathNotAllowed": "{{name}} konnte nicht gesendet werden, da die Datei außerhalb der erlaubten Sendeverzeichnisse liegt",
++  "display": "Anzeige",
++  "imageGeneration": "Bilderzeugung",
++  "imageGenerationToggle": "Tool zur Bilderzeugung aktivieren",
++  "imageGenerationDescription": "Wähle, welches konfigurierte bildfähige Modell das Tool standardmäßig verwenden soll.",
++  "speechToText": "Sprache zu Text",
++  "speechToTextDescription": "Konfiguriere den Anbieter für die Spracheingabe, der vom Chatfenster auf Desktop und WebUI verwendet wird.",
++  "speechToTextProvider": "Anbieter",
++  "speechToTextProviderOpenAI": "OpenAI Whisper",
++  "speechToTextProviderDeepgram": "Deepgram Nova-2",
++  "speechToTextApiKey": "API-Schlüssel",
++  "speechToTextBaseUrl": "Base URL",
++  "speechToTextModel": "Modell",
++  "speechToTextLanguage": "Standardsprache",
++  "speechToTextDetectLanguage": "Sprache automatisch erkennen",
++  "speechToTextPunctuate": "Interpunktion hinzufügen",
++  "speechToTextSmartFormat": "Intelligente Formatierung",
++  "speechToTextRequired": "Erforderlich",
++  "speechToTextOptional": "Optional",
++  "mcp": "MCP-Integration",
++  "imageGenerationModel": "Bildmodell",
++  "imageGenSupportedTooltipTitle": "Derzeit unterstützte Bildmodelle:",
++  "imageGenSupportedTooltipGemini": "Google Gemini / Vertex AI Bildmodelle (z. B. gemini-2.5-flash-image)",
++  "imageGenSupportedTooltipOpenRouter": "OpenRouter Chat-artige Bildmodelle (z. B. nano-banana, gemini-image)",
++  "imageGenSupportedTooltipAntigravity": "AntigravityTools (gemini-3-pro-image)",
++  "imageGenUnsupportedTooltip": "Modelle wie gpt-image-* / dall-e-* / Imagen / FLUX verwenden eine andere API und werden noch nicht unterstützt.",
++  "imageGenerationGuide": "Einrichtungsanleitung für Bildmodelle",
++  "noAvailable": "Keine verfügbaren Bildmodelle, bitte zuerst konfigurieren.",
++  "mcpSettings": "MCP-Tools-Konfiguration",
++  "mcpServerList": "MCP-Server",
++  "mcpStatus": "Status",
++  "mcpAddServer": "Manuell hinzufügen",
++  "mcpEditServer": "Bearbeiten",
++  "mcpDeleteServer": "Löschen",
++  "mcpDeleteConfirm": "Möchtest du diesen MCP-Server wirklich löschen?",
++  "mcpImportFromJSON": "Aus JSON importieren",
++  "mcpImportTitle": "MCP-Konfiguration importieren",
++  "mcpImportPlaceholder": "Füge die MCP-JSON-Konfiguration aus der Dienstdokumentation unten ein. Wenn die Konfiguration Befehle wie npx oder uvx verwendet, stelle sicher, dass diese auf deinem Rechner installiert und verfügbar sind.",
++  "mcpImportTips": "Import-Tipps",
++  "mcpImportTip1": "Verwende ein gültiges JSON-Objekt mit einem „mcpServers“-Feld auf oberster Ebene.",
++  "mcpImportTip2": "Jeder Server sollte entweder „command“ (stdio) oder „url“ (http/sse) definieren.",
++  "mcpImportTip3": "Es können mehrere Server gleichzeitig importiert werden.",
++  "mcpJsonFormatError": "JSON-Formatfehler",
++  "mcpEditNameLocked": "Der MCP-Name kann während der Bearbeitung nicht geändert werden. Behalte den Servernamen auf oberster Ebene als „{{name}}“ bei.",
++  "mcpJsonBareServerError": "Verpacke die MCP-Serverkonfiguration in ein „mcpServers“-Objekt auf oberster Ebene oder füge in einem Array-Element ein „name“ hinzu.",
++  "mcpJsonUrlRequiredError": "HTTP- und SSE-MCP-Server benötigen eine nicht leere „url“.",
++  "mcpJsonStdioCommandRequiredError": "Stdio-MCP-Server benötigen ein nicht leeres „command“.",
++  "mcpTestConnection": "MCP-Verfügbarkeit prüfen",
++  "mcpTestConnectionSuccess": "Verbindungstest erfolgreich",
++  "mcpConnected": "Verfügbar",
++  "mcpAuthenticated": "Authentifiziert",
++  "mcpDisconnected": "Nicht getestet",
++  "mcpError": "Letzter Test fehlgeschlagen",
++  "mcpErrorNodeCommandNotFound": "Befehl {{command}} wurde nicht gefunden. Installiere Node.js (enthält npm/npx), starte AionUI neu oder konfiguriere diesen MCP-Server so, dass er einen absoluten Befehlspfad verwendet.",
++  "mcpErrorBunCommandNotFound": "Befehl {{command}} wurde nicht gefunden. Installiere Bun (enthält bun/bunx), starte AionUI neu oder konfiguriere diesen MCP-Server so, dass er einen absoluten Befehlspfad verwendet.",
++  "mcpErrorUvCommandNotFound": "Befehl {{command}} wurde nicht gefunden. Installiere uv, starte AionUI neu oder konfiguriere diesen MCP-Server so, dass er einen absoluten Befehlspfad verwendet.",
++  "mcpErrorPythonCommandNotFound": "Befehl {{command}} wurde nicht gefunden. Installiere Python, starte AionUI neu oder konfiguriere diesen MCP-Server so, dass er einen absoluten Befehlspfad verwendet.",
++  "mcpErrorDenoCommandNotFound": "Befehl {{command}} wurde nicht gefunden. Installiere Deno, starte AionUI neu oder konfiguriere diesen MCP-Server so, dass er einen absoluten Befehlspfad verwendet.",
++  "mcpErrorCommandNotFound": "Befehl {{command}} wurde nicht gefunden. Installiere ihn oder konfiguriere diesen MCP-Server so, dass er einen absoluten Befehlspfad verwendet.",
++  "mcpErrorCommandPermissionDenied": "AionUI kann {{command}} nicht ausführen, da die Berechtigung verweigert wurde.",
++  "mcpErrorCommandStartFailed": "AionUI konnte {{command}} nicht starten.",
++  "mcpErrorTimeout": "Verbindungstest nach {{seconds}} s abgelaufen.",
++  "mcpErrorConnectionFailed": "AionUI konnte den MCP-Server nicht erreichen.",
++  "mcpErrorHttp": "Der MCP-Server hat HTTP {{status}} zurückgegeben.",
++  "mcpErrorRpc": "Der MCP-Server hat bei der Verarbeitung von {{method}} einen RPC-Fehler zurückgegeben.",
++  "mcpErrorProtocol": "AionUI konnte den MCP-Handshake nicht abschließen.",
++  "mcpLastCheckedAvailable": "Letzte Prüfung in den Tool-Einstellungen: Verfügbar",
++  "mcpLastCheckedFailed": "Letzte Prüfung in den Tool-Einstellungen: Fehlgeschlagen",
++  "mcpCheckedAt": "Geprüft am: {{time}}",
++  "mcpCheckedAtLabel": "Geprüft am:",
++  "mcpNeverTested": "Noch nicht in den Tool-Einstellungen getestet",
++  "mcpCheckJsonHint": "Bitte überprüfe die MCP-JSON-Konfiguration und teste erneut.",
++  "mcpCheckResultLabel": "Manuelle Prüfung:",
++  "mcpCheckReasonLabel": "Mögliche Ursache:",
++  "mcpCheckPurposeHint": "Dient zur Überprüfung, ob die MCP-Konfiguration verfügbar ist. Es stellt nicht den tatsächlichen Laufzeitstatus dar.",
++  "mcpCheckAvailableSimple": "Verfügbar",
++  "mcpCheckPassedSimple": "Manuelle Prüfung bestanden",
++  "mcpCheckFailedSimple": "Fehlgeschlagen",
++  "mcpCheckPassedSummary": "Manuelle Prüfung bestanden",
++  "mcpCheckFailedSummary": "Manuelle Prüfung fehlgeschlagen",
++  "mcpInlineConfigHint": "Die Konfiguration ist möglicherweise fehlerhaft. Überprüfe die MCP-JSON und teste erneut.",
++  "mcpInlineCommandHint": "{{command}} fehlt auf diesem Rechner. Installiere es und teste erneut.",
++  "mcpTestConnectionFailedWithHint": "{{name}}: {{error}}. Bitte überprüfe die MCP-JSON-Konfiguration und teste erneut.",
++  "mcpLocalCommandUnavailable": "Erfordert {{command}} auf diesem Rechner",
++  "mcpTesting": "Wird getestet",
++  "mcpOneKeyImport": "Ein-Klick-Import",
++  "mcpImportFromCLI": "MCP-Tools scannen",
++  "mcpSelectCLI": "CLI auswählen",
++  "mcpNoServersFound": "Keine MCP-Server gefunden",
++  "mcpImportSuccess": "Import erfolgreich",
++  "mcpImportFailed": "Import fehlgeschlagen",
++  "mcpJsonInvalid": "Ungültiges JSON-Format",
++  "mcpImportDescription": "Importiere die von deinen CLI-Agenten erkannten MCP-Konfigurationen in AionUi.",
++  "mcpStepSelectAgent": "Agent auswählen",
++  "mcpStepFetchTools": "MCP abrufen",
++  "mcpStepImportSuccess": "Import erfolgreich",
++  "mcpLoadingTools": "CLI-Tool-Liste wird gelesen …",
++  "mcpToolsLoaded": "{{count}} MCP-Server erkannt",
++  "mcpImportedSuccess": "{{count}} MCP-Server importiert",
++  "mcpWillImportCount": "{{count}} werden importiert",
++  "mcpImportedCount": "{{count}} importiert",
++  "mcpSkippedCount": "{{count}} übersprungen",
++  "mcpStatusReady": "Wird importiert",
++  "mcpStatusImported": "Importiert",
++  "mcpStatusSkipped": "Übersprungen",
++  "mcpWillImport": "Wird in AionUi importiert",
++  "mcpImported": "In AionUi importiert",
++  "mcpImportSkipped": "Nicht unterstützt",
++  "mcpImportSkippedAlreadyExists": "Bereits importiert",
++  "mcpImportSkippedPluginManaged": "Wird von einem CLI-Plugin verwaltet und kann hier nicht importiert werden",
++  "mcpImportSkippedDisabled": "In der CLI deaktiviert",
++  "mcpImportSkippedNeedsAuth": "Erfordert zuerst eine Authentifizierung in der CLI",
++  "mcpImportSkippedUnavailable": "Derzeit in der CLI nicht verfügbar",
++  "mcpImportButton": "Importieren",
++  "mcpPrevStep": "Zurück",
++  "mcpNextStep": "Weiter",
++  "mcpConfirmButton": "Bestätigen",
++  "mcpSyncStarted": "MCP-Konfiguration wird synchronisiert …",
++  "mcpRemoveStarted": "MCP-Konfiguration wird entfernt …",
++  "mcpSyncPartialFailed": "Synchronisierung der MCP-Konfiguration teilweise fehlgeschlagen: {{errors}}",
++  "mcpRemovePartialFailed": "Entfernen der MCP-Konfiguration teilweise fehlgeschlagen: {{errors}}",
++  "mcpSyncFailed": "Synchronisierung der MCP-Konfiguration fehlgeschlagen: {{error}}",
++  "mcpRemoveFailed": "Entfernen der MCP-Konfiguration fehlgeschlagen: {{error}}",
++  "mcpSyncFailedNoAgents": "Keine verfügbaren Agenten erkannt, MCP-Konfiguration kann nicht synchronisiert werden",
++  "mcpDeletedWithCleanup": "MCP-Server gelöscht und Konfiguration bereinigt",
++  "mcpDeleted": "MCP-Server gelöscht",
++  "mcpDeleteError": "Fehler beim Löschen der MCP-Konfiguration",
++  "mcpSyncError": "Synchronisierung der MCP-Konfiguration fehlgeschlagen",
++  "mcpRemoveError": "Entfernen der MCP-Konfiguration fehlgeschlagen",
++  "unknownError": "Unbekannter Fehler",
++  "devTools": "Entwicklertools",
++  "openDevTools": "DevTools öffnen",
++  "closeDevTools": "DevTools schließen",
++  "restartNow": "Jetzt neu starten",
++  "cdp": {
++    "title": "CDP (Chrome DevTools Protocol)",
++    "enable": "CDP-Remote-Debugging aktivieren",
++    "enableDesc": "Einen lokalen CDP-Endpunkt für Browser-Debugging und MCP-Integration bereitstellen.",
++    "currentPort": "Aktueller Port",
++    "openInBrowser": "/json im Browser öffnen",
++    "mcpConfig": "MCP-Konfiguration",
++    "copyMcpConfig": "MCP-Konfiguration kopieren",
++    "mcpConfigHint": "Füge dies in deine MCP-Client-Konfiguration ein, um eine Verbindung zu den lokalen Chrome DevTools herzustellen.",
++    "disabledHint": "CDP ist derzeit deaktiviert.",
++    "restartRequired": "CDP-Starteinstellung geändert. Zum Anwenden ist ein Neustart erforderlich.",
++    "configSaved": "CDP-Konfiguration gespeichert",
++    "configFailed": "CDP-Konfiguration konnte nicht gespeichert werden",
++    "playwrightMcpConfig": "Playwright-MCP-Konfiguration",
++    "playwrightMcpConfigHint": "Verwende Playwright MCP, um über den CDP-Endpunkt eine Verbindung herzustellen, mit Accessibility-Snapshots und Browser-Automatisierung."
++  },
++  "mcpNoDescription": "Keine Beschreibung",
++  "mcpAuthRequired": "Authentifizierung erforderlich",
++  "mcpOAuthLoginSuccess": "OAuth-Anmeldung erfolgreich",
++  "mcpOAuthLoginFailed": "OAuth-Anmeldung fehlgeschlagen",
++  "mcpLogin": "Anmelden",
++  "mcpNeedsLogin": "Anmeldung erforderlich",
++  "noConfiguredModels": "Keine konfigurierten Modelle",
++  "needHelpConfigGuide": "Hilfe benötigt? Sieh dir die ausführliche",
++  "configGuide": "Konfigurationsanleitung",
++  "configGuideSuffix": "an.",
++  "needHelpTooltip": "Wenn du Hilfe benötigst, sieh bitte nach",
++  "googleCloudProjectPlaceholder": "Gib deine Google Cloud Project ID ein",
++  "noAvailableModels": "Keine verfügbaren Modelle",
++  "appDescription": "Ein Desktop. Deine KI-Agenten, die wirklich zusammenarbeiten.",
++  "helpDocumentation": "Hilfedokumentation",
++  "updateLog": "Änderungsprotokoll",
++  "feedback": "Feedback",
++  "bugReport": "Problem melden",
++  "bugReportTitle": "Problem melden",
++  "oneClickFeedback": "Problem melden",
++  "bugReportModuleLabel": "Modul",
++  "bugReportModulePlaceholder": "Wähle das mit dem Problem zusammenhängende Modul",
++  "bugReportDescriptionLabel": "Beschreibung",
++  "bugReportDescriptionPlaceholder": "Beschreibe das Problem ausführlich, einschließlich der Schritte zur Reproduktion",
++  "bugReportScreenshotLabel": "Screenshots",
++  "bugReportScreenshotUploaded": "({{count}} hochgeladen)",
++  "bugReportScreenshotDropzoneText": "Screenshots hier klicken, ziehen oder einfügen",
++  "bugReportScreenshotFormats": "Unterstützt PNG, JPG, GIF",
++  "bugReportAutoInfo": "Systeminformationen und Logs der letzten 3 Tage werden automatisch angehängt, damit wir das Problem schneller eingrenzen können",
++  "bugReportSubmit": "Absenden",
++  "bugReportCancel": "Abbrechen",
++  "bugReportSuccess": "Bericht eingereicht, danke für dein Feedback",
++  "bugReportError": "Einreichen fehlgeschlagen, bitte später erneut versuchen",
++  "bugReportModuleSkills": "Skills & Plugins",
++  "bugReportModuleWebui": "WebUI & Remote-Zugriff",
++  "bugReportModuleMcp": "MCP & Tools",
++  "bugReportModuleChannel": "Kanal-Integrationen",
++  "bugReportModuleChat": "Konversation & Sitzungen",
++  "bugReportModuleScheduledTask": "Geplante Aufgaben",
++  "bugReportModuleLlmConfig": "Modelle & Authentifizierung",
++  "bugReportModuleAssistant": "Assistenten & Voreinstellungen",
++  "bugReportModulePermission": "Agentenerkennung & Verbindung",
++  "bugReportModuleSession": "Suche & Verlauf",
++  "bugReportModuleWorkspace": "Projekt, Dateien & Vorschau",
++  "bugReportModuleSkillsDescription": "Für Probleme mit dem Skills-Markt, integrierten oder externen Skills, Plugin-Installation und -Aktivierung, Ladefehlern oder Plugin-Ausführung.",
++  "bugReportModuleWebuiDescription": "Für Probleme mit dem WebUI-Start, Remote-Zugriff, QR-Anmeldung, Konto- oder Passwortänderungen oder browserseitigem Verhalten.",
++  "bugReportModuleMcpDescription": "Für Probleme mit der MCP-Serverkonfiguration, OAuth-Anmeldung, Tool-Synchronisierung, fehlenden Tools oder fehlgeschlagenen Tool-Aufrufen.",
++  "bugReportModuleChannelDescription": "Für Probleme mit Telegram-, Slack-, Lark- und anderen Kanal-Plugins, einschließlich Konfiguration, Kopplung, Autorisierung oder Nachrichtenzustellung.",
++  "bugReportModuleChatDescription": "Für Probleme beim Senden von Nachrichten, Empfangen von Agentenantworten, der Kontextverarbeitung, der Nutzung der Befehlswarteschlange oder anderem In-Chat-Verhalten.",
++  "bugReportModuleScheduledTaskDescription": "Für Probleme beim Erstellen, Bearbeiten, Auslösen, Erinnern oder Ausführen geplanter Aufgaben.",
++  "bugReportModuleLlmConfigDescription": "Für Probleme mit Modellanbietern, API-Schlüsseln, Anmeldung und Authentifizierung, Ratenbegrenzungen, Kontingenten oder Modellauswahl.",
++  "bugReportModuleAssistantDescription": "Für Probleme mit Assistentenkarten, Voreinstellungen, dem Wechseln von Standardwerten oder den Verhaltenseinstellungen von Assistenten.",
++  "bugReportModulePermissionDescription": "Für Probleme, bei denen lokale oder entfernte Agenten nicht erkannt werden, nicht verfügbar oder fehlerhaft sind oder eine Verbindung bzw. einen Handshake nicht herstellen können.",
++  "bugReportModuleSessionDescription": "Für Probleme mit Suche, Verlauf, Umbenennen, Anheften, Löschen oder der Darstellung von Konversationslisten.",
++  "bugReportModuleWorkspaceDescription": "Für Probleme mit Projekten, Uploads, Ordnerauswahl, Office-Dateien, Vorschaufenstern oder Diff-Ansichten.",
++  "bugReportModuleAgentTeamDescription": "Für Probleme mit der Teamerstellung, der Koordination von Leiter oder Teammitgliedern, der Aufgabenverteilung oder dem Team-Nachrichtenfluss.",
++  "bugReportModuleDisplaySettingsDescription": "Für Probleme mit Theme, Skalierung, UI-Stilen, Fensteranzeige oder der Darstellung des Desktop-Pets.",
++  "bugReportModuleSystemSettingsDescription": "Für Probleme mit Systemberechtigungen, Start beim Hochfahren, Benachrichtigungen, Speicherpfaden oder Plattform-Integration.",
++  "bugReportModuleOtherDescription": "Verwende dies, wenn das Problem mehrere Module betrifft oder du dir nicht sicher bist, welche Kategorie am besten passt.",
++  "bugReportModulePreview": "Vorschaufenster",
++  "bugReportModuleSystemSettings": "Systemeinstellungen",
++  "bugReportModuleDisplaySettings": "Oberfläche, Anzeige & Desktop-Pet",
++  "bugReportModulePlugin": "Plugin-System",
++  "bugReportModuleAgentTeam": "Team-Zusammenarbeit",
++  "bugReportModulePet": "Pet",
++  "bugReportModuleOther": "Sonstiges",
++  "contactMe": "Kontakt aufnehmen",
++  "officialWebsite": "Offizielle Website",
++  "checkForUpdates": "Nach Updates suchen",
++  "includePrereleaseUpdates": "Vorabversionen/Dev-Builds einbeziehen",
++  "saveModelConfigFailed": "Modellkonfiguration konnte nicht gespeichert werden",
++  "healthCheck": "Health-Check",
++  "clearStatus": "Status löschen",
++  "healthStatusCleared": "Health-Status gelöscht",
++  "latency": "Latenz",
++  "customAcpAgent": "Benutzerdefinierte ACP-Agenten",
++  "addCustomAgent": "Hinzufügen",
++  "configureCustomAgent": "Konfigurieren",
++  "editCustomAgent": "Benutzerdefinierten Agenten bearbeiten",
++  "noCustomAgentConfigured": "Keine benutzerdefinierten Agenten konfiguriert",
++  "agentDisabled": "Deaktiviert",
++  "customAcpAgentSaved": "Benutzerdefinierter Agent gespeichert",
++  "customAcpAgentSaveFailed": "Benutzerdefinierter Agent konnte nicht gespeichert werden",
++  "customAcpAgentDeleted": "Benutzerdefinierter Agent gelöscht",
++  "customAcpAgentDeleteFailed": "Benutzerdefinierter Agent konnte nicht gelöscht werden",
++  "deleteCustomAgent": "Benutzerdefinierten Agenten löschen",
++  "deleteCustomAgentConfirm": "Möchtest du diesen benutzerdefinierten Agenten wirklich löschen?",
++  "customAcpAgentJsonDescription": "Füge unten die JSON-Konfiguration deines benutzerdefinierten Agenten ein",
++  "customAcpAgentTips": "Konfigurationstipps:",
++  "customAcpAgentTip2": "name: Anzeigename, der in der Agentenauswahl angezeigt wird",
++  "customAcpAgentTip3": "defaultCliPath: Auszuführender Befehl (z. B. „goose“ oder „npx @pkg/name“)",
++  "customAcpAgentTip4": "env: Umgebungsvariablen (z. B. API-Schlüssel)",
++  "customAcpAgentTipArgs": "acpArgs: Benutzerdefinierte CLI-Argumente (optional)",
++  "configMode": "Konfigurationsmodus",
++  "simpleMode": "Einfach",
++  "advancedMode": "Erweitert (JSON)",
++  "selectCli": "CLI auswählen",
++  "noCliDetected": "Keine CLI-Tools erkannt. Bitte installiere zuerst eine ACP-kompatible CLI.",
++  "agentDisplayName": "Anzeigename",
++  "agentNamePlaceholder": "Gib einen Namen für diesen Agenten ein",
++  "commandLabel": "Befehl",
++  "commandPlaceholder": "z. B. my-agent oder /usr/local/bin/my-agent",
++  "commandHelp": "Der ausführbare Befehl zum Starten der Agenten-CLI",
++  "argsLabel": "Argumente",
++  "argsPlaceholder": "z. B. --acp --verbose",
++  "argsHelp": "Durch Leerzeichen getrennte Argumente, die an den Befehl übergeben werden",
++  "envLabel": "Umgebungsvariablen",
++  "envKeyPlaceholder": "KEY",
++  "envValuePlaceholder": "Wert",
++  "addEnvVar": "Variable hinzufügen",
++  "testConnectionBtn": "Verbindung testen",
++  "testConnectionTesting": "Wird getestet …",
++  "testConnectionSuccess": "Verbindung erfolgreich! Die CLI existiert und das ACP-Protokoll funktioniert.",
++  "testConnectionFailCli": "Befehl nicht gefunden. Stelle sicher, dass er installiert und in deinem PATH ist.",
++  "testConnectionFailAcp": "CLI gefunden, aber die ACP-Initialisierung ist fehlgeschlagen.",
++  "addCustomAgentTitle": "Benutzerdefinierten Agenten hinzufügen",
++  "simpleModeTip": "Wähle eine erkannte CLI und gib ihr einen eigenen Namen. Wechsle in den erweiterten Modus für Umgebungsvariablen und weitere Optionen.",
++  "command": "Befehl",
++  "args": "Argumente",
++  "env": "Env",
++  "agentModelSettings": "Agenten-Modelleinstellungen",
++  "agentModelSettingsTooltip": "Konfiguriere Standardmodelle für jeden KI-Agenten. Modelle werden beim Starten neuer Konversationen eingefügt.",
++  "selectModel": "Modell auswählen",
++  "agentModelSaved": "Modellauswahl gespeichert",
++  "agentModelSaveFailed": "Modellauswahl konnte nicht gespeichert werden",
++  "agentModelLoadFailed": "Agentenmodelle konnten nicht geladen werden",
++  "agentModelValidateSuccess": "Modellkonfiguration ist gültig",
++  "agentModelValidateFailed": "Modellvalidierung fehlgeschlagen",
++  "agentModelValid": "Konfiguration ist gültig",
++  "agentModelInvalid": "Konfiguration ist ungültig",
++  "clickToValidate": "Zum Validieren klicken",
++  "agentModelNote": "Hinweis: Modelländerungen werden in neuen Konversationen wirksam.",
++  "agentModelCustomNote": "Du kannst auch eine beliebige vom Agenten unterstützte benutzerdefinierte Modell-ID eingeben.",
++  "customModel": "Benutzerdefinierte Modell-ID …",
++  "customModelPlaceholder": "Modell-ID eingeben (z. B. claude-opus-4-20250514)",
++  "switchToPreset": "Zu voreingestellten Modellen wechseln",
++  "preset": "Voreinstellung",
++  "noAgentsDetected": "Keine Agenten erkannt",
++  "protocolDetecting": "API-Protokoll wird erkannt …",
++  "protocolDetected": "{{protocol}}-Protokoll erkannt",
++  "protocolDetectFailed": "Protokollerkennung fehlgeschlagen",
++  "protocolUnknown": "Unbekanntes Protokoll",
++  "switchPlatform": "Wechseln",
++  "platformSwitched": "Zur Plattform {{platform}} gewechselt",
++  "protocolOpenAICompatible": "OpenAI-kompatibles Protokoll erkannt, Konfiguration ist korrekt",
++  "protocolSwitchSuggestion": "{{protocol}}-Protokoll erkannt, erwäge den Wechsel zu {{platform}} für bessere Unterstützung",
++  "protocolTimeout": "Verbindungs-Timeout, bitte überprüfe Netzwerk oder API-URL",
++  "protocolInvalidKey": "Ungültiger API-Schlüssel, bitte überprüfe deinen Schlüssel",
++  "protocolCheckConfig": "API-Protokoll konnte nicht identifiziert werden, bitte überprüfe die Konfiguration",
++  "packyapiOpenAIDetected": "PackyAPI: OpenAI-Format erkannt. Für das Claude-Format entferne /v1 aus der URL und wähle die Anthropic-Plattform",
++  "packyapiAnthropicDetected": "PackyAPI: Claude-Format erkannt. Für das OpenAI-Format füge /v1 zur URL hinzu und wähle die OpenAI/Custom-Plattform",
++  "multiKeyTestResult": "Multi-Schlüssel-Test: {{valid}}/{{total}} gültig",
++  "multiKeyAllValid": "Alle {{total}} Schlüssel sind gültig",
++  "multiKeyPartialValid": "{{valid}} gültig, {{invalid}} ungültig",
++  "multiKeyAllInvalid": "Alle {{total}} Schlüssel sind ungültig",
++  "noSkillsFound": "Keine gültigen Skills im ausgewählten Pfad gefunden",
++  "skillScanFailed": "Skills konnten nicht gescannt werden",
++  "quickScan": "Schnellscan gängiger Pfade",
++  "assistant": {
++    "tokenRequired": "Bitte einen Bot-Token eingeben",
++    "pluginEnabled": "Telegram-Bot aktiviert",
++    "pluginDisabled": "Telegram-Bot deaktiviert",
++    "enableFailed": "Plugin konnte nicht aktiviert werden",
++    "disableFailed": "Plugin konnte nicht deaktiviert werden",
++    "connectionSuccess": "Verbunden! Bot: @{{username}}",
++    "connectionFailed": "Verbindung fehlgeschlagen",
++    "botToken": "Bot-Token",
++    "botTokenDesc": "Öffne Telegram, suche @BotFather und sende /newbot, um deinen Bot-Token zu erhalten.",
++    "testConnection": "Testen",
++    "defaultModel": "Standardmodell",
++    "defaultModelDesc": "Modell für Telegram-Konversationen",
++    "noAvailableModels": "Keine verfügbaren Modelle konfiguriert",
++    "selectModel": "Modell auswählen",
++    "modelSaved": "Modell gespeichert",
++    "modelSaveFailed": "Modell konnte nicht gespeichert werden",
++    "nextSteps": "Nächste Schritte",
++    "step1": "Öffne Telegram und suche nach deinem Bot",
++    "step2": "Sende eine beliebige Nachricht oder klicke auf /start, um die Kopplung zu starten",
++    "step3": "Unten erscheint eine Kopplungsanfrage. Klicke auf „Genehmigen“, um den Benutzer zu autorisieren.",
++    "step4": "Sobald genehmigt, kannst du über Telegram mit der KI chatten!",
++    "pendingPairings": "Ausstehende Kopplungsanfragen",
++    "noPendingPairings": "Keine ausstehenden Kopplungsanfragen",
++    "pairingCode": "Code",
++    "expiresIn": "Läuft ab in",
++    "approve": "Genehmigen",
++    "reject": "Ablehnen",
++    "pairingApproved": "Kopplung genehmigt",
++    "pairingRejected": "Kopplung abgelehnt",
++    "approveFailed": "Kopplung konnte nicht genehmigt werden",
++    "rejectFailed": "Kopplung konnte nicht abgelehnt werden",
++    "authorizedUsers": "Autorisierte Benutzer",
++    "noAuthorizedUsers": "Noch keine autorisierten Benutzer",
++    "platform": "Plattform",
++    "authorizedAt": "Autorisiert",
++    "revokeAccess": "Zugriff widerrufen",
++    "userRevoked": "Benutzerzugriff widerrufen",
++    "revokeFailed": "Benutzer konnte nicht widerrufen werden",
++    "copyCode": "Kopplungscode kopieren",
++    "agentDescTelegram": "Wird für Telegram-Konversationen verwendet",
++    "autoFollowCliModel": "Automatisch dem Modell folgen, wenn die CLI läuft",
++    "agentSwitched": "Agent erfolgreich gewechselt",
++    "modelSwitched": "Modell erfolgreich gewechselt"
++  },
++  "lark": {
++    "appId": "App ID",
++    "devConsoleLink": "Feishu Developer Console",
++    "appIdDescSuffix": ", um deine App ID zu erhalten",
++    "appSecret": "App Secret",
++    "appSecretDescSuffix": ", um das App Secret zu erhalten",
++    "encryptKey": "Encrypt Key",
++    "encryptKeyDesc": "Optional: Für die Ereignisverschlüsselung (aus den Einstellungen für Event Subscription)",
++    "verificationToken": "Verification Token",
++    "verificationTokenDesc": "Optional: Für die Ereignisüberprüfung (aus den Einstellungen für Event Subscription)",
++    "optional": "Optional",
++    "credentialsRequired": "Bitte App ID und App Secret eingeben",
++    "connectionSuccess": "Mit der Lark-API verbunden!",
++    "connectionFailed": "Verbindung fehlgeschlagen",
++    "pluginEnabled": "Lark-Bot aktiviert",
++    "pluginDisabled": "Lark-Bot deaktiviert",
++    "enableFailed": "Lark-Plugin konnte nicht aktiviert werden",
++    "testAndConnect": "Testen & verbinden",
++    "credentialsSaved": "Anmeldedaten bereits konfiguriert. Gib neue Werte ein, um sie zu aktualisieren.",
++    "defaultModelDesc": "Modell für Lark-Konversationen",
++    "connectionStatus": "Verbindungsstatus",
++    "statusConnected": "✅ Verbunden",
++    "statusError": "❌ Fehler",
++    "statusConnecting": "⏳ Verbindung wird hergestellt …",
++    "step1": "Öffne Feishu/Lark und finde deine Bot-Anwendung",
++    "step2": "Sende eine beliebige Nachricht, um die Kopplung zu starten",
++    "step3": "Unten erscheint eine Kopplungsanfrage. Klicke auf „Genehmigen“, um den Benutzer zu autorisieren.",
++    "step4": "Sobald genehmigt, kannst du über Lark mit dem KI-Assistenten chatten!",
++    "waitingConnection": "Die WebSocket-Verbindung wird aufgebaut. Bitte warten …",
++    "showOptionalFields": "Optionale Einstellungen anzeigen",
++    "hideOptionalFields": "Optionale Einstellungen ausblenden",
++    "agent": "Agent",
++    "agentDesc": "Wird für Lark-Konversationen verwendet",
++    "autoFollowCliModel": "Automatisch dem Modell folgen, wenn die CLI läuft"
++  },
++  "dingtalk": {
++    "clientId": "Client ID",
++    "devConsoleLink": "Folge dem Tutorial",
++    "clientIdDescSuffix": ", um deine Client ID zu erhalten",
++    "clientSecret": "Client Secret",
++    "clientSecretDescSuffix": ", um das Client Secret zu erhalten",
++    "credentialsRequired": "Bitte Client ID und Client Secret eingeben",
++    "connectionSuccess": "Mit der DingTalk-API verbunden!",
++    "connectionFailed": "Verbindung fehlgeschlagen",
++    "pluginEnabled": "DingTalk-Bot aktiviert",
++    "pluginDisabled": "DingTalk-Bot deaktiviert",
++    "enableFailed": "DingTalk-Plugin konnte nicht aktiviert werden",
++    "disableFailed": "DingTalk-Plugin konnte nicht deaktiviert werden",
++    "testAndConnect": "Testen & verbinden",
++    "credentialsSaved": "Anmeldedaten bereits konfiguriert. Gib neue Werte ein, um sie zu aktualisieren.",
++    "defaultModelDesc": "Modell für DingTalk-Konversationen",
++    "connectionStatus": "Verbindungsstatus",
++    "statusConnected": "Verbunden",
++    "statusError": "Fehler",
++    "statusConnecting": "Verbindung wird hergestellt …",
++    "step1": "Öffne DingTalk und finde deine Bot-Anwendung",
++    "step2": "Sende eine beliebige Nachricht, um die Kopplung zu starten",
++    "step3": "Unten erscheint eine Kopplungsanfrage. Klicke auf „Genehmigen“, um den Benutzer zu autorisieren.",
++    "step4": "Sobald genehmigt, kannst du über DingTalk mit dem KI-Assistenten chatten!",
++    "waitingConnection": "Die Verbindung wird aufgebaut. Bitte warten …",
++    "agent": "Agent",
++    "agentDesc": "Wird für DingTalk-Konversationen verwendet"
++  },
++  "weixin": {
++    "accountId": "Account ID",
++    "scanPrompt": "Bitte scanne den QR-Code mit WeChat",
++    "loginButton": "Zum Anmelden scannen",
++    "connected": "Verbunden",
++    "disconnect": "Trennen",
++    "scanned": "Gescannt, warte auf Bestätigung …",
++    "pluginEnabled": "WeChat-Kanal aktiviert",
++    "pluginDisabled": "WeChat-Kanal deaktiviert",
++    "enableFailed": "WeChat-Plugin konnte nicht aktiviert werden",
++    "disableFailed": "Trennen fehlgeschlagen",
++    "loginExpired": "QR-Code abgelaufen, bitte erneut versuchen",
++    "loginError": "WeChat-Anmeldung fehlgeschlagen",
++    "agent": "Agent",
++    "agentDesc": "Wird für WeChat-Konversationen verwendet",
++    "defaultModelDesc": "Modell für WeChat-Konversationen",
++    "step1": "Finde deinen Bot in WeChat und sende ihm eine Nachricht",
++    "step2": "Unten erscheint eine Kopplungsanfrage. Klicke auf „Genehmigen“, um den Benutzer zu autorisieren.",
++    "step3": "Sobald genehmigt, kannst du über WeChat mit dem KI-Assistenten chatten!",
++    "loginRequired": "Bitte melde dich zuerst mit dem WeChat-QR-Code an"
++  },
++  "wecom": {
++    "callbackTitle": "WeCom-Callback-URL",
++    "callbackLocal": "Lokal",
++    "callbackLan": "LAN",
++    "callbackHint": "Für den Produktivbetrieb wird in der Regel eine öffentliche HTTPS-URL benötigt, die von WeCom erreichbar ist. Starte zuerst WebUI; verwende bei Bedarf einen Reverse Proxy oder Tunnel.",
++    "devDocLink": "WeCom-Entwicklerdokumentation",
++    "token": "Callback-Token",
++    "tokenDesc": "Muss mit dem Token in der WeCom-Bot-Callback-Konfiguration übereinstimmen",
++    "encodingAesKey": "EncodingAESKey",
++    "encodingAesKeyDesc": "43-stelliger Schlüssel von WeCom (AES-Verschlüsselung für Callbacks)",
++    "credentialsRequired": "Bitte Token und EncodingAESKey eingeben",
++    "encodingAesKeyLength": "EncodingAESKey muss genau 43 Zeichen lang sein",
++    "credentialsSaved": "Anmeldedaten bereits konfiguriert. Gib neue Werte ein, um sie zu aktualisieren.",
++    "saveAndEnable": "Speichern & aktivieren",
++    "pluginEnabled": "WeCom-Kanal aktiviert",
++    "pluginDisabled": "WeCom-Kanal deaktiviert",
++    "enableFailed": "WeCom-Kanal konnte nicht aktiviert werden",
++    "disableFailed": "WeCom-Kanal konnte nicht deaktiviert werden",
++    "configureFirst": "Bitte speichere zuerst Token und EncodingAESKey",
++    "defaultModelDesc": "Modell für WeCom-Konversationen",
++    "connectionStatus": "Verbindungsstatus",
++    "statusConnected": "Verbunden",
++    "statusError": "Fehler",
++    "statusConnecting": "Verbindung wird hergestellt …",
++    "step1": "Konfiguriere die Callback-URL in der WeCom-Administration so, dass sie deiner WebUI-Basis + /channels/wecom/webhook entspricht",
++    "step2": "Sende eine beliebige Nachricht an den Bot in WeCom, um die Kopplung zu starten",
++    "step3": "Unten erscheint eine Kopplungsanfrage. Klicke auf „Genehmigen“, um den Benutzer zu autorisieren.",
++    "step4": "Sobald genehmigt, kannst du über WeCom mit dem KI-Assistenten chatten.",
++    "waitingConnection": "Stelle sicher, dass WebUI läuft, damit WeCom die Callback-URL erreichen kann.",
++    "agent": "Agent",
++    "agentDesc": "Wird für WeCom-Konversationen verwendet"
++  },
++  "extensionAssistantReadonly": "Erweiterungs-Assistenten sind schreibgeschützt. Du kannst sie duplizieren und die Kopie bearbeiten.",
++  "agentManagement": {
++    "localAgents": "Lokale Agenten",
++    "remoteAgents": "Remote-Agenten",
++    "localAgentsDescription": "Aion CLI ist der integrierte Agent und wird mit der App ausgeliefert – keine Installation nötig. Andere Agenten werden erst erkannt, nachdem ihre CLI lokal installiert wurde.",
++    "localAgentsSetupLink": "Einrichtungsanleitung",
++    "goToChat": "Chat starten",
++    "remoteAgentsDescription": "Derzeit werden nur Remote-OpenClaw-Verbindungen unterstützt. Andere Agenten sind in Entwicklung.",
++    "advancedConfig": "Erweiterte Konfiguration",
++    "geminiDescription": "Google Gemini KI-Befehlszeilen-Tool",
++    "connectRemoteAgent": "Remote-Agenten verbinden",
++    "discoverMoreAgents": "Weitere Agenten entdecken",
++    "addAgent": "Agent hinzufügen",
++    "installFromMarket": "Aus dem Markt installieren",
++    "marketInstall": "Installieren",
++    "marketInstalling": "Wird installiert …",
++    "marketUpdate": "Aktualisieren",
++    "marketEmpty": "Keine installierbaren Agenten gefunden. Überprüfe deine Netzwerkverbindung und stelle sicher, dass GitHub erreichbar ist.",
++    "marketContributionHint": "Möchtest du, dass hier ein neuer Agent gelistet wird?",
++    "marketContributionAction": "Einen PR auf AionHub eröffnen",
++    "marketComingSoon": "Der AionHub-Markt ist bald verfügbar.",
++    "detectCustomAgent": "Benutzerdefinierten Agenten erkennen",
++    "editCustomAgent": "Benutzerdefinierten Agenten bearbeiten",
++    "localAgentsEmpty": "Keine lokalen Agenten erkannt",
++    "detected": "Erkannt",
++    "customAgents": "Benutzerdefinierte Agenten",
++    "custom": "Benutzerdefiniert",
++    "addCustomAgent": "Benutzerdefinierten Agenten hinzufügen",
++    "customEmpty": "Keine benutzerdefinierten Agenten konfiguriert. Klicke auf „Benutzerdefinierten Agenten hinzufügen“, um einen zu erstellen."
++  },
++  "remoteAgent": {
++    "title": "Remote-Agenten",
++    "add": "Hinzufügen",
++    "addTitle": "Remote-Agenten hinzufügen",
++    "editTitle": "Remote-Agenten bearbeiten",
++    "empty": "Keine Remote-Agenten konfiguriert. Klicke auf „Hinzufügen“, um eine Verbindung zu einem Remote-Agentendienst herzustellen.",
++    "emptyTitle": "Noch keine Remote-Agenten verbunden",
++    "emptyAction": "Verbinde deinen ersten Agenten",
++    "guideAction": "Einrichtungsanleitung ansehen",
++    "name": "Name",
++    "namePlaceholder": "z. B. Mein Remote-Agent",
++    "nameRequired": "Name ist erforderlich",
++    "url": "URL",
++    "urlRequired": "Bitte die URL eingeben",
++    "authType": "Authentifizierung",
++    "authNone": "Keine",
++    "authBearer": "Bearer Token",
++    "authToken": "Token",
++    "tokenRequired": "Token ist erforderlich",
++    "tokenPlaceholder": "Token eingeben",
++    "description": "Beschreibung",
++    "descriptionPlaceholder": "Optionale Beschreibung",
++    "allowInsecure": "Unsichere Verbindung erlauben",
++    "allowInsecureHint": "TLS-Zertifikatsprüfung überspringen (für selbstsignierte Zertifikate)",
++    "testConnection": "Verbindung testen",
++    "testSuccess": "Verbindung erfolgreich",
++    "testFailed": "Verbindung fehlgeschlagen: {{error}}",
++    "testError": "Test fehlgeschlagen: {{error}}",
++    "save": "Speichern",
++    "cancel": "Abbrechen",
++    "created": "Remote-Agent erstellt",
++    "updated": "Remote-Agent aktualisiert",
++    "deleted": "Remote-Agent gelöscht",
++    "deleteConfirm": "Remote-Agenten löschen",
++    "deleteConfirmContent": "Möchtest du „{{name}}“ wirklich löschen?",
++    "handshaking": "Verbindung wird hergestellt …",
++    "pendingApproval": "Warte auf Gateway-Genehmigung …",
++    "pendingApprovalHint": "Bitte genehmige dieses Gerät im OpenClaw Gateway",
++    "pendingTimeout": "Genehmigungsanfrage abgelaufen (5 Minuten). Bitte erneut versuchen.",
++    "pendingCancel": "Abbrechen",
++    "pendingTimeRemaining": "Verbleibende Zeit: {{time}}"
++  }
++}
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/de-DE/starOffice.json b/packages/desktop/src/renderer/services/i18n/locales/de-DE/starOffice.json
+new file mode 100644
+index 0000000..659fc64
+--- /dev/null
++++ b/packages/desktop/src/renderer/services/i18n/locales/de-DE/starOffice.json
+@@ -0,0 +1,38 @@
++{
++  "monitor": {
++    "title": "OpenClaw Live-Monitor",
++    "detected": "Live-Monitor öffnen (erkannt unter {{url}})",
++    "detecting": "Lokaler Monitor-Dienst wird erkannt …",
++    "detectFailed": "Monitor-Erkennung fehlgeschlagen, zum manuellen Konfigurieren klicken",
++    "notInstalled": "Kein lokaler Monitor erkannt, zum Installieren/Verbinden klicken",
++    "openMonitor": "Live-Monitor öffnen",
++    "ready": "Verbunden: {{url}}",
++    "checking": "Lokaler Star-Office-Dienst wird geprüft …",
++    "error": "Erkennung fehlgeschlagen. Du kannst die URL weiterhin manuell eingeben.",
++    "missing": "Star Office wurde auf diesem Gerät nicht erkannt.",
++    "assistPromptInstalled": "Star Office wurde unter {{url}} erkannt. Bitte führe mich durch das Verbinden und stelle die verfügbaren Workflows vor.",
++    "installPrompt": "Bitte installiere und starte den Star-Office-Visualisierungsdienst und führe mich dann durch das Verbinden.",
++    "diagnosePrompt": "Die Star-Office-Verbindung hat Probleme. Bitte diagnostiziere und behebe sie.",
++    "visualTitle": "Was ist Star Office UI?",
++    "visualDesc": "Star Office ist ein visueller Begleiter für OpenClaw. Es verwandelt den Status im Chat in eine interaktive Live-Monitoransicht.",
++    "visualFallbackTitle": "Star Office UI – Live-Vorschau",
++    "visualFallbackDesc": "Der OpenClaw-Chatstatus wird zu einer visuellen Büroszene.",
++    "visualImageAlt": "Star Office UI – offizielle Vorschau",
++    "visualImageCaptionFallback": "Vorschaubild nicht verfügbar, öffne das Projekt für vollständige Screenshots.",
++    "visualImageCaption": "Offizielle Vorschau von Star-Office-UI (GitHub).",
++    "visualStepChat": "OpenClaw-Chat",
++    "visualStepUi": "Star Office UI",
++    "visualStepLive": "Live-Monitor",
++    "introTitle": "Star-Office-Monitor",
++    "connectedInline": "Verbunden · {{url}}",
++    "notDetectedInline": "Auf diesem Gerät nicht erkannt",
++    "openNow": "Monitor öffnen",
++    "hideUrlEditor": "URL-Editor ausblenden",
++    "editUrl": "URL ändern",
++    "installWithOpenClaw": "Mit OpenClaw installieren",
++    "detect": "Erneut erkennen",
++    "diagnoseHint": "Verbindungsproblem erkannt. ",
++    "diagnoseRun": "Geführte Diagnose ausführen",
++    "hint": "Monitor-URL manuell eingeben, z. B. http://127.0.0.1:19000"
++  }
++}
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/de-DE/team.json b/packages/desktop/src/renderer/services/i18n/locales/de-DE/team.json
+new file mode 100644
+index 0000000..738fe4f
+--- /dev/null
++++ b/packages/desktop/src/renderer/services/i18n/locales/de-DE/team.json
+@@ -0,0 +1,60 @@
++{
++  "sider": {
++    "title": "Teams",
++    "createTeam": "Neues Team",
++    "pin": "Anpinnen",
++    "unpin": "Abpinnen",
++    "rename": "Umbenennen",
++    "delete": "Löschen",
++    "renameTitle": "Team umbenennen",
++    "renamePlaceholder": "Teamname",
++    "deleteConfirm": "Dieses Team löschen?",
++    "deleteConfirmContent": "Diese Aktion kann nicht rückgängig gemacht werden.",
++    "deleteOk": "Löschen",
++    "deleteCancel": "Abbrechen",
++    "renameOk": "Speichern",
++    "renameCancel": "Abbrechen",
++    "renameSuccess": "Team umbenannt",
++    "deleteSuccess": "Team gelöscht"
++  },
++  "newAgent": "Neuer Agent",
++  "noMessages": "Noch keine Nachrichten.",
++  "agentNotConfigured": "Agent noch nicht konfiguriert.",
++  "sendBox": {
++    "placeholder": "Nachricht an Team-Leiter …"
++  },
++  "create": {
++    "title": "Team erstellen",
++    "namePlaceholder": "Teamname",
++    "dispatchAgentPlaceholder": "Team-Leiter auswählen",
++    "subAgentsPlaceholder": "Sub-Agenten auswählen",
++    "workspacePlaceholder": "Projektordner-Pfad (optional)",
++    "confirm": "Team erstellen",
++    "noSupportedAgents": "Keine unterstützten Agenten installiert",
++    "supportedAgentsHint": "Unterstützt derzeit Claude und Codex. Weitere Agenten folgen bald.",
++    "leaderDesc": "Versteht deine Ziele und koordiniert Agenten, um Aufgaben zu erledigen",
++    "step": {
++      "dispatch": "Team-Leiter",
++      "subAgents": "Sub-Agenten",
++      "workspace": "Projekt"
++    },
++    "nameRequired": "Bitte gib einen Teamnamen ein",
++    "leaderRequired": "Bitte wähle einen Team-Leiter aus",
++    "selectFolder": "Ordner auswählen",
++    "recentLabel": "Zuletzt verwendet",
++    "chooseDifferentFolder": "Anderen Ordner auswählen",
++    "error": "Team konnte nicht erstellt werden"
++  },
++  "removeAgent": {
++    "confirmTitle": "Teammitglied entfernen",
++    "confirmContent": "Dieses Mitglied ist gerade aktiv. Trotzdem entfernen?"
++  },
++  "emptyState": {
++    "subtitle": "Beschreibe dein Ziel und ich setze das Team darauf an",
++    "suggestions": {
++      "debate": "Eine Debatte organisieren, in der Agenten unterschiedliche Positionen vertreten",
++      "interview": "Ein ausführliches Interview zwischen Agenten planen",
++      "expert_review": "Mehrere Experten dasselbe Problem analysieren lassen"
++    }
++  }
++}
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/de-DE/tools.json b/packages/desktop/src/renderer/services/i18n/locales/de-DE/tools.json
+new file mode 100644
+index 0000000..a57701c
+--- /dev/null
++++ b/packages/desktop/src/renderer/services/i18n/locales/de-DE/tools.json
+@@ -0,0 +1,69 @@
++{
++  "unknownFile": "Unbekannte Datei",
++  "newFile": "Neue Datei",
++  "deletedFile": "Gelöschte Datei",
++  "modified": "Geändert",
++  "fileChanges": "Dateiänderungen",
++  "shell": {
++    "displayName": "Shell-Befehl",
++    "description": "Shell-Befehle ausführen"
++  },
++  "fileOps": {
++    "displayName": "Dateioperationen",
++    "description": "Datei lesen, schreiben und ändern"
++  },
++  "webSearch": {
++    "displayName": "Websuche",
++    "description": "Webinhalte durchsuchen"
++  },
++  "mcp": {
++    "generic": {
++      "displayName": "MCP-Tool: {{toolName}}",
++      "description": "MCP-Tool-Aufruf: {{toolName}}"
++    }
++  },
++  "unknown": {
++    "displayName": "Unbekanntes Tool",
++    "description": "Unbekannter Tool-Typ"
++  },
++  "status": {
++    "pending": "Ausstehend",
++    "executing": "Wird ausgeführt",
++    "success": "Erfolgreich",
++    "error": "Fehler",
++    "canceled": "Abgebrochen"
++  },
++  "titles": {
++    "web_search_started": "Websuche gestartet",
++    "web_search_completed": "Websuche abgeschlossen",
++    "web_search": "Websuche",
++    "applying_patch": "Patch wird angewendet",
++    "patch_applied": "Patch angewendet",
++    "file_patch": "Datei-Patch",
++    "mcp_tool_starting": "MCP-Tool: {{toolName}} (wird gestartet)",
++    "mcp_tool": "MCP-Tool: {{toolName}}",
++    "execute_command": "Ausführen: {{command}}",
++    "command_output": "Befehlsausgabe",
++    "command_completed": "Befehl abgeschlossen",
++    "shell_command": "Shell-Befehl"
++  },
++  "labels": {
++    "search_query": "Suchanfrage:",
++    "file_changes": "Dateiänderungen:",
++    "tool_details": "Tool-Details:",
++    "tool": "Tool",
++    "arguments": "Argumente:",
++    "result": "Ergebnis:",
++    "command": "Befehl:",
++    "working_directory": "Arbeitsverzeichnis:",
++    "exit_code": "Exit: {{code}}",
++    "duration": "Dauer: {{seconds}}",
++    "auto_approved": "Automatisch genehmigt",
++    "manual_approval": "Manuelle Genehmigung"
++  },
++  "actions": {
++    "create": "erstellen",
++    "modify": "ändern",
++    "delete": "löschen"
++  }
++}
+diff --git a/packages/desktop/src/renderer/services/i18n/locales/de-DE/update.json b/packages/desktop/src/renderer/services/i18n/locales/de-DE/update.json
+new file mode 100644
+index 0000000..ef267a3
+--- /dev/null
++++ b/packages/desktop/src/renderer/services/i18n/locales/de-DE/update.json
+@@ -0,0 +1,26 @@
++{
++  "modalTitle": "Software-Update",
++  "checking": "Suche nach Updates ...",
++  "checkFailed": "Suche nach Updates fehlgeschlagen",
++  "upToDateTitle": "Alles aktuell",
++  "currentVersion": "Aktuelle Version: {{version}}",
++  "availableTitle": "Update verfügbar",
++  "noReleaseNotes": "Keine Release Notes vorhanden.",
++  "downloadingTitle": "Update wird heruntergeladen ...",
++  "downloadButton": "Herunterladen",
++  "downloadAndInstall": "Herunterladen & installieren",
++  "downloadStartFailed": "Download konnte nicht gestartet werden",
++  "downloadFailed": "Download fehlgeschlagen",
++  "noCompatibleAsset": "Kein kompatibler Download für diese Plattform gefunden",
++  "noCompatibleAssetManual": "Kein Paket passt zu deiner aktuellen Systemarchitektur. Bitte lade den passenden Installer aus den Releases herunter.",
++  "goToRelease": "Releases öffnen",
++  "downloadCompleteTitle": "Download abgeschlossen",
++  "readyToInstall": "Bereit zur Installation",
++  "readyToInstallDesc": "Das Update wurde heruntergeladen. Klicke auf die Schaltfläche unten, um neu zu starten und das Update zu installieren.",
++  "installNow": "Installieren und neu starten",
++  "installWarning": "Öffne die App während der Installation nicht erneut. Sie wird automatisch neu gestartet.",
++  "autoUpdateMode": "Automatische Updates",
++  "showInFolder": "Im Ordner anzeigen",
++  "openFile": "Datei öffnen",
++  "errorTitle": "Update fehlgeschlagen"
++}
 diff --git a/packages/desktop/src/renderer/services/i18n/locales/en-US/guid.json b/packages/desktop/src/renderer/services/i18n/locales/en-US/guid.json
 index 0a9e582..0121854 100644
 --- a/packages/desktop/src/renderer/services/i18n/locales/en-US/guid.json
@@ -324,14 +4029,21 @@ index 0a9e582..0121854 100644
 +    "prompt": "Hi, what's your plan for today?"
 +  },
 diff --git a/packages/desktop/src/renderer/services/i18n/locales/en-US/login.json b/packages/desktop/src/renderer/services/i18n/locales/en-US/login.json
-index 558b796..b846b86 100644
+index 558b796..ad5b44b 100644
 --- a/packages/desktop/src/renderer/services/i18n/locales/en-US/login.json
 +++ b/packages/desktop/src/renderer/services/i18n/locales/en-US/login.json
-@@ -2,2 +2,2 @@
+@@ -2,3 +2,3 @@
 -  "pageTitle": "AionUi - Sign In",
 -  "brand": "AionUi",
-+  "pageTitle": "EVE - Sign In",
-+  "brand": "EVE",
+-  "subtitle": "Welcome back, please sign in to your account",
++  "pageTitle": "⌘ EVE - Sign In",
++  "brand": "⌘ EVE",
++  "subtitle": "Welcome back. Sign in to start Command EVE.",
+@@ -16,2 +16,2 @@
+-  "footerPrimary": "Transform your command-line AI",
+-  "footerSecondary": "Modern & Efficient",
++  "footerPrimary": "Command EVE Operator Shell",
++  "footerSecondary": "Company.OS with Human-Gates",
 diff --git a/packages/desktop/src/renderer/services/i18n/locales/ja-JP/guid.json b/packages/desktop/src/renderer/services/i18n/locales/ja-JP/guid.json
 index f81768a..772225a 100644
 --- a/packages/desktop/src/renderer/services/i18n/locales/ja-JP/guid.json

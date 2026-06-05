@@ -7,14 +7,18 @@ import test from "node:test";
 import {
   buildAionuiStartCommand,
   buildEveFirstRunSkillContent,
+  buildEveFirstRunConfirmationFlow,
   buildEveSoulContent,
   buildEveRuntimeBootPacket,
+  buildHermesAuthPreflightProfile,
   buildHermesPackageDecision,
   classifyFailureTaxonomy,
   DEFAULT_EVE_CONNECTOR_MANIFEST_FILE,
   DEFAULT_EVE_RUNTIME_POLICY_FILE,
   DEFAULT_CONTEXT_FILES,
   FAILURE_CODES,
+  EVE_FIRST_RUN_CONFIRMATION_VERSION,
+  EVE_HERMES_AUTH_PREFLIGHT_VERSION,
   prepareEveSidecar,
   preflightEveSidecar,
   readEveConnectorManifest,
@@ -177,6 +181,9 @@ test("buildEveFirstRunSkillContent gives EVE startup modules and connector rules
   assert.match(skill, /Ask no company identity, tool-stack or permission questions/);
   assert.match(skill, /manifest as policy, not proof of availability/);
   assert.match(skill, /Runtime Policy/);
+  assert.match(skill, /Auth \/ Model Preflight/);
+  assert.match(skill, /minimax\/minimax-m3/);
+  assert.match(skill, /BLOCKED_AUTH means provider key/);
   assert.match(skill, /native-scheduled-tasks/);
   assert.match(skill, /durable-memory-writes/);
   assert.match(skill, /unverified until the verify command or connector evidence passes/);
@@ -200,6 +207,67 @@ test("buildEveRuntimeBootPacket distinguishes templates from client seed", () =>
   assert.equal(packet.first_response_modes.client_seed_missing.choices.length, 3);
   assert.match(packet.first_response_modes.client_seed_missing.forbidden.join("\n"), /full setup queue/);
   assert.match(packet.first_response_modes.client_seed_present.opening, /already have these company\/account facts/);
+  assert.equal(packet.first_run_confirmation.version, EVE_FIRST_RUN_CONFIRMATION_VERSION);
+  assert.equal(packet.first_run_confirmation.seed_status, "client_seed_missing");
+  assert.ok(packet.first_run_confirmation.progressive_setup_queue.required_now.includes("confirm known account/company facts"));
+});
+
+test("buildEveFirstRunConfirmationFlow states known facts before setup queue", () => {
+  const fixture = makeFixture();
+  writeFile(
+    path.join(fixture.companyOsRoot, ".company-os/onboarding/eve-boot-packet.json"),
+    JSON.stringify({
+      account_seed: {
+        user_name: "Jane Founder",
+        company_name: "Acme Systems",
+        website: "https://acme.example",
+        primary_offer: "AI operating-system setup",
+        buyer: "founder-led service firms",
+        first_department: "marketing",
+      },
+      existing_systems: {
+        discovery_status: "partial",
+        connected_tools: ["Plane"],
+        already_available: ["GitHub repo"],
+        missing_or_blocked: ["Honcho auth"],
+      },
+    }),
+  );
+  const paths = resolveEveSidecarPaths({
+    companyOsRoot: fixture.companyOsRoot,
+    privateRoot: fixture.privateRoot,
+  });
+  const flow = buildEveFirstRunConfirmationFlow({ paths, generatedAt: "2026-06-04T00:00:00.000Z" });
+
+  assert.equal(flow.version, EVE_FIRST_RUN_CONFIRMATION_VERSION);
+  assert.equal(flow.seed_status, "client_seed_present");
+  assert.equal(flow.status, "needs_confirmation");
+  assert.equal(flow.first_response_contract.ask, "Is this correct?");
+  assert.equal(flow.known_facts.find((fact) => fact.id === "company_name").value, "Acme Systems");
+  assert.equal(flow.known_facts.find((fact) => fact.id === "primary_offer").source, ".company-os/onboarding/eve-boot-packet.json");
+  assert.equal(flow.existing_system_inventory.policy, "adapt_existing_first");
+  assert.deepEqual(flow.existing_system_inventory.connected_tools, ["Plane"]);
+  assert.ok(flow.progressive_setup_queue.required_now.includes("run Hermes provider auth/model smoke if auth is unverified"));
+  assert.ok(flow.allowed_drafts.includes("CEO Delegation Packet"));
+  assert.ok(flow.blocked_actions.includes("no worker dispatch"));
+});
+
+test("buildHermesAuthPreflightProfile points to official BYOK flow without storing secrets", () => {
+  const fixture = makeFixture();
+  const paths = resolveEveSidecarPaths({
+    companyOsRoot: fixture.companyOsRoot,
+    privateRoot: fixture.privateRoot,
+  });
+  const profile = buildHermesAuthPreflightProfile({ paths });
+
+  assert.equal(profile.version, EVE_HERMES_AUTH_PREFLIGHT_VERSION);
+  assert.equal(profile.provider, "openrouter");
+  assert.equal(profile.model, "gpt-5.1-codex-mini");
+  assert.equal(profile.status, "model_profile_ready_auth_unverified");
+  assert.equal(profile.official_setup.blocked_auth_result, FAILURE_CODES.BLOCKED_AUTH);
+  assert.match(profile.official_setup.rule, /official BYOK\/API-key flow/);
+  assert.match(profile.secret_policy, /do-not-store-raw-api-key/);
+  assert.ok(profile.blocked_actions.some((action) => /raw API keys/.test(action)));
 });
 
 test("prepare dry-run plans writes without mutating private sidecar", () => {
@@ -258,6 +326,9 @@ test("preflight passes after prepare against fixture sidecars", () => {
   assert.match(result.hermes.version_text, /Hermes Agent v0\.test/);
   assert.equal(result.hermes.model_config.model, "gpt-5.1-codex-mini");
   assert.equal(result.hermes.model_config.provider, "openrouter");
+  assert.equal(result.hermes.auth_profile.status, "model_profile_ready_auth_unverified");
+  assert.equal(result.hermes.auth_profile.auth_mode, "bring-your-own-key");
+  assert.equal(result.eve.first_run_confirmation.seed_status, "client_seed_missing");
   assert.equal(result.hermes.acp_dependency.status, "found");
   assert.equal(result.hermes.soul_location.status, "found");
   assert.equal(result.eve.first_run_skill.status, "found");
@@ -346,6 +417,8 @@ test("Hermes smoke passes provider and model through to the local wrapper", () =
   });
   assert.equal(result.ok, true);
   assert.match(result.result.stdout, /--model gpt-5\.1-codex-mini --provider openrouter -z EVE smoke/);
+  assert.equal(result.auth_profile.status, "verified");
+  assert.equal(result.auth_profile.readiness_proof.status, "pass");
 });
 
 test("Hermes smoke falls back to HERMES_HOME default model config", () => {
@@ -369,6 +442,7 @@ test("Hermes smoke falls back to HERMES_HOME default model config", () => {
   assert.equal(result.model, "gpt-5.1-codex-mini");
   assert.equal(result.provider, "openrouter");
   assert.match(result.result.stdout, /--model gpt-5\.1-codex-mini --provider openrouter -z EVE smoke/);
+  assert.equal(result.auth_profile.provider, "openrouter");
 });
 
 test("start command exports local Hermes shim and AionUI state dirs", () => {
@@ -405,6 +479,18 @@ test("buildHermesPackageDecision reads version from pyproject.toml", () => {
   assert.match(decision.decision, /0\.14\.0/);
   assert.ok(decision.install_path);
   assert.ok(Array.isArray(decision.update_procedure.split(" ").filter(Boolean)));
+});
+
+test("buildHermesPackageDecision falls back to installed package metadata", () => {
+  const fixture = makeFixture();
+  writeFile(path.join(fixture.hermesRoot, "venv/bin/python"), "#!/usr/bin/env bash\necho '0.15.2'\n", 0o755);
+  const paths = resolveEveSidecarPaths({
+    companyOsRoot: fixture.companyOsRoot,
+    privateRoot: fixture.privateRoot,
+  });
+  const decision = buildHermesPackageDecision(paths);
+  assert.equal(decision.version, "0.15.2");
+  assert.match(decision.decision, /0\.15\.2/);
 });
 
 test("buildHermesPackageDecision returns unknown version when pyproject.toml is missing", () => {
@@ -492,7 +578,9 @@ test("preflightEveSidecar includes failure_taxonomy and hermes_package_decision 
   });
   assert.ok("failure_taxonomy" in result, "failure_taxonomy must be present");
   assert.ok("hermes_package_decision" in result, "hermes_package_decision must be present");
+  assert.ok("auth_profile" in result, "auth_profile must be present");
   assert.equal(result.failure_taxonomy.code, null);
   assert.equal(result.hermes_package_decision.version, "0.14.0");
   assert.equal(result.hermes_package_decision.update_channel, "manual-explicit");
+  assert.equal(result.auth_profile.auth_mode, "bring-your-own-key");
 });

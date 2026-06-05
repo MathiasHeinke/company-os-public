@@ -1,24 +1,26 @@
 # Client Productization Readiness
 
-Status: canonical productization gate for `0.9.0-rc.0`
+Status: canonical productization gate for `1.0.0-alpha.2`
 Use for: deciding whether Company.OS can be installed into another company
-Last updated: 2026-06-03
+Last updated: 2026-06-04
 
 ## Verdict
 
-Company.OS `0.9.0-rc.0` is ready as a **Command EVE remote-install release
-candidate** for the install/onboarding/update path. A public clone or
-sanitized public mirror artifact can install the kit into a fresh target,
-write the first intake from generic signup/report seed, generate EVE's boot
-packet, write update provenance and produce a public-RC handoff report.
+Company.OS `1.0.0-alpha.2` is ready as a **Command EVE local operator-shell
+alpha** for the install/onboarding/update path. A public clone or sanitized
+public mirror artifact can install the kit into a fresh target, write the first
+intake from generic signup/report seed, generate EVE's boot packet, prepare
+AionUI/Hermes/EVE sidecars, write BYOK/auth and first-run confirmation
+receipts, write update provenance and produce a public-RC handoff report.
 
 It is a guided/self-serve release candidate, not a stable unrestricted
 autonomy product.
 
 ```text
-public remote-install rc: yes
+public self-install alpha: yes
 public mirror artifact: yes
 private overlays update from public: yes
+installed start_eve auth-check: yes
 stable unsupported autonomy: gated
 default scheduler autonomy: gated
 ```
@@ -41,7 +43,7 @@ HumanGate release.
 | Company discovery | ready | `docs/operations/client-onboarding-discovery-pipeline.md`, `docs/templates/company-discovery-brief.md` |
 | EVE first-run boot packet | ready | `docs/operations/eve-first-run-founder-onboarding.md`, `kits/company-os-kit/.company-os/onboarding/eve-boot-packet.example.json`, `scripts/onboarding/first-company-packet.mjs` |
 | Client stack registry | ready | `docs/registries/company-os-client-stack-registry.md` |
-| Kit install | public RC | `scripts/install/public-rc.mjs`, `scripts/install/bootstrap.mjs`, `kits/company-os-kit/`, `docs/bootstrap/fresh-company-setup.md` |
+| Kit + Command EVE install | alpha self-install | `scripts/install/command-eve-self-install.mjs`, `scripts/install/public-rc.mjs`, `scripts/operator-shell/install-command-eve.mjs`, `kits/company-os-kit/`, `docs/bootstrap/fresh-company-setup.md` |
 | Plane execution ledger | ready for guided installs | `docs/orchestration/plane-first-linear-bridge.md`, `docs/integrations/plane-app-control-plane.md` |
 | Worker contracts | ready | `docs/templates/worker-issue-contract.md`, `docs/orchestration/spec-to-worker-pipeline.md` |
 | Capability registry | ready as gate | `docs/registries/capability-registry.md`, `registries/capabilities/company-os.json` |
@@ -85,6 +87,9 @@ Before installing Company.OS into a new firm, the operator must complete:
 
 The current public-RC install bar is:
 
+- `scripts/install/command-eve-self-install.mjs` is the founder-facing
+  one-command wrapper for the current alpha: dry-run first, then public-RC
+  workspace install plus managed AionUI/Hermes/EVE sidecar install
 - `scripts/install/public-rc.mjs` provisions kit files and active local setup
   files without overwriting existing client rules or installation state
 - public mirror builder includes domain-pack, Plane-template and

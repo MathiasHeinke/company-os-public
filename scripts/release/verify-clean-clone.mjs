@@ -63,6 +63,7 @@ const TOKEN_PATTERNS = [
   { id: "github-fine-grained-pat", regex: /\bgithub_pat_[A-Za-z0-9_]{20,}/ },
   { id: "slack-bot-token", regex: /\bxoxb-[A-Za-z0-9-]{10,}/ },
   { id: "slack-user-token", regex: /\bxoxp-[A-Za-z0-9-]{10,}/ },
+  { id: "supabase-token", regex: /\b(?:sbp_[A-Za-z0-9_-]{16,}|su_(?:live|test)_[A-Za-z0-9_-]{16,})\b/ },
   { id: "google-api-key", regex: /\bAIza[0-9A-Za-z_-]{30,}/ },
 ];
 

@@ -76,12 +76,13 @@ Clone locally under one developer root:
 ~/Developer/agent-repo
 ```
 
-## Phase 4 - Install Company.OS Kit
+## Phase 4 - Install Company.OS Kit + Command EVE
 
-From the public Company.OS repo root, run the public-RC installer:
+From the public Company.OS repo root, first run the no-write Command EVE
+self-install dry-run:
 
 ```bash
-node scripts/install/public-rc.mjs install \
+node scripts/install/command-eve-self-install.mjs install --dry-run \
   --target ~/Developer/product-repo \
   --company "Acme Systems" \
   --website "https://acme.example" \
@@ -93,9 +94,25 @@ node scripts/install/public-rc.mjs install \
   --json
 ```
 
-The installer runs the bootstrap collision dry-run, installs the kit, writes
-the first intake from signup/report seed, generates EVE's boot packet, writes
-an update dry-run report and writes a public-RC handoff report.
+If the dry-run reports `pass` or `dry-run`, run the live install:
+
+```bash
+node scripts/install/command-eve-self-install.mjs install \
+  --target ~/Developer/product-repo \
+  --company "Acme Systems" \
+  --website "https://acme.example" \
+  --offer "AI operating-system setup" \
+  --buyer "founder-led service firms" \
+  --founder "Jane Founder" \
+  --approval-owner "Jane Founder" \
+  --first-department marketing \
+  --json
+```
+
+The wrapper runs the bootstrap collision dry-run, installs the kit, writes the
+first intake from signup/report seed, generates EVE's boot packet, writes an
+update dry-run report, writes a public-RC handoff report, installs the managed
+AionUI/Hermes/EVE sidecars and writes a combined self-install report.
 
 It creates active local setup files:
 
@@ -108,7 +125,11 @@ It creates active local setup files:
 - `.company-os/onboarding/company-intake.json`
 - `.company-os/onboarding/intake-record.json`
 - `.company-os/onboarding/eve-boot-packet.json`
-- `reports/company-os-public-rc/YYYY-MM-DD/company-os-public-rc-0.9.0-rc.0.md`
+- `.company-os/bin/start_eve`
+- `.company-os/bin/update_eve`
+- `reports/company-os-public-rc/YYYY-MM-DD/company-os-public-rc-1.0.0-alpha.1.md`
+- `reports/operator-shell/YYYY-MM-DD/command-eve-install-1.0.0-alpha.1.md`
+- `reports/command-eve-self-install/YYYY-MM-DD/command-eve-self-install-1.0.0-alpha.1.md`
 
 Record the exact Company.OS version and autonomy profile. Do not install
 "latest" without a version.
@@ -269,8 +290,24 @@ clear and the readiness verdict is `go` or `pilot-only`.
 
 ## Phase 6.6 - Self-Serve Smoke Drill
 
-Before claiming the install path for a new founder, run the public-RC install
-drill from the public Company.OS source checkout:
+Before claiming the install path for a new founder, run the Command EVE
+self-install dry-run from the public Company.OS source checkout:
+
+```bash
+node ~/Developer/company-os/scripts/install/command-eve-self-install.mjs install --dry-run \
+  --target ~/Developer/product-repo-self-serve-smoke \
+  --company "Acme Systems" \
+  --website "https://acme.example" \
+  --offer "AI operating-system setup" \
+  --buyer "founder-led service firms" \
+  --approval-owner "Jane Founder" \
+  --first-department marketing \
+  --date YYYY-MM-DD \
+  --json
+```
+
+The lower-level public-RC drill remains useful when debugging the workspace kit
+install without AionUI/Hermes:
 
 ```bash
 node ~/Developer/company-os/scripts/install/public-rc.mjs install \
@@ -294,7 +331,8 @@ node ~/Developer/company-os/scripts/install/self-serve-smoke.mjs run \
   --json
 ```
 
-The public-RC drill proves the narrow 0.9 path end to end:
+The self-install drill proves the current local-first 1.0 alpha path end to
+end:
 
 - bootstrap dry-run blocks collisions before writes
 - bootstrap apply installs the kit
@@ -303,6 +341,8 @@ The public-RC drill proves the narrow 0.9 path end to end:
 - update check writes an update report
 - update apply dry-run stays non-destructive
 - public-RC handoff report tells EVE what is known and what needs confirmation
+- AionUI/Hermes pins, prerequisites and generated start/update commands are
+  checked before sidecar writes
 
 This does not replace founder onboarding. It only proves the repo artifacts can
 produce the first install/onboarding/update evidence from a fresh target.

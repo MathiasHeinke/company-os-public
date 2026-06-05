@@ -720,6 +720,13 @@ test("redactRuntimeOutput strips obvious secret patterns", () => {
   assert.equal(redacted.includes("[REDACTED_SECRET]"), true);
 });
 
+test("redactRuntimeOutput strips Supabase token patterns", () => {
+  const fakeKey = ["su", "test", "abcdefghijklmnopqrstuvwxyz"].join("_");
+  const redacted = redactRuntimeOutput(`token ${fakeKey}`);
+  assert.equal(redacted.includes(fakeKey), false);
+  assert.equal(redacted.includes("[REDACTED_SECRET]"), true);
+});
+
 test("redactRuntimeOutput strips runtime connector tokens that can appear in process args", () => {
   const honchoToken = ["hch", "v3", "abcdefghijklmnopqrstuvwxyz123456"].join("-");
   const openRouterToken = ["sk", "or", "v1", "abcdefghijklmnopqrstuvwxyz123456"].join("-");

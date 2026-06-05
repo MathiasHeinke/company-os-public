@@ -12,13 +12,16 @@ import {
   normalizeHumanGateLevel,
   resolveControllerInputs,
   decideController,
+  buildPostWorkerQualityPlanForController,
   buildDecisionCardYaml,
   findCaoVerdictComment,
 } from "./codex-controller-dryrun.mjs";
+import { loadPostWorkerQualityRegistry } from "./post-worker-quality-loop-core.mjs";
 import { stripHtml } from "./plane-html.mjs";
 import { extractContractBlock } from "./worker-ledger-validator.mjs";
 
 const EMPTY_GATES = { green: [], red: [] };
+const QUALITY_REGISTRY = loadPostWorkerQualityRegistry().registry;
 
 test("normalizeHumanGateLevel extracts canonical level from descriptive contracts", () => {
   assert.equal(normalizeHumanGateLevel("HG-2.5 sandbox only; no merge"), "HG-2.5");
@@ -409,6 +412,75 @@ test("buildDecisionCardYaml emits expected keys for SELF-FIX", () => {
   assert.match(yaml, /selffix:/);
   assert.match(yaml, /eligible: true/);
   assert.match(yaml, /no_writes_performed: true/);
+});
+
+test("buildPostWorkerQualityPlanForController makes shared coding work scheduler-visible", () => {
+  const decision = decideController({
+    caoVerdict: "PASS",
+    humanGateLevel: "HG-2.5",
+    ceoConfidence: HUMAN_GATE_AUTO_GO_THRESHOLDS["HG-2.5"],
+  });
+  const plan = buildPostWorkerQualityPlanForController({
+    registry: QUALITY_REGISTRY,
+    decision,
+    contractFields: {
+      agent: "claude",
+      mode: "implement",
+      inferenceclass: "P2-code-shared",
+      postworkerqualitypolicy: "required",
+      scope: "scripts/orchestration runtime auth work",
+    },
+    workerReport: { state: "PASS" },
+    caoVerdict: "PASS",
+  });
+
+  assert.equal(plan.status, "FOLLOWUP_READY");
+  assert.equal(plan.scheduler.scheduler_may_spawn, true);
+  assert.deepEqual(
+    plan.markers_to_post.map((item) => `${item.marker}:${item.worker_class}`),
+    [
+      "controller.audit-followup:quality-auditor",
+      "controller.audit-followup:security-auditor",
+    ],
+  );
+});
+
+test("buildDecisionCardYaml emits post-worker quality markers into controller decision card", () => {
+  const decision = decideController({
+    caoVerdict: "PASS",
+    humanGateLevel: "HG-2.5",
+    ceoConfidence: HUMAN_GATE_AUTO_GO_THRESHOLDS["HG-2.5"],
+  });
+  decision._inputs = { ceoConfidence: HUMAN_GATE_AUTO_GO_THRESHOLDS["HG-2.5"] };
+  const postWorkerQualityPlan = buildPostWorkerQualityPlanForController({
+    registry: QUALITY_REGISTRY,
+    decision,
+    contractFields: {
+      agent: "claude",
+      mode: "implement",
+      inferenceclass: "P2-code-shared",
+      postworkerqualitypolicy: "required",
+      scope: "scripts/orchestration runtime auth work",
+    },
+    workerReport: { state: "PASS" },
+    caoVerdict: "PASS",
+  });
+
+  const yaml = buildDecisionCardYaml({
+    runId: "abc",
+    workItem: { id: "x", sequence_id: 456, name: "Quality Gate Test" },
+    caoVerdict: "PASS",
+    decision,
+    contractFields: { human_gate: "HG-2.5", blockedactions: "merge,push" },
+    signedAt: "2026-05-31T00:00:00.000Z",
+    postWorkerQualityPlan,
+  });
+
+  assert.match(yaml, /post_worker_quality:/);
+  assert.match(yaml, /scheduler_may_spawn: true/);
+  assert.match(yaml, /controller\.audit-followup:/);
+  assert.match(yaml, /worker_class: quality-auditor/);
+  assert.match(yaml, /worker_class: security-auditor/);
 });
 
 test("buildDecisionCardYaml preserves non-COMPA project identifiers", () => {

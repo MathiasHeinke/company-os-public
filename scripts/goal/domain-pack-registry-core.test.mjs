@@ -78,6 +78,22 @@ test("actual registry exposes department capability pack creator as draft-only m
   assert.ok(pack.outputs.includes("aionui-hermes-<pack-id>-skill.md"));
 });
 
+test("actual registry exposes content-machine as CMO draft-only substrate pack", () => {
+  const registry = JSON.parse(fs.readFileSync(REGISTRY_PATH, "utf8"));
+  const pack = registry.packs.find((candidate) => candidate.id === "content-machine");
+  assert.ok(pack, "content-machine pack missing");
+  assert.equal(pack.owner_role, "role:cmo");
+  assert.equal(pack.activation_mode, "draft-only");
+  assert.equal(pack.default_human_gate, "HG-2.5");
+  assert.equal(pack.operator_confirmation_required, true);
+  assert.ok(pack.outputs.includes("content/content-machine/01_source_inventory/SOURCE_INVENTORY.md"));
+  assert.ok(pack.outputs.includes("content/content-machine/02_vault/CONTENT_VAULT.md"));
+  assert.ok(pack.blocked_actions.includes("secret-read"));
+  assert.ok(pack.blocked_actions.includes("production-write"));
+  assert.ok(pack.blocked_actions.includes("done-transition-by-worker-or-cao"));
+  assert.ok(pack.blocked_actions.some((action) => action.includes("public-publish")));
+});
+
 // ---------------------------------------------------------------------------
 // Structural guard
 // ---------------------------------------------------------------------------

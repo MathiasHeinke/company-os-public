@@ -3,7 +3,9 @@ import path from "node:path";
 
 import {
   applyAionuiCommandEveOverlay,
+  inspectAionuiCommandEveBrandConfig,
   inspectAionuiCommandEveOverlay,
+  writeAionuiCommandEveBrandConfig,
 } from "./aionui-command-eve-overlay-core.mjs";
 import {
   buildAionuiStartCommand,
@@ -73,14 +75,22 @@ function blocked({ stages, failedStage, failures, nextActions, overlay, prepare,
 
 function summarize({ overlay, preflight, sessionContinuity, sessionRegistry } = {}) {
   const modelConfig = preflight?.hermes?.model_config || {};
+  const authProfile = preflight?.hermes?.auth_profile || preflight?.auth_profile || {};
   const runtimePolicy = preflight?.eve?.runtime_policy || {};
+  const firstRunConfirmation = preflight?.eve?.first_run_confirmation || {};
   const routeReceipt = sessionContinuity?.route_receipt || {};
+  const brandVersion = overlay?.brand_version || {};
   return {
     default_agent: overlay?.overlay_applied || overlay?.overlay_applied_after ? "EVE via Hermes" : "not verified",
+    command_eve_ui_version: brandVersion.version || brandVersion.actual_version || brandVersion.expected_version || "",
     aionui_version: preflight?.aionui?.version || "",
     hermes_version: (preflight?.hermes?.version_text || "").split("\n")[0],
     hermes_model: modelConfig.model || "",
     hermes_provider: modelConfig.provider || "",
+    hermes_auth_status: authProfile.status || "",
+    hermes_auth_mode: authProfile.auth_mode || "",
+    first_run_seed_status: firstRunConfirmation.seed_status || "",
+    first_run_confirmation_status: firstRunConfirmation.status || "",
     soul_status: preflight?.hermes?.soul_location?.status || "",
     runtime_policy_profile: runtimePolicy.profile || "",
     runtime_policy_mode: runtimePolicy.default_mode || "",
@@ -98,6 +108,52 @@ function normalizeSessionClass(value) {
   if (!text) return DEFAULT_START_EVE_SESSION_CLASS;
   if (text.toLowerCase() === "auto") return "";
   return text;
+}
+
+export function resolveStartEveOptions(options = {}) {
+  const companyOsRoot = path.resolve(options.companyOsRoot || process.cwd());
+  const clientRootText = compact(options.clientRoot);
+  if (!clientRootText) {
+    return {
+      ...options,
+      companyOsRoot,
+    };
+  }
+  const clientRoot = path.resolve(clientRootText);
+  const operatorRoot = path.resolve(options.operatorRoot || path.join(clientRoot, ".company-os", "operator-shell"));
+  const explicitPrivateRoot = compact(options.privateRoot);
+  const privateRoot = explicitPrivateRoot ? path.resolve(explicitPrivateRoot) : operatorRoot;
+  const usesInstalledOperatorLayout = !explicitPrivateRoot;
+  return {
+    ...options,
+    companyOsRoot,
+    clientRoot,
+    privateRoot,
+    aionuiRoot: options.aionuiRoot || (
+      usesInstalledOperatorLayout
+        ? path.join(operatorRoot, "aionui", "AionUi")
+        : path.join(privateRoot, "aionui-sidecar", "AionUi")
+    ),
+    hermesRoot: options.hermesRoot || (
+      usesInstalledOperatorLayout
+        ? path.join(operatorRoot, "hermes")
+        : path.join(privateRoot, "hermes-sidecar", "hermes-agent")
+    ),
+    hermesHome: options.hermesHome || (
+      usesInstalledOperatorLayout
+        ? path.join(operatorRoot, "hermes", "home")
+        : path.join(privateRoot, "hermes-sidecar", "hermes-home")
+    ),
+    hermesWrapper: options.hermesWrapper || (
+      usesInstalledOperatorLayout
+        ? path.join(operatorRoot, "hermes", "hermes-command-eve")
+        : path.join(privateRoot, "hermes-sidecar", "hermes-companyos")
+    ),
+    aionuiHermesBin: options.aionuiHermesBin || path.join(privateRoot, "aionui-sidecar", "bin"),
+    aionuiData: options.aionuiData || path.join(privateRoot, "aionui-sidecar", "aionui-data"),
+    aionuiLog: options.aionuiLog || path.join(privateRoot, "aionui-sidecar", "aionui-logs"),
+    contextRoot: options.contextRoot || path.join(privateRoot, "aion-companyos-context"),
+  };
 }
 
 export function routeStartEveSessionContinuity(options = {}) {
@@ -143,13 +199,14 @@ export function routeStartEveSessionContinuity(options = {}) {
 }
 
 export function runStartEve(options = {}) {
-  const port = Number(options.port || 25809);
+  const resolvedOptions = resolveStartEveOptions(options);
+  const port = Number(resolvedOptions.port || 25809);
   const stages = [];
 
-  const overlayInspection = inspectAionuiCommandEveOverlay(options);
+  const overlayInspection = inspectAionuiCommandEveOverlay(resolvedOptions);
   let overlay = overlayInspection;
-  if (options.applyOverlay && overlayInspection.ok && !overlayInspection.overlay_applied) {
-    overlay = applyAionuiCommandEveOverlay(options);
+  if (resolvedOptions.applyOverlay && overlayInspection.ok && !overlayInspection.overlay_applied) {
+    overlay = applyAionuiCommandEveOverlay(resolvedOptions);
   }
   const overlayApplied = Boolean(overlay.overlay_applied || overlay.overlay_applied_after);
   const overlayStatus = overlayApplied
@@ -178,7 +235,51 @@ export function runStartEve(options = {}) {
     });
   }
 
-  const prepare = prepareEveSidecar(options);
+  const brandInspection = inspectAionuiCommandEveBrandConfig(overlay.paths);
+  const brandVersion =
+    brandInspection.ok
+      ? brandInspection
+      : writeAionuiCommandEveBrandConfig(overlay.paths);
+  const brandVersionStageStatus =
+    brandInspection.ok
+      ? "pass"
+      : brandVersion.ok
+        ? "refreshed"
+        : brandVersion.status;
+  overlay = {
+    ...overlay,
+    brand_version_before: brandInspection,
+    brand_version: {
+      ...brandVersion,
+      status: brandVersionStageStatus,
+      previous_status: brandInspection.status,
+      previous_version: brandInspection.actual_version || "",
+      expected_version:
+        brandInspection.expected_version || brandVersion.version || "",
+    },
+  };
+  stages.push(stage("aionui.brand_version", overlay.brand_version, {
+    status: brandVersionStageStatus,
+    expected_version: overlay.brand_version.expected_version || "",
+    actual_version: overlay.brand_version.version || overlay.brand_version.actual_version || "",
+    previous_version: overlay.brand_version.previous_version || "",
+    previous_status: overlay.brand_version.previous_status || "",
+  }));
+  if (!brandVersion.ok) {
+    return blocked({
+      stages,
+      failedStage: "aionui.brand_version",
+      failures: brandVersion.failures || ["command_eve_brand_config_write_failed"],
+      nextActions: [
+        "Fix write access to AionUI public/command-eve-brand.json.",
+        "Then rerun scripts/operator-shell/start_eve.mjs check --json.",
+      ],
+      overlay,
+      startCommand: [],
+    });
+  }
+
+  const prepare = prepareEveSidecar(resolvedOptions);
   stages.push(stage("eve.prepare", prepare, {
     files_written: prepare.files_written?.length || 0,
   }));
@@ -194,7 +295,7 @@ export function runStartEve(options = {}) {
     });
   }
 
-  const preflight = preflightEveSidecar(options);
+  const preflight = preflightEveSidecar(resolvedOptions);
   const startCommand = buildAionuiStartCommand({ paths: preflight.paths, port });
   stages.push(stage("eve.preflight", preflight, {
     failures: preflight.failures || [],
@@ -212,7 +313,7 @@ export function runStartEve(options = {}) {
     });
   }
 
-  const sessionContinuity = routeStartEveSessionContinuity(options);
+  const sessionContinuity = routeStartEveSessionContinuity(resolvedOptions);
   stages.push(stage("eve.session_continuity", sessionContinuity, {
     status: sessionContinuity.ok ? "pass" : "blocked",
     route_class: sessionContinuity.route_class || "",
@@ -243,9 +344,9 @@ export function runStartEve(options = {}) {
     route: sessionContinuity,
     preflight,
     paths: preflight.paths,
-    registryPath: options.sessionRegistryPath,
-    now: options.now || new Date(),
-    dryRun: options.sessionRegistryDryRun === true,
+    registryPath: resolvedOptions.sessionRegistryPath,
+    now: resolvedOptions.now || new Date(),
+    dryRun: resolvedOptions.sessionRegistryDryRun === true,
   });
   stages.push(stage("eve.session_registry", sessionRegistry, {
     status: sessionRegistry.status || (sessionRegistry.ok ? "pass" : "blocked"),
@@ -276,8 +377,8 @@ export function runStartEve(options = {}) {
   let smoke = null;
   if (options.authCheck) {
     smoke = runHermesEveSmoke({
-      ...options,
-      prompt: options.prompt || "Command EVE auth/model preflight: reply with one short readiness line.",
+      ...resolvedOptions,
+      prompt: resolvedOptions.prompt || "Command EVE auth/model preflight: reply with one short readiness line.",
     });
     stages.push(stage("hermes.auth_model_smoke", smoke, {
       reason: smoke.reason,
@@ -285,14 +386,23 @@ export function runStartEve(options = {}) {
       provider: smoke.provider,
     }));
     if (!smoke.ok) {
+      const taxonomy = smoke.failure_taxonomy || {};
       return blocked({
         stages,
         failedStage: "hermes.auth_model_smoke",
-        failures: [smoke.reason || "hermes_auth_model_smoke_failed"],
-        nextActions: [
-          "Fix Hermes provider/model auth or pass --provider and --model explicitly.",
-          "Then rerun scripts/operator-shell/start_eve.mjs check --auth-check --json.",
+        failures: [
+          taxonomy.code || smoke.reason || "hermes_auth_model_smoke_failed",
+          ...(taxonomy.reasons || []),
         ],
+        nextActions: taxonomy.next_actions?.length
+          ? [
+            ...taxonomy.next_actions,
+            "Then rerun scripts/operator-shell/start_eve.mjs check --auth-check --json.",
+          ]
+          : [
+            "Fix Hermes provider/model auth or pass --provider and --model explicitly.",
+            "Then rerun scripts/operator-shell/start_eve.mjs check --auth-check --json.",
+          ],
         overlay,
         prepare,
         preflight,
@@ -345,10 +455,15 @@ export function renderStartEveReport(result = {}) {
     "## Summary",
     "",
     `Default agent: ${result.summary?.default_agent || ""}`,
+    `Command EVE UI version: ${result.summary?.command_eve_ui_version || ""}`,
     `AionUI version: ${result.summary?.aionui_version || ""}`,
     `Hermes version: ${result.summary?.hermes_version || ""}`,
     `Hermes model: ${result.summary?.hermes_model || ""}`,
     `Hermes provider: ${result.summary?.hermes_provider || ""}`,
+    `Hermes auth status: ${result.summary?.hermes_auth_status || ""}`,
+    `Hermes auth mode: ${result.summary?.hermes_auth_mode || ""}`,
+    `First-run seed: ${result.summary?.first_run_seed_status || ""}`,
+    `First-run confirmation: ${result.summary?.first_run_confirmation_status || ""}`,
     `Soul status: ${result.summary?.soul_status || ""}`,
     `Runtime policy: ${result.summary?.runtime_policy_profile || ""}`,
     `Runtime policy mode: ${result.summary?.runtime_policy_mode || ""}`,
@@ -375,6 +490,24 @@ export function renderStartEveReport(result = {}) {
     `Hygiene: ${result.session_registry?.hygiene?.status || ""}`,
     `Generation: ${result.session_registry?.session?.generation || ""}`,
     `Written: ${result.session_registry?.written === true}`,
+    "",
+    "## BYOK / Auth Preflight",
+    "",
+    `Provider: ${result.preflight?.hermes?.auth_profile?.provider || ""}`,
+    `Model: ${result.preflight?.hermes?.auth_profile?.model || ""}`,
+    `Auth status: ${result.preflight?.hermes?.auth_profile?.status || ""}`,
+    `Auth mode: ${result.preflight?.hermes?.auth_profile?.auth_mode || ""}`,
+    `Secret policy: ${result.preflight?.hermes?.auth_profile?.secret_policy || ""}`,
+    `Auth check: ${result.smoke?.auth_profile?.readiness_proof?.status || result.preflight?.hermes?.auth_profile?.readiness_proof?.status || ""}`,
+    "",
+    "## First-Run Confirmation",
+    "",
+    `Seed status: ${result.preflight?.eve?.first_run_confirmation?.seed_status || ""}`,
+    `Confirmation status: ${result.preflight?.eve?.first_run_confirmation?.status || ""}`,
+    "Known facts:",
+    ...((result.preflight?.eve?.first_run_confirmation?.known_facts || []).map((fact) =>
+      `- ${fact.label}: ${fact.value || fact.status}`,
+    )),
     "",
     "## Stages",
     "",

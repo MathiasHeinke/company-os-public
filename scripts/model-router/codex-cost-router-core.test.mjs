@@ -42,6 +42,19 @@ test("secret prompts are blocked even when private override is enabled", () => {
   assert.ok(plan.risk.secretBlockers.includes("openrouter_key"));
 });
 
+test("secret prompts are blocked on Supabase token-shaped values", () => {
+  const fakeSupabaseToken = ["su", "test", "abcdefghijklmnopqrstuvwxyz"].join("_");
+  const plan = buildRunPlan({
+    mode: "issue-triage",
+    prompt: `Use ${fakeSupabaseToken}`,
+    allowPrivate: true,
+  });
+
+  assert.equal(plan.blocked, true);
+  assert.equal(plan.blockReason, "secret_detected");
+  assert.ok(plan.risk.secretBlockers.includes("supabase_token"));
+});
+
 test("private prompts require explicit allow-private", () => {
   const plan = buildRunPlan({
     mode: "morning-briefing-redacted",
@@ -189,6 +202,30 @@ test("persistModelResult redacts leaked secrets in reports", () => {
 
   assert.equal(result.exitCode, 0);
   assert.match(fs.readFileSync(result.report, "utf8"), /\[REDACTED:openrouter_key\]/);
+});
+
+test("persistModelResult redacts leaked Supabase tokens in reports", () => {
+  const fakeSupabaseToken = ["su", "test", "abcdefghijklmnopqrstuvwxyz"].join("_");
+  const plan = buildRunPlan({
+    mode: "issue-triage",
+    prompt: "Safe prompt",
+    outDir: fs.mkdtempSync(path.join(os.tmpdir(), "codex-cost-router-supabase-redact-")),
+  });
+  const result = persistModelResult({
+    plan,
+    modelAlias: "grok",
+    result: {
+      status: 0,
+      signal: null,
+      stdout: `token ${fakeSupabaseToken} should not persist`,
+      stderr: "",
+    },
+  });
+
+  assert.equal(result.exitCode, 0);
+  const report = fs.readFileSync(result.report, "utf8");
+  assert.equal(report.includes(fakeSupabaseToken), false);
+  assert.match(report, /\[REDACTED:supabase_token\]/);
 });
 
 test("sanitizeWorkerOutput redacts private markers and truncates noisy logs", () => {

@@ -241,6 +241,41 @@ function contractFor(registry, id, reason) {
   };
 }
 
+function markerStateForWorkerClass(workerClass) {
+  if (workerClass === "deep-audit-worker") return "DEEP_AUDIT_REQUESTED";
+  if (workerClass === "hotfix-worker") return "HOTFIX_REQUESTED";
+  return "AUDIT_REQUESTED";
+}
+
+function markerForFollowup(registry, followup) {
+  if (!followup?.worker_class) return null;
+  if (followup.worker_class === "hotfix-worker") {
+    return {
+      marker: registry.plane_markers.hotfix_request,
+      state: "HOTFIX_REQUESTED",
+      worker_class: followup.worker_class,
+    };
+  }
+  return {
+    marker: registry.plane_markers.audit_request,
+    state: markerStateForWorkerClass(followup.worker_class),
+    worker_class: followup.worker_class,
+  };
+}
+
+function dedupeMarkers(markers = []) {
+  const deduped = [];
+  const seen = new Set();
+  for (const marker of markers) {
+    if (!marker?.marker || !marker?.worker_class) continue;
+    const key = `${marker.marker}:${marker.worker_class}:${marker.state || ""}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    deduped.push(marker);
+  }
+  return deduped;
+}
+
 function needsFix(workerReport, caoVerdict, findings) {
   const state = workerState(workerReport);
   const cao = caoState(caoVerdict);
@@ -367,7 +402,12 @@ export function planPostWorkerQualityLoop({
     dedupedFollowups.push(item);
   }
 
-  if (successful && dedupedFollowups.length === 0 && !markers.length) {
+  const markersToPost = dedupeMarkers([
+    ...markers,
+    ...dedupedFollowups.map((followup) => markerForFollowup(registry, followup)),
+  ]);
+
+  if (successful && dedupedFollowups.length === 0 && !markersToPost.length) {
     reasonCodes.push(QUALITY_LOOP_REASONS.NO_FOLLOWUP);
   }
 
@@ -404,7 +444,7 @@ export function planPostWorkerQualityLoop({
       pass_like: successful,
     },
     followup_worker_contracts: dedupedFollowups,
-    markers_to_post: markers,
+    markers_to_post: markersToPost,
   };
 }
 

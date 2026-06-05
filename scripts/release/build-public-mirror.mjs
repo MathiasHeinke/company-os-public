@@ -84,6 +84,7 @@ export const INCLUDE_RULES = [
   { pattern: "registries/capabilities/example.json" },
   { pattern: "registries/inference/example.json" },
   { pattern: "registries/inference/eve-hermes-brain.json" },
+  { pattern: "registries/operator-shell/**" },
   { pattern: "registries/sessions/**" },
   { pattern: "registries/domain-packs/**" },
   { pattern: "registries/plane-templates/**" },
@@ -330,6 +331,11 @@ const PRIVATE_CONTENT_PATTERNS = [
     severity: "private-content",
   },
   {
+    id: "supabase-token",
+    regex: /\b(?:sbp_[A-Za-z0-9_-]{16,}|su_(?:live|test)_[A-Za-z0-9_-]{16,})\b/,
+    severity: "private-content",
+  },
+  {
     id: "private-home-path",
     regex: /\/Users\/[a-zA-Z][-a-zA-Z0-9]+/,
     severity: "private-content",
@@ -411,6 +417,12 @@ const PUBLIC_MIRROR_TEXT_REWRITES = [
     id: "slack-bot-token-test-fixture",
     regex: /\bxoxb-[A-Za-z0-9-]{10,}/g,
     replacement: "[SLACK_BOT_TOKEN_EXAMPLE]",
+    appliesTo: (relativePath) => relativePath.startsWith("scripts/") && /\.test\.(?:mjs|cjs|js|ts)$/.test(relativePath),
+  },
+  {
+    id: "supabase-token-test-fixture",
+    regex: /\b(?:sbp_[A-Za-z0-9_-]{16,}|su_(?:live|test)_[A-Za-z0-9_-]{16,})\b/g,
+    replacement: "[SUPABASE_TOKEN_EXAMPLE]",
     appliesTo: (relativePath) => relativePath.startsWith("scripts/") && /\.test\.(?:mjs|cjs|js|ts)$/.test(relativePath),
   },
   {

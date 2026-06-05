@@ -34,7 +34,13 @@ export const REQUIRED_SCRIPTS = [
   "scripts/release-gates/human-gate-release.mjs",
   "scripts/release-gates/productization-readiness.mjs",
   "scripts/release-gates/runtime-04-readiness.mjs",
+  "scripts/install/command-eve-self-install.mjs",
   "scripts/operator-shell/start_eve.mjs",
+  "scripts/operator-shell/install-command-eve.mjs",
+];
+
+export const REQUIRED_OPERATOR_SHELL_FILES = [
+  "registries/operator-shell/command-eve-1.0-alpha.json",
 ];
 
 function readText(root, relativePath) {
@@ -165,6 +171,7 @@ const TOKEN_PATTERNS = [
   { id: "github-fine-grained-pat", regex: /\bgithub_pat_[A-Za-z0-9_]{20,}/ },
   { id: "slack-bot-token", regex: /\bxoxb-[A-Za-z0-9-]{10,}/ },
   { id: "slack-user-token", regex: /\bxoxp-[A-Za-z0-9-]{10,}/ },
+  { id: "supabase-token", regex: /\b(?:sbp_[A-Za-z0-9_-]{16,}|su_(?:live|test)_[A-Za-z0-9_-]{16,})\b/ },
   {
     id: "source-company-token",
     regex: new RegExp(String.raw`\b${SOURCE_COMPANY_TOKEN_PREFIX}-[A-Za-z0-9_-]{20,}`),
@@ -218,6 +225,15 @@ export function evaluateProductizationReadiness({
       "scripts.required",
       exists(resolvedRoot, script) ? `Required script exists: ${script}` : `Required script missing: ${script}`,
       { path: script },
+    );
+  }
+  for (const file of REQUIRED_OPERATOR_SHELL_FILES) {
+    pushCheck(
+      checks,
+      exists(resolvedRoot, file) ? "pass" : "block",
+      "operator-shell.required",
+      exists(resolvedRoot, file) ? `Required operator-shell file exists: ${file}` : `Required operator-shell file missing: ${file}`,
+      { path: file },
     );
   }
 

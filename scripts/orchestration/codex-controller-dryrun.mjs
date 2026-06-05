@@ -40,6 +40,10 @@ import {
   buildRaindropOutputDir,
   writeRaindropCallSummary,
 } from "./raindrop-call-adapter.mjs";
+import {
+  loadPostWorkerQualityRegistry,
+  planPostWorkerQualityLoop,
+} from "./post-worker-quality-loop-core.mjs";
 import { extractContractBlock } from "./worker-ledger-validator.mjs";
 
 // Closed set of decision modes per docs/orchestration/codex-controller-runtime.md.
@@ -445,6 +449,90 @@ export function decideController({
   };
 }
 
+function asList(value) {
+  if (value === undefined || value === null || value === "") return [];
+  if (Array.isArray(value)) return value.flatMap(asList);
+  return String(value)
+    .split(/[,;\n]/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function contractText(fields = {}, ...names) {
+  return names.flatMap((name) => asList(contractField(fields, name))).join("\n");
+}
+
+function inferPostWorkerQualityClass(contractFields = {}) {
+  const explicit = contractField(contractFields, "inferenceclass", "inference_class", "InferenceClass");
+  if (explicit) return explicit;
+  const text = [
+    contractText(contractFields, "scope", "source_of_truth", "sourceoftruth", "allowedwritepaths", "allowed_write_paths", "gates"),
+    contractField(contractFields, "mode", "Mode"),
+  ].join("\n").toLowerCase();
+  if (/\b(cross[-\s]?repo|multi[-\s]?repo|multiple workspaces)\b/.test(text)) return "P3-cross-repo";
+  if (/(scripts\/(?:orchestration|runtime|update|release|release-gates|capabilities)|registries\/|auth|rls|service-role|capability|scheduler|dispatcher|controller)/.test(text)) {
+    return "P2-code-shared";
+  }
+  if (/(^|\s)(docs\/|assets\/|reports\/|README\.md|CHANGELOG\.md|ROADMAP\.md)/i.test(text)) return "P0-doc-small";
+  return "P1-code-bounded";
+}
+
+function shouldRunPostWorkerQuality(contractFields = {}, decision = {}) {
+  const policy = String(contractField(
+    contractFields,
+    "postworkerqualitypolicy",
+    "post_worker_quality_policy",
+    "PostWorkerQualityPolicy",
+  ) || "").trim().toLowerCase();
+  if (["off", "disabled", "none", "optional"].includes(policy)) return false;
+  if (["required", "enforced", "post-worker-quality-loop/v0"].includes(policy)) return true;
+  const mode = String(contractField(contractFields, "mode", "Mode") || "").trim().toLowerCase();
+  const agent = String(contractField(contractFields, "agent", "Agent") || "").trim().toLowerCase();
+  const decisionMode = decision?.decision_mode || "";
+  return (
+    ["implement", "verify", "review"].includes(mode)
+    && ["claude", "codex", "gemini"].includes(agent)
+    && ![
+      DECISION_MODES.ASK_FOUNDER,
+      DECISION_MODES.ASK_CEO_HG3,
+      DECISION_MODES.HG_35_PENDING_ARTIFACT_REVIEW,
+      DECISION_MODES.PARK,
+    ].includes(decisionMode)
+  );
+}
+
+export function buildPostWorkerQualityPlanForController({
+  registry,
+  decision,
+  contractFields = {},
+  workerReport = {},
+  caoVerdict = "",
+  findings = [],
+  previousHotfixRounds = 0,
+  now = new Date(),
+} = {}) {
+  if (!registry || !shouldRunPostWorkerQuality(contractFields, decision)) return null;
+  const inferenceClass = inferPostWorkerQualityClass(contractFields);
+  const report = {
+    state: workerReport.state || workerReport.verdict || workerReport.status || (caoVerdict === "REJECT" ? "REJECT" : "PASS"),
+    reason: workerReport.reason || "",
+    summary: workerReport.summary || "",
+    reason_codes: workerReport.reason_codes || [],
+  };
+  return planPostWorkerQualityLoop({
+    registry,
+    contractFields: {
+      ...contractFields,
+      InferenceClass: inferenceClass,
+    },
+    workerReport: report,
+    caoVerdict,
+    findings,
+    previousHotfixRounds,
+    now,
+  });
+}
+
 /**
  * Build the controller.decision YAML block. Pure function for reuse and
  * testing.
@@ -458,6 +546,7 @@ export function buildDecisionCardYaml({
   signedAt,
   version = "codex-controller-dryrun-v0",
   noWritesPerformed = true,
+  postWorkerQualityPlan = null,
 }) {
   const lines = ["controller.decision:"];
   const indent = (n) => " ".repeat(n);
@@ -504,6 +593,9 @@ export function buildDecisionCardYaml({
     emitLiteralBlock(lines, indent(4), "sign_template", decision.hg35.sign_template);
     emitLiteralBlock(lines, indent(4), "reject_template", decision.hg35.reject_template);
   }
+  if (postWorkerQualityPlan) {
+    emitPostWorkerQualityPlan(lines, indent, postWorkerQualityPlan, seq);
+  }
   lines.push(`${indent(2)}blocked_actions_remaining:`);
   for (const a of blocked) lines.push(`${indent(4)}- ${a}`);
   lines.push(`${indent(2)}signed_at: ${signedAt}`);
@@ -520,6 +612,38 @@ function formatControllerWorkItemSequence(workItem = {}) {
     || "COMPA";
   const prefix = String(rawPrefix || "COMPA").trim().toUpperCase();
   return `${prefix || "COMPA"}-${workItem.sequence_id}`;
+}
+
+function emitPostWorkerQualityPlan(lines, indent, plan, workItemRef) {
+  lines.push(`${indent(2)}post_worker_quality:`);
+  lines.push(`${indent(4)}version: ${plan.version || "post-worker-quality-loop/v0"}`);
+  lines.push(`${indent(4)}status: ${plan.status || "UNKNOWN"}`);
+  lines.push(`${indent(4)}inference_class: ${plan.inference_class || "unknown"}`);
+  lines.push(`${indent(4)}scheduler_may_spawn: ${Boolean(plan.scheduler?.scheduler_may_spawn)}`);
+  lines.push(`${indent(4)}reason_codes:`);
+  const reasons = plan.reason_codes || [];
+  if (!reasons.length) lines.push(`${indent(6)}- []`);
+  for (const reason of reasons) lines.push(`${indent(6)}- ${reason}`);
+  lines.push(`${indent(4)}markers_to_post:`);
+  const markers = plan.markers_to_post || [];
+  if (!markers.length) lines.push(`${indent(6)}- []`);
+  for (const marker of markers) {
+    lines.push(`${indent(6)}- ${marker.marker}:${marker.worker_class}`);
+  }
+  for (const marker of markers) {
+    lines.push(`${marker.marker}:`);
+    lines.push(`${indent(2)}version: ${plan.version || "post-worker-quality-loop/v0"}`);
+    lines.push(`${indent(2)}work_item: ${workItemRef || "unknown"}`);
+    lines.push(`${indent(2)}state: ${marker.state || "AUDIT_REQUESTED"}`);
+    lines.push(`${indent(2)}worker_class: ${marker.worker_class || "unknown"}`);
+    lines.push(`${indent(2)}reason_codes:`);
+    if (!reasons.length) lines.push(`${indent(4)}- []`);
+    for (const reason of reasons) lines.push(`${indent(4)}- ${reason}`);
+    if (marker.worker_class === "hotfix-worker") {
+      lines.push(`${indent(2)}max_auto_hotfix_rounds: ${plan.loop_limits?.max_auto_hotfix_rounds ?? 1}`);
+      lines.push(`${indent(2)}previous_hotfix_rounds: ${plan.loop_limits?.previous_hotfix_rounds ?? 0}`);
+    }
+  }
 }
 
 function emitLiteralBlock(lines, indentText, key, value) {
@@ -583,6 +707,29 @@ export function findCaoVerdictComment(comments) {
         ts,
         verdict: fields.verdict || null,
         cao_session_id: fields.cao_session_id || null,
+      };
+    }
+  }
+  return best;
+}
+
+function findLatestWorkerReportedComment(comments) {
+  let best = null;
+  for (const row of comments || []) {
+    const html = row.comment_html || row.body || "";
+    const body = stripHtml(html);
+    if (!body.includes("worker.reported")) continue;
+    const yamlMatch = body.match(/worker\.reported:\s*\n([\s\S]*?)(?:\n\S|$)/);
+    const fields = parseYamlScalar(yamlMatch?.[1] || body);
+    const ts = row.created_at ? Date.parse(row.created_at) : 0;
+    if (!best || ts > best.ts) {
+      best = {
+        comment_id: row.id || null,
+        ts,
+        state: fields.state || fields.verdict || fields.status || null,
+        reason: fields.reason || null,
+        summary: fields.summary || null,
+        reason_codes: asList(fields.reason_codes),
       };
     }
   }
@@ -765,6 +912,18 @@ async function main() {
   });
   decision._inputs = controllerInputs;
 
+  const qualityRegistry = loadPostWorkerQualityRegistry(process.env.COMPANY_OS_POST_WORKER_QUALITY_REGISTRY);
+  const postWorkerQualityPlan = qualityRegistry.ok
+    ? buildPostWorkerQualityPlanForController({
+      registry: qualityRegistry.registry,
+      decision,
+      contractFields,
+      workerReport: findLatestWorkerReportedComment(comments) || {},
+      caoVerdict: cao?.verdict || null,
+      findings: args.gatesRed,
+    })
+    : null;
+
   const runId = randomUUID();
   const signedAt = new Date().toISOString();
   const yaml = buildDecisionCardYaml({
@@ -776,6 +935,7 @@ async function main() {
     signedAt,
     version: args.mode === "post" ? "codex-controller-v0" : "codex-controller-dryrun-v0",
     noWritesPerformed: args.mode !== "post",
+    postWorkerQualityPlan,
   });
 
   result.cao_verdict = cao?.verdict || null;

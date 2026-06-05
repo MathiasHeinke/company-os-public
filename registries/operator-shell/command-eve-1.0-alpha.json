@@ -1,0 +1,56 @@
+{
+  "version": "command-eve-operator-shell-manifest/v0",
+  "release": "1.0.0-alpha.3",
+  "status": "alpha",
+  "components": {
+    "aionui": {
+      "name": "AionUI",
+      "repo": "https://github.com/iOfficeAI/AionUi.git",
+      "release_url": "https://github.com/iOfficeAI/AionUi/releases/tag/v2.1.10",
+      "version": "2.1.10",
+      "tag": "v2.1.10",
+      "commit": "83f52aff5c3e79c066798162dbdaa6d4c8ec220f",
+      "license": "Apache-2.0",
+      "default_install_mode": "source-overlay",
+      "fallback_install_mode": "web-release",
+      "web_release_base": "https://github.com/iOfficeAI/AionUi/releases/download/v2.1.10"
+    },
+    "aioncore": {
+      "name": "AionCore",
+      "repo": "https://github.com/iOfficeAI/AionCore.git",
+      "release_url": "https://github.com/iOfficeAI/AionCore/releases/tag/v0.1.19",
+      "version": "v0.1.19",
+      "source": "AionUI package.json aioncoreVersion",
+      "install_mode": "aionui-prepare-script"
+    },
+    "hermes": {
+      "name": "Hermes Agent",
+      "repo": "https://github.com/NousResearch/hermes-agent.git",
+      "release_url": "https://github.com/NousResearch/hermes-agent/releases/tag/v2026.5.29.2",
+      "package": "hermes-agent",
+      "version": "0.15.2",
+      "tag": "v2026.5.29.2",
+      "wheel": "https://github.com/NousResearch/hermes-agent/releases/download/v2026.5.29.2/hermes_agent-0.15.2-py3-none-any.whl",
+      "license": "MIT",
+      "install_mode": "python-venv-wheel"
+    }
+  },
+  "default_inference": {
+    "provider": "openrouter",
+    "model": "minimax/minimax-m3",
+    "model_url": "https://openrouter.ai/minimax/minimax-m3",
+    "auth_mode": "bring-your-own-key",
+    "secret_policy": "do-not-store-raw-api-key-in-company-os",
+    "auth_preflight": "node scripts/operator-shell/start_eve.mjs check --auth-check --json",
+    "blocked_auth_code": "BLOCKED_AUTH",
+    "official_setup_rule": "Configure provider access through the provider's official BYOK/API-key flow; never paste raw API keys into chat, Plane, reports or repository files."
+  },
+  "blocked_actions": [
+    "do not collect API keys in chat",
+    "do not enable AionUI YOLO/full-auto",
+    "do not enable Hermes native cron or broad delegation",
+    "do not dispatch workers before CEO/Codex review",
+    "do not mark Plane Done",
+    "do not publish/send/spend/deploy"
+  ]
+}

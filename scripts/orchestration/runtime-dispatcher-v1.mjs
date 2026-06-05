@@ -178,6 +178,7 @@ const SECRET_PATTERNS = [
   /\bsk-or-v1-[A-Za-z0-9_-]{16,}\b/,
   /\bplane_api_[A-Za-z0-9]{16,}\b/,
   /\b(?:sk|pk)-[A-Za-z0-9]{20,}\b/, // OpenAI/Stripe-style keys
+  /\b(?:sbp_[A-Za-z0-9_-]{16,}|su_(?:live|test)_[A-Za-z0-9_-]{16,})\b/, // Supabase access tokens
   /\bAKIA[0-9A-Z]{16}\b/, // AWS access keys
   /-----BEGIN [A-Z ]*PRIVATE KEY-----/, // PEM keys
   /\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{5,}\b/, // JWT
@@ -185,7 +186,7 @@ const SECRET_PATTERNS = [
   /\bghp_[A-Za-z0-9]{20,}\b/, // GitHub PAT
 ];
 
-const DEFAULT_CLAUDE_COMMAND = process.env.CLAUDE_BIN || "[LOCAL_WORKSPACE]";
+const DEFAULT_CLAUDE_COMMAND = process.env.CLAUDE_BIN || "claude";
 
 // ---------- Pure preflight functions ----------
 

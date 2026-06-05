@@ -166,12 +166,36 @@ and applies:
 assets/brand/eve-command/aionui-overlay/patches/command-eve-aionui.patch
 ```
 
+It also refreshes the managed German language pack:
+
+```text
+assets/brand/eve-command/aionui-overlay/locales/de-DE/
+```
+
 Use the overlay CLI rather than applying this patch by hand; the patch is
 stored with zero-context hunks so the CLI applies it with `git apply
 --unidiff-zero`.
 
+Validate AionUI locale drift against the installed sidecar before shipping a
+new overlay update:
+
+```bash
+node "${COMPANY_OS_ROOT}/scripts/operator-shell/aionui-localization-gate.mjs" \
+  --company-os-root "${COMPANY_OS_ROOT}" \
+  --aionui-root "${AIONUI_SIDECAR_ROOT}" \
+  --json
+```
+
 Current overlay behavior:
 
+- AionUI is German-first with a full Command EVE `de-DE` language pack across
+  every upstream `en-US` namespace; fresh installs default to German while
+  still allowing English
+- login brand media uses the face-focused EVE wait video, not the AionUI or
+  fallback Command-key logo
+- login title renders `⌘ EVE + <version>` from generated
+  `public/command-eve-brand.json`, so the installed Company.OS version remains
+  visible without manually editing AionUI for every release
 - sidebar brand shows the Command EVE mark plus `EVE`
 - Hermes remains the default backend but is displayed as EVE
 - model/assistant picker is hidden on the first screen
@@ -442,9 +466,12 @@ reports/operator-shell/YYYY-MM-DD/eve-aionui-hermes-start-packet.json
 ## `/update_eve` Rule
 
 `/update_eve` first updates Company.OS kit/docs through
-`scripts/update/company-os-update.mjs`. AionUI/Hermes sidecar updates are a
-separate explicit step. If the update includes frontend branding or first-run
-UI changes, re-run the overlay preflight/apply commands above and then run the
+`scripts/update/company-os-update.mjs`. If the source is a Git checkout, the
+launcher runs `git pull --ff-only` before checking. If the source is an exported
+public mirror without `.git` metadata, it skips only the pull step and still
+runs the local update check. AionUI/Hermes sidecar updates are a separate
+explicit step. If the update includes frontend branding or first-run UI
+changes, re-run the overlay preflight/apply commands above and then run the
 Hermes/EVE smoke.
 
 ```text

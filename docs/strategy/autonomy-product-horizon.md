@@ -1,11 +1,11 @@
 # Company.OS Autonomy Product Horizon
 
 Status: strategic horizon
-Current Company.OS version: `0.9.0-rc.0`
+Current Company.OS version: `1.0.0-alpha.1`
 Current autonomy profile: `Stage 3.65 / 5`, `7.45 / 10`
 Current runtime buildout: `Stage 7 / 9 proven, Stage 8-9 gated`
 Use for: deciding what must exist before Company.OS becomes beta, 1.0 and 1.2
-Last updated: 2026-06-02
+Last updated: 2026-06-04
 
 ## Purpose
 
@@ -25,20 +25,27 @@ company direction remain governed.
 
 ## Current Position
 
-`0.7.1-rc.0` means:
+`1.0.0-alpha.1` means:
 
-- the first Command EVE/AionUI/Hermes operator-shell start path is packaged as
-  repo artifact, not just a local sidecar edit
+- the `0.9.0-rc.0` public-upstream install/update path is absorbed into the
+  current alpha line
+- the first Command EVE/AionUI/AionCore/Hermes operator-shell start path is
+  packaged as a managed local install artifact, not just a local sidecar edit
 - EVE has a first-run skill pack that inspects existing onboarding artifacts
   before asking the founder for missing setup context
 - connector manifests classify the first required/optional app surfaces EVE
   needs to reason about during setup
-- runtime smoke evidence exists for the local guided start path
+- runtime smoke evidence exists for the local guided start path and bundled
+  update commands
 - a self-serve candidate smoke proves kit install, first onboarding packet,
   EVE boot packet and update dry-run from a fresh target
+- the Content Machine pack provides the first reusable marketing/GTM wedge
 - the installable kit exists
 - the execution-ledger contract exists
 - the controller and HumanGate doctrine exists
+- the post-worker quality loop can produce scheduler-visible quality,
+  security, regression, deep-audit and hotfix follow-up candidates without
+  letting the controller spawn workers directly
 - Plane is the canonical Company.OS execution ledger; Linear is legacy/bridge
 - L1/L2 lanes have executable hardening gates
 - L3 can prepare sandbox branches and review packets
@@ -64,11 +71,11 @@ Current limits:
 - no complete department dashboard layer
 - no mature cloud scheduler install
 - no role identity registry or app-user layer
-- no completed self-serve install/update/onboarding path for an arbitrary new
-  founder
-- no hardened `/start_eve` command, Hermes update-or-pin decision or AionUI
-  default-agent/auth preflight
-- no full marketing/content/social publishing OS
+- no stable unattended self-serve install/update/onboarding path for an
+  arbitrary new founder
+- no signed desktop app, hosted multi-tenant account layer or product-grade
+  support lifecycle
+- no autonomous marketing/content/social publishing OS
 - no HR, sales, finance or legal operating packs
 - no standard customer implementation playbook with support lifecycle
 - no 1.0 release gate with security, privacy, license and install evidence

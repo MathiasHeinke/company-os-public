@@ -52,7 +52,8 @@ Canonical upstream references:
 Upstream-reported properties to verify during the pilot:
 
 - local UI: `http://localhost:5899`
-- install command: `curl -fsSL https://raindrop.sh/install | bash`
+- install path: verify the upstream Raindrop Workshop install docs first; do not
+  run pipe-to-shell quick installers without operator review.
 - source build: `git clone https://github.com/raindrop-ai/workshop.git`
   followed by `bun install` and `bun run dev`
 - default local database:

@@ -6,6 +6,7 @@ import test from "node:test";
 
 import {
   REQUIRED_DOCS,
+  REQUIRED_OPERATOR_SHELL_FILES,
   REQUIRED_SCRIPTS,
   evaluateProductizationReadiness,
   extractReadmeVersion,
@@ -25,6 +26,7 @@ function write(root, relativePath, content = "ok\n") {
 function writeMinimalRepo(root, { version = "0.3.1-alpha.1", readmeVersion = version } = {}) {
   for (const doc of REQUIRED_DOCS) write(root, doc);
   for (const script of REQUIRED_SCRIPTS) write(root, script);
+  for (const file of REQUIRED_OPERATOR_SHELL_FILES) write(root, file, "{}\n");
   write(root, "VERSION", `${version}\n`);
   write(root, "CHANGELOG.md", `# Changelog\n\n## ${version} - 2026-05-10\n`);
   write(
@@ -351,6 +353,24 @@ test("kit.token-shaped-string redacts token values and blocks on public release"
     !publicSerialized.includes(leakedToken),
     "public-release blocker must not include the redacted token value",
   );
+});
+
+test("kit.token-shaped-string catches Supabase token-shaped values", () => {
+  const root = fixtureRoot();
+  writeMinimalRepo(root);
+  const leakedToken = ["su", "test", "abcdefghijklmnopqrstuvwxyz"].join("_");
+  write(
+    root,
+    "kits/company-os-kit/.company-os/operations/example.md",
+    `SUPABASE_ACCESS_TOKEN=${leakedToken}\n`,
+  );
+
+  const publicRelease = evaluateProductizationReadiness({ root, publicRelease: true });
+  assert.equal(publicRelease.ok, false);
+  const blocker = publicRelease.blockers.find((item) => item.id === "kit.token-shaped-string");
+  assert.ok(blocker, "expected kit.token-shaped-string blocker for Supabase-like token");
+  assert.equal(blocker.details.sample[0].pattern, "supabase-token");
+  assert.equal(JSON.stringify(blocker).includes(leakedToken), false);
 });
 
 test("install.prerequisite-drift warns when installer scaffolding is missing", () => {

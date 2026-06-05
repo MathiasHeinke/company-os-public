@@ -542,6 +542,16 @@ test("preflightSecrets BLOCKED on connector token patterns", () => {
   assert.equal(r.reason, PREFLIGHT_REASONS.SECRET_LEAK_SUSPECTED);
 });
 
+test("preflightSecrets BLOCKED on Supabase token patterns", () => {
+  const token = ["su", "test", "abcdefghijklmnopqrstuvwxyz"].join("_");
+  const r = preflightSecrets({
+    description: `Do not leak ${token}`,
+    contractFields: {},
+  });
+  assert.equal(r.state, RUN_STATES.BLOCKED_AUTH);
+  assert.equal(r.reason, PREFLIGHT_REASONS.SECRET_LEAK_SUSPECTED);
+});
+
 // ---------- preflightCapabilityProfile ----------
 
 test("preflightCapabilityProfile PASS for matching declared profile", () => {

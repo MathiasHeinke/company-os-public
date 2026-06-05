@@ -7,8 +7,14 @@ export const EVE_RUNTIME_BOOT_PACKET_VERSION = "eve-runtime-boot-packet/v0";
 export const EVE_FIRST_RUN_SKILL_PACK_VERSION = "eve-first-run-skill-pack/v0";
 export const EVE_CONNECTOR_MANIFEST_VERSION = "eve-connector-manifest/v0";
 export const EVE_RUNTIME_POLICY_VERSION = "eve-runtime-policy/v0";
+export const EVE_FIRST_RUN_CONFIRMATION_VERSION = "eve-first-run-confirmation/v0";
+export const EVE_HERMES_AUTH_PREFLIGHT_VERSION = "eve-hermes-auth-preflight/v0";
 export const DEFAULT_EVE_CONNECTOR_MANIFEST_FILE = "kits/company-os-kit/.company-os/eve/connector-manifests.json";
 export const DEFAULT_EVE_RUNTIME_POLICY_FILE = "kits/company-os-kit/.company-os/eve/runtime-policy.json";
+export const DEFAULT_EVE_OPERATOR_MANIFEST_FILE = "registries/operator-shell/command-eve-1.0-alpha.json";
+export const DEFAULT_EVE_INFERENCE_PROVIDER = "openrouter";
+export const DEFAULT_EVE_INFERENCE_MODEL = "minimax/minimax-m3";
+export const DEFAULT_EVE_INFERENCE_MODEL_URL = "https://openrouter.ai/minimax/minimax-m3";
 
 // [WORK_ITEM_ID]: Failure taxonomy codes for preflight and smoke blockages.
 // BLOCKED_RUNTIME: missing sidecar tools, venv, ACP adapter or generated files.
@@ -21,7 +27,7 @@ export const FAILURE_CODES = Object.freeze({
 });
 
 const RUNTIME_FAILURE_KEYS = new Set([
-  "company_os_root", "aionui_root", "hermes_root",
+  "company_os_root", "client_root", "aionui_root", "hermes_root",
   "hermes_wrapper_executable", "aionui_hermes_shim_executable",
   "hermes_acp_dependency_available", "hermes_soul_exists",
   "eve_runtime_boot_packet_exists", "eve_first_run_skill_exists",
@@ -95,6 +101,27 @@ function rel(root, file) {
 
 function exists(file) {
   return fs.existsSync(file);
+}
+
+function readJsonSafe(file) {
+  if (!exists(file)) return { ok: false, status: "missing", path: file, data: null, errors: [] };
+  try {
+    return {
+      ok: true,
+      status: "found",
+      path: file,
+      data: JSON.parse(fs.readFileSync(file, "utf8")),
+      errors: [],
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      status: "invalid_json",
+      path: file,
+      data: null,
+      errors: [error.message || String(error)],
+    };
+  }
 }
 
 function isExecutable(file) {
@@ -190,6 +217,96 @@ function readHermesModelConfig(hermesHome) {
   };
 }
 
+function readOperatorInferenceManifest(paths) {
+  const manifestPath = path.join(paths.companyOsRoot, DEFAULT_EVE_OPERATOR_MANIFEST_FILE);
+  const loaded = readJsonSafe(manifestPath);
+  const inference = loaded.data?.default_inference || {};
+  return {
+    ok: loaded.ok,
+    status: loaded.status,
+    path: manifestPath,
+    provider: compact(inference.provider) || DEFAULT_EVE_INFERENCE_PROVIDER,
+    model: compact(inference.model) || DEFAULT_EVE_INFERENCE_MODEL,
+    model_url: compact(inference.model_url) || DEFAULT_EVE_INFERENCE_MODEL_URL,
+    auth_mode: compact(inference.auth_mode) || "bring-your-own-key",
+    secret_policy: compact(inference.secret_policy) || "do-not-store-raw-api-key-in-company-os",
+    errors: loaded.errors || [],
+  };
+}
+
+export function buildHermesAuthPreflightProfile({ paths, provider = "", model = "", smoke = null } = {}) {
+  const manifest = readOperatorInferenceManifest(paths);
+  const configured = readHermesModelConfig(paths.hermesHome);
+  const effectiveProvider = compact(provider) || configured.provider || manifest.provider;
+  const effectiveModel = compact(model) || configured.model || manifest.model;
+  const smokeStatus = smoke
+    ? smoke.ok
+      ? "verified"
+      : smoke.failure_taxonomy?.code || smoke.reason || "blocked"
+    : "not_run";
+  const modelProfileConfigured = Boolean(configured.ok && effectiveProvider && effectiveModel);
+  const status = smoke
+    ? smoke.ok
+      ? "verified"
+      : smokeStatus === FAILURE_CODES.BLOCKED_AUTH
+        ? FAILURE_CODES.BLOCKED_AUTH
+        : "blocked"
+    : modelProfileConfigured
+      ? "model_profile_ready_auth_unverified"
+      : "needs_model_profile";
+  return {
+    version: EVE_HERMES_AUTH_PREFLIGHT_VERSION,
+    status,
+    provider: effectiveProvider,
+    model: effectiveModel,
+    model_url: manifest.model_url,
+    auth_mode: manifest.auth_mode,
+    secret_policy: manifest.secret_policy,
+    config_path: configured.path,
+    model_profile_configured: modelProfileConfigured,
+    smoke_status: smokeStatus,
+    official_setup: {
+      rule: "Configure provider access through the provider's official BYOK/API-key flow. Do not paste raw API keys into EVE, Codex, Plane, reports or repository files.",
+      provider_auth_surface: effectiveProvider === "openrouter"
+        ? "OpenRouter account dashboard / API Keys"
+        : `${effectiveProvider || "provider"} official account dashboard / API key flow`,
+      expected_default_route: `${effectiveProvider || DEFAULT_EVE_INFERENCE_PROVIDER} / ${effectiveModel || DEFAULT_EVE_INFERENCE_MODEL}`,
+      check_command: "node scripts/operator-shell/start_eve.mjs check --auth-check --json",
+      blocked_auth_result: FAILURE_CODES.BLOCKED_AUTH,
+    },
+    next_actions: modelProfileConfigured
+      ? [
+        "Run: node scripts/operator-shell/start_eve.mjs check --auth-check --json",
+        "If the result is BLOCKED_AUTH, configure the provider through its official account/API-key flow.",
+        "Never paste raw API keys into chat, Plane, reports or the Company.OS repository.",
+      ]
+      : [
+        `Set the Hermes default provider/model profile to ${manifest.provider} / ${manifest.model}.`,
+        "Then configure provider access through the official provider BYOK/API-key flow.",
+        "Then run: node scripts/operator-shell/start_eve.mjs check --auth-check --json",
+      ],
+    readiness_proof: smoke?.ok
+      ? {
+        status: "pass",
+        provider: effectiveProvider,
+        model: effectiveModel,
+        proof: "Hermes one-shot returned a non-empty EVE readiness line.",
+      }
+      : {
+        status: smoke ? smokeStatus : "pending",
+        provider: effectiveProvider,
+        model: effectiveModel,
+        proof: "Auth/model readiness is not proven until --auth-check returns pass.",
+      },
+    blocked_actions: [
+      "do not collect raw API keys in chat",
+      "do not write provider secrets into Company.OS",
+      "do not scrape browser sessions, cookies or local keychains",
+      "do not mutate provider billing or quota settings autonomously",
+    ],
+  };
+}
+
 function checkHermesAcpDependency(paths) {
   const python = path.join(paths.hermesRoot, "venv/bin/python");
   const installCommand = `cd "${paths.hermesRoot}" && venv/bin/python -m pip install -e '.[acp]'`;
@@ -218,13 +335,24 @@ function checkHermesAcpDependency(paths) {
   };
 }
 
-// [WORK_ITEM_ID]: Reads the installed Hermes version from pyproject.toml.
+// [WORK_ITEM_ID]: Reads the installed Hermes version from source or venv package metadata.
 function readHermesVersion(hermesRoot) {
   const tomlPath = path.join(hermesRoot, "pyproject.toml");
-  if (!exists(tomlPath)) return "";
-  const content = fs.readFileSync(tomlPath, "utf8");
-  const match = content.match(/^version\s*=\s*"([^"]+)"/m);
-  return match ? match[1] : "";
+  if (exists(tomlPath)) {
+    const content = fs.readFileSync(tomlPath, "utf8");
+    const match = content.match(/^version\s*=\s*"([^"]+)"/m);
+    if (match) return match[1];
+  }
+  const python = path.join(hermesRoot, "venv/bin/python");
+  if (!exists(python)) return "";
+  const metadata = runCapture(python, [
+    "-c",
+    "import importlib.metadata as m; print(m.version('hermes-agent'))",
+  ], {
+    cwd: hermesRoot,
+    timeoutMs: 15_000,
+  });
+  return metadata.ok ? metadata.stdout : "";
 }
 
 // [WORK_ITEM_ID]: Produces a structured Hermes runtime package decision.
@@ -323,6 +451,7 @@ export function classifyFailureTaxonomy(failures = [], smoke = null) {
 export function resolveEveSidecarPaths(options = {}, env = process.env) {
   const home = env.HOME || process.env.HOME || "";
   const companyOsRoot = path.resolve(options.companyOsRoot || env.COMPANY_OS_ROOT || process.cwd());
+  const clientRoot = path.resolve(options.clientRoot || env.COMPANY_OS_CLIENT_ROOT || companyOsRoot);
   const privateRoot = path.resolve(
     options.privateRoot || env.COMPANY_OS_PRIVATE_ROOT || path.join(home, "Developer", "company-os-private-ops"),
   );
@@ -352,6 +481,7 @@ export function resolveEveSidecarPaths(options = {}, env = process.env) {
   );
   return {
     companyOsRoot,
+    clientRoot,
     privateRoot,
     aionuiRoot,
     hermesRoot,
@@ -488,8 +618,8 @@ export function readEveRuntimePolicy({ paths } = {}) {
   return readRuntimePolicyFile(source);
 }
 
-function findLatestFirstCompanyPacket(companyOsRoot) {
-  const reportsRoot = path.join(companyOsRoot, "reports", "company-discovery");
+function findLatestFirstCompanyPacket(clientRoot) {
+  const reportsRoot = path.join(clientRoot, "reports", "company-discovery");
   if (!exists(reportsRoot)) return "";
   const dates = fs.readdirSync(reportsRoot, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
@@ -503,20 +633,247 @@ function findLatestFirstCompanyPacket(companyOsRoot) {
   return "";
 }
 
+function clientArtifactCandidates(paths) {
+  const latestFirstCompanyPacket = findLatestFirstCompanyPacket(paths.clientRoot);
+  return [
+    {
+      id: "eve_boot_packet",
+      relative_path: ".company-os/onboarding/eve-boot-packet.json",
+      path: path.join(paths.clientRoot, ".company-os/onboarding/eve-boot-packet.json"),
+      kind: "json",
+    },
+    {
+      id: "intake_record",
+      relative_path: ".company-os/onboarding/intake-record.json",
+      path: path.join(paths.clientRoot, ".company-os/onboarding/intake-record.json"),
+      kind: "json",
+    },
+    {
+      id: "company_intake",
+      relative_path: ".company-os/onboarding/company-intake.json",
+      path: path.join(paths.clientRoot, ".company-os/onboarding/company-intake.json"),
+      kind: "json",
+    },
+    {
+      id: "company_discovery_brief",
+      relative_path: ".company-os/company-discovery-brief.md",
+      path: path.join(paths.clientRoot, ".company-os/company-discovery-brief.md"),
+      kind: "markdown",
+    },
+    {
+      id: "first_company_packet",
+      relative_path: latestFirstCompanyPacket
+        ? rel(paths.clientRoot, latestFirstCompanyPacket)
+        : "reports/company-discovery/YYYY-MM-DD/first-company-packet.md",
+      path: latestFirstCompanyPacket || path.join(paths.clientRoot, "reports/company-discovery/YYYY-MM-DD/first-company-packet.md"),
+      kind: "markdown",
+    },
+  ];
+}
+
+function sourceObjects(data = {}) {
+  return [
+    data.account_seed,
+    data.company,
+    data.market,
+    data.eve_onboarding,
+    data,
+  ].filter((entry) => entry && typeof entry === "object");
+}
+
+function pickField(objects, keys) {
+  for (const object of objects) {
+    for (const key of keys) {
+      const value = compact(object[key]);
+      if (value) return value;
+    }
+  }
+  return "";
+}
+
+function extractKnownFactsFromData(data = {}) {
+  const objects = sourceObjects(data);
+  return {
+    user_name: pickField(objects, ["user_name", "founder_name", "founder", "founder_ceo", "approval_owner"]),
+    company_name: pickField(objects, ["company_name", "name", "company"]),
+    website: pickField(objects, ["website", "domain", "url"]),
+    primary_offer: pickField(objects, ["primary_offer", "offer"]),
+    buyer: pickField(objects, ["buyer", "target_buyer", "customer"]),
+    first_department: pickField(objects, ["first_department", "first_pack", "first_wedge", "pack_id"]),
+    initial_report_context: pickField(objects, ["initial_report_context", "report_context", "context"]),
+  };
+}
+
+function mergeKnownFacts(artifacts) {
+  const merged = {};
+  const sources = {};
+  for (const artifact of artifacts) {
+    if (!artifact.data) continue;
+    const facts = extractKnownFactsFromData(artifact.data);
+    for (const [key, value] of Object.entries(facts)) {
+      if (!value || merged[key]) continue;
+      merged[key] = value;
+      sources[key] = artifact.relative_path;
+    }
+  }
+  return { facts: merged, sources };
+}
+
+function firstRunFactRows(facts, sources) {
+  const labels = {
+    user_name: "Founder/operator",
+    company_name: "Company",
+    website: "Website",
+    primary_offer: "Primary offer",
+    buyer: "Buyer",
+    first_department: "First department wedge",
+    initial_report_context: "Initial report context",
+  };
+  return Object.entries(labels).map(([id, label]) => ({
+    id,
+    label,
+    value: compact(facts[id]),
+    status: compact(facts[id]) ? "known" : "missing_or_unverified",
+    source: sources[id] || "",
+  }));
+}
+
+function extractExistingSystems(artifacts) {
+  for (const artifact of artifacts) {
+    const data = artifact.data;
+    if (!data) continue;
+    const existing = data.existing_systems || {};
+    const runtimeProbe = data.runtime_probe || {};
+    const connectedTools = existing.connected_tools || runtimeProbe.connected_tools || [];
+    const alreadyAvailable = existing.already_available || runtimeProbe.already_available || [];
+    const missingOrBlocked = existing.missing_or_blocked || runtimeProbe.missing_or_blocked || [];
+    if (connectedTools.length || alreadyAvailable.length || missingOrBlocked.length || existing.discovery_status) {
+      return {
+        status: existing.discovery_status || "partial_or_unverified",
+        source: artifact.relative_path,
+        connected_tools: connectedTools,
+        already_available: alreadyAvailable,
+        missing_or_blocked: missingOrBlocked,
+      };
+    }
+  }
+  return {
+    status: "not_inventoried",
+    source: "",
+    connected_tools: [],
+    already_available: [],
+    missing_or_blocked: [],
+  };
+}
+
+export function buildEveFirstRunConfirmationFlow({ paths, generatedAt = new Date().toISOString() } = {}) {
+  const candidates = clientArtifactCandidates(paths);
+  const artifacts = candidates.map((candidate) => {
+    if (candidate.kind === "json") {
+      const loaded = readJsonSafe(candidate.path);
+      return {
+        ...candidate,
+        status: loaded.status,
+        ok: loaded.ok,
+        data: loaded.data,
+        errors: loaded.errors,
+      };
+    }
+    return {
+      ...candidate,
+      status: exists(candidate.path) ? "found" : "missing",
+      ok: exists(candidate.path),
+      data: null,
+      errors: [],
+    };
+  });
+  const found = artifacts.filter((artifact) => artifact.status === "found");
+  const { facts, sources } = mergeKnownFacts(artifacts);
+  const knownFacts = firstRunFactRows(facts, sources);
+  const missingFacts = knownFacts.filter((fact) => fact.status !== "known").map((fact) => fact.id);
+  const clientSeedPresent = found.some((artifact) => ["eve_boot_packet", "intake_record", "company_intake"].includes(artifact.id));
+  const existingSystems = extractExistingSystems(artifacts);
+  return {
+    version: EVE_FIRST_RUN_CONFIRMATION_VERSION,
+    generated_at: generatedAt,
+    status: clientSeedPresent ? "needs_confirmation" : "needs_initialization",
+    seed_status: clientSeedPresent ? "client_seed_present" : "client_seed_missing",
+    client_root: paths.clientRoot,
+    source_artifacts: artifacts.map((artifact) => ({
+      id: artifact.id,
+      relative_path: artifact.relative_path,
+      path: artifact.path,
+      status: artifact.status,
+      errors: artifact.errors,
+    })),
+    known_facts: knownFacts,
+    missing_or_unverified_facts: missingFacts,
+    first_response_contract: clientSeedPresent
+      ? {
+        opening: "I know these account/company facts from the signup or intake seed. Please confirm or correct them before I persist memory or draft work.",
+        ask: "Is this correct?",
+        max_questions: 1,
+      }
+      : {
+        opening: "This Company.OS runtime is installed, but I do not have initialized client intake yet.",
+        ask: "Which setup path should we take first?",
+        max_questions: 1,
+      },
+    progressive_setup_queue: {
+      required_now: [
+        "confirm known account/company facts",
+        "confirm memory persistence boundary",
+        "run Hermes provider auth/model smoke if auth is unverified",
+      ],
+      helpful_now: [
+        "inventory existing ledgers, task sources, roles and owners read-only",
+        "choose first department wedge",
+        "draft Founder Intent Packet and CEO Delegation Packet",
+      ],
+      later: [
+        "connect only the tools needed by the selected department wedge",
+        "draft Plane parent/child contracts with dispatch: manual",
+        "enable durable memory, code delegation or scheduled routines only after gates",
+      ],
+    },
+    existing_system_inventory: {
+      policy: "adapt_existing_first",
+      status: existingSystems.status,
+      source: existingSystems.source,
+      connected_tools: existingSystems.connected_tools,
+      already_available: existingSystems.already_available,
+      missing_or_blocked: existingSystems.missing_or_blocked,
+      next_step: "Inspect existing systems read-only before proposing replacement structure, migration or duplication.",
+    },
+    allowed_drafts: [
+      "Founder Intent Packet",
+      "CEO Delegation Packet",
+      "Plane worker-contract draft with dispatch: manual",
+    ],
+    blocked_actions: [
+      "no durable memory write before confirmation",
+      "no connector OAuth mutation before explicit operator step",
+      "no worker dispatch",
+      "no Plane Done",
+      "no public publish/send/schedule/spend",
+    ],
+  };
+}
+
 export function buildEveRuntimeBootPacket({ paths, generatedAt = new Date().toISOString() } = {}) {
   const clientArtifacts = [
     ".company-os/onboarding/eve-boot-packet.json",
     ".company-os/onboarding/intake-record.json",
     ".company-os/company-discovery-brief.md",
   ].map((file) => {
-    const absolute = path.join(paths.companyOsRoot, file);
+    const absolute = path.join(paths.clientRoot, file);
     return {
       path: absolute,
       relative_path: file,
       status: exists(absolute) ? "found" : "missing",
     };
   });
-  const latestFirstCompanyPacket = findLatestFirstCompanyPacket(paths.companyOsRoot);
+  const latestFirstCompanyPacket = findLatestFirstCompanyPacket(paths.clientRoot);
   clientArtifacts.push({
     path: latestFirstCompanyPacket || path.join(paths.companyOsRoot, "reports/company-discovery/YYYY-MM-DD/first-company-packet.md"),
     relative_path: latestFirstCompanyPacket
@@ -531,6 +888,7 @@ export function buildEveRuntimeBootPacket({ paths, generatedAt = new Date().toIS
     version: EVE_RUNTIME_BOOT_PACKET_VERSION,
     generated_at: generatedAt,
     source_root: paths.companyOsRoot,
+    client_root: paths.clientRoot,
     north_star: FOUNDER_OFFLINE_TEST,
     client_status: clientStatus,
     client_artifacts: clientArtifacts,
@@ -568,6 +926,7 @@ export function buildEveRuntimeBootPacket({ paths, generatedAt = new Date().toIS
         ],
       },
     },
+    first_run_confirmation: buildEveFirstRunConfirmationFlow({ paths, generatedAt }),
     max_initial_questions: 3,
     blocked_actions: [
       "no Plane writes",
@@ -613,18 +972,20 @@ export function buildEveFirstRunSkillContent({
     "1. Read the runtime boot packet first.",
     `   - ${paths.eveRuntimeBootPacket}`,
     "2. Check for actual client onboarding artifacts before asking setup questions.",
-    `   - ${path.join(paths.companyOsRoot, ".company-os/onboarding/eve-boot-packet.json")}`,
-    `   - ${path.join(paths.companyOsRoot, ".company-os/onboarding/intake-record.json")}`,
-    `   - ${path.join(paths.companyOsRoot, ".company-os/company-discovery-brief.md")}`,
-    `   - ${path.join(paths.companyOsRoot, "reports/company-discovery/YYYY-MM-DD/first-company-packet.md")}`,
-    "3. Read the connector manifest and classify what is available now, later, optional or gated.",
+    `   - ${path.join(paths.clientRoot, ".company-os/onboarding/eve-boot-packet.json")}`,
+    `   - ${path.join(paths.clientRoot, ".company-os/onboarding/intake-record.json")}`,
+    `   - ${path.join(paths.clientRoot, ".company-os/company-discovery-brief.md")}`,
+    `   - ${path.join(paths.clientRoot, "reports/company-discovery/YYYY-MM-DD/first-company-packet.md")}`,
+    "3. Read `first_run_confirmation` in the runtime boot packet. Say known facts first, ask for correction, then proceed through required/helpful/later setup.",
+    "4. Read the Hermes auth profile from preflight when available. Missing provider auth is BLOCKED_AUTH and should route the operator to the provider's official BYOK flow; never ask for raw keys in chat.",
+    "5. Read the connector manifest and classify what is available now, later, optional or gated.",
     `   - ${paths.eveConnectorManifest}`,
-    "4. Read the runtime policy and keep native AionUI/Hermes autonomy disabled unless a Company.OS gate promotes it.",
+    "6. Read the runtime policy and keep native AionUI/Hermes autonomy disabled unless a Company.OS gate promotes it.",
     `   - ${paths.eveRuntimePolicy}`,
-    "5. Treat the manifest as policy, not proof of availability. A connector is only configured when a preflight/evidence path proves it.",
-    "6. Inventory existing systems before creating new Company.OS structures.",
-    "7. Offer exactly three next moves when the install is not initialized.",
-    "8. Keep all work at draft/manual-dispatch until CEO/Codex review.",
+    "7. Treat the manifest as policy, not proof of availability. A connector is only configured when a preflight/evidence path proves it.",
+    "8. Inventory existing systems before creating new Company.OS structures.",
+    "9. Offer exactly three next moves when the install is not initialized.",
+    "10. Keep all work at draft/manual-dispatch until CEO/Codex review.",
     "",
     "## First Response Modes",
     "",
@@ -676,6 +1037,13 @@ export function buildEveFirstRunSkillContent({
     `- AionUI disabled features: ${aionuiDisabled.map((feature) => feature.id).join(", ") || "unverified"}`,
     `- Hermes disabled features: ${hermesDisabled.map((feature) => feature.id).join(", ") || "unverified"}`,
     `- Hermes gated features: ${hermesGated.map((feature) => `${feature.id} (${feature.human_gate || "gate"})`).join(", ") || "unverified"}`,
+    "",
+    "## Auth / Model Preflight",
+    "",
+    "- Default route: openrouter / minimax/minimax-m3 unless the install manifest or Hermes config says otherwise.",
+    "- Supported proof: `node scripts/operator-shell/start_eve.mjs check --auth-check --json` or installed `.company-os/bin/start_eve --auth-check --json`.",
+    "- BLOCKED_AUTH means provider key, quota, network or official provider setup is missing; it is not proof the Company.OS install is broken.",
+    "- Guide the operator to the provider's official BYOK/API-key flow. Do not collect, echo, store or paste raw API keys.",
     "",
     "## Install Assistance Rules",
     "",
@@ -764,10 +1132,10 @@ export function buildEveSoulContent({ paths, generatedAt = new Date().toISOStrin
     "0b. Then load the Command EVE Runtime Policy. It disables native AionUI/Hermes autonomy until CEO/Codex, CAO and HumanGate evidence promotes a lane:",
     `   - ${paths.eveRuntimePolicy}`,
     "1. Then check whether onboarding artifacts are present:",
-    `   - ${path.join(paths.companyOsRoot, ".company-os/onboarding/eve-boot-packet.json")}`,
-    `   - ${path.join(paths.companyOsRoot, ".company-os/onboarding/intake-record.json")}`,
-    `   - ${path.join(paths.companyOsRoot, ".company-os/company-discovery-brief.md")}`,
-    `   - ${path.join(paths.companyOsRoot, "reports/company-discovery/YYYY-MM-DD/first-company-packet.md")}`,
+    `   - ${path.join(paths.clientRoot, ".company-os/onboarding/eve-boot-packet.json")}`,
+    `   - ${path.join(paths.clientRoot, ".company-os/onboarding/intake-record.json")}`,
+    `   - ${path.join(paths.clientRoot, ".company-os/company-discovery-brief.md")}`,
+    `   - ${path.join(paths.clientRoot, "reports/company-discovery/YYYY-MM-DD/first-company-packet.md")}`,
     "2. If eve-boot-packet.json exists, start by saying what you already know from account/report/intake seed and ask for correction before saving memory.",
     "3. If artifacts are missing but the Company.OS kit/template exists, do not say the workspace is empty. Say the client runtime is not initialized yet and offer exactly three choices: generate the first-company packet from known signup/report seed, inspect existing systems read-only, or continue as product-demo.",
     "4. If artifacts are missing and no template exists, start a short guided setup queue. Ask at most three initial questions before drafting the next concrete setup step.",
@@ -828,6 +1196,7 @@ export function buildOperatorBrief({ paths, generatedAt = new Date().toISOString
     "Important paths:",
     "",
     `- Company.OS root: ${paths.companyOsRoot}`,
+    `- Client install root: ${paths.clientRoot}`,
     `- Command Center packet: ${path.join(paths.companyOsRoot, "reports/examples/command-center-read-model/command-center-read-model.example.json")}`,
     `- EVE soul source: ${path.join(paths.companyOsRoot, "docs/operations/eve-soul-boot-contract.md")}`,
     `- Founder intent source: ${path.join(paths.companyOsRoot, "docs/operations/eve-founder-intent-operating-layer.md")}`,
@@ -927,6 +1296,7 @@ export function prepareEveSidecar(options = {}) {
     .filter((file) => !exists(file));
   const errors = [];
   if (!exists(paths.companyOsRoot)) errors.push(`Company.OS root not found: ${paths.companyOsRoot}`);
+  if (!exists(paths.clientRoot)) errors.push(`Company.OS client root not found: ${paths.clientRoot}`);
   if (!exists(paths.aionuiRoot)) errors.push(`AionUI sidecar root not found: ${paths.aionuiRoot}`);
   if (!exists(paths.hermesRoot)) errors.push(`Hermes sidecar root not found: ${paths.hermesRoot}`);
   if (!exists(path.join(paths.hermesRoot, "venv/bin/hermes"))) {
@@ -992,9 +1362,15 @@ export function prepareEveSidecar(options = {}) {
 export function preflightEveSidecar(options = {}) {
   const paths = resolveEveSidecarPaths(options);
   const hermesModel = readHermesModelConfig(paths.hermesHome);
+  const authProfile = buildHermesAuthPreflightProfile({
+    paths,
+    provider: options.provider,
+    model: options.model,
+  });
   const hermesAcp = checkHermesAcpDependency(paths);
   const sidecarConnectorManifest = readConnectorManifestFile(paths.eveConnectorManifest);
   const sidecarRuntimePolicy = readRuntimePolicyFile(paths.eveRuntimePolicy);
+  const firstRunConfirmation = buildEveFirstRunConfirmationFlow({ paths });
   const hermesVersion = exists(paths.hermesWrapper) && isExecutable(paths.hermesWrapper)
     ? runCapture(paths.hermesWrapper, ["--version"], { cwd: paths.companyOsRoot, timeoutMs: 20_000 })
     : { ok: false, stdout: "", stderr: "", error: "Hermes wrapper missing or not executable" };
@@ -1002,6 +1378,7 @@ export function preflightEveSidecar(options = {}) {
   const aionPackage = exists(aionPkg) ? JSON.parse(fs.readFileSync(aionPkg, "utf8")) : {};
   const checks = {
     company_os_root: exists(paths.companyOsRoot),
+    client_root: exists(paths.clientRoot),
     aionui_root: exists(paths.aionuiRoot),
     hermes_root: exists(paths.hermesRoot),
     hermes_wrapper_executable: isExecutable(paths.hermesWrapper),
@@ -1031,6 +1408,7 @@ export function preflightEveSidecar(options = {}) {
     failures,
     failure_taxonomy: failureTaxonomy,
     hermes_package_decision: packageDecision,
+    auth_profile: authProfile,
     aionui: {
       version: aionPackage.version || "",
       git: gitInfo(paths.aionuiRoot),
@@ -1040,6 +1418,7 @@ export function preflightEveSidecar(options = {}) {
       version_ok: hermesVersion.ok,
       git: gitInfo(paths.hermesRoot),
       model_config: hermesModel,
+      auth_profile: authProfile,
       acp_dependency: hermesAcp,
       soul_location: {
         status: exists(paths.soulPath) ? "found" : "not_found",
@@ -1078,6 +1457,7 @@ export function preflightEveSidecar(options = {}) {
         blocked_actions: sidecarRuntimePolicy.data.blocked_actions || [],
         errors: sidecarRuntimePolicy.errors,
       },
+      first_run_confirmation: firstRunConfirmation,
     },
   };
 }
@@ -1164,6 +1544,12 @@ export function runHermesEveSmoke(options = {}) {
       : "",
   };
   smokeResult.failure_taxonomy = classifyFailureTaxonomy([], smokeResult);
+  smokeResult.auth_profile = buildHermesAuthPreflightProfile({
+    paths,
+    provider,
+    model,
+    smoke: smokeResult,
+  });
   return smokeResult;
 }
 

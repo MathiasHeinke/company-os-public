@@ -43,6 +43,7 @@ function usage() {
 
 Applies the reproducible Command EVE AionUI UI overlay:
 - copies the Command EVE logo and wait-video assets into AionUI public/
+- copies the managed full de-DE Command EVE language pack into AionUI locales/
 - applies the checked AionUI source patch with git apply
 
 Version: ${AIONUI_COMMAND_EVE_OVERLAY_VERSION}

@@ -10,6 +10,7 @@ import {
   hasQualityControllerMarker,
   normalizePlaneComment,
   parentContractFromWorkItem,
+  postableCandidateResults,
   renderPlaneCandidateMarkdown,
   sequenceRef,
 } from "./post-worker-quality-plane-handoff-core.mjs";
@@ -125,6 +126,32 @@ test("buildPlaneQualitySchedulerHandoff returns no-spawn when no marker exists",
   assert.deepEqual(result.reason_codes, ["quality-scheduler.marker-missing"]);
 });
 
+test("buildPlaneQualitySchedulerHandoff fans out multi-marker controller cards", () => {
+  const result = buildPlaneQualitySchedulerHandoff({
+    registry,
+    workItem: workItem(),
+    comments: [comment([
+      "post_worker_quality:",
+      "  status: FOLLOWUP_READY",
+      "  scheduler_may_spawn: true",
+      "controller.audit-followup:",
+      "  state: AUDIT_REQUESTED",
+      "  worker_class: quality-auditor",
+      "controller.audit-followup:",
+      "  state: AUDIT_REQUESTED",
+      "  worker_class: security-auditor",
+    ].join("\n"))],
+    workspaceRoot,
+    projectIdentifier: "COMPA",
+  });
+
+  assert.equal(result.status, "CANDIDATES_READY");
+  assert.equal(result.marker_count, 2);
+  assert.equal(result.candidate_count, 2);
+  assert.deepEqual(result.candidates.map((candidate) => candidate.worker_class), ["quality-auditor", "security-auditor"]);
+  assert.equal(postableCandidateResults(result).length, 2);
+});
+
 test("buildPlaneQualityProjectScan skips unmarked items and returns candidates", () => {
   const marked = workItem({ id: "marked", sequence_id: 352 });
   const unmarked = workItem({ id: "unmarked", sequence_id: 353 });
@@ -149,6 +176,58 @@ test("buildPlaneQualityProjectScan skips unmarked items and returns candidates",
   assert.equal(scan.skipped_no_marker, 1);
   assert.equal(scan.candidate_count, 1);
   assert.equal(scan.candidates[0].worker_class, "security-auditor");
+});
+
+test("buildPlaneQualityProjectScan does not post partial candidates from blocked aggregate cards", () => {
+  const marked = workItem({ id: "marked", sequence_id: 352 });
+  const scan = buildPlaneQualityProjectScan({
+    registry,
+    workItems: [marked],
+    commentsByWorkItemId: {
+      marked: [comment([
+        "post_worker_quality:",
+        "  status: FOLLOWUP_READY",
+        "  scheduler_may_spawn: true",
+        "controller.audit-followup:",
+        "  state: AUDIT_REQUESTED",
+        "  worker_class: quality-auditor",
+        "controller.audit-followup:",
+        "  state: AUDIT_REQUESTED",
+        "  worker_class: unknown-auditor",
+      ].join("\n"))],
+    },
+    workspaceRoot,
+    projectIdentifier: "COMPA",
+  });
+
+  assert.equal(scan.status, "NO_CANDIDATES");
+  assert.equal(scan.candidate_count, 0);
+  assert.equal(scan.blocked_count, 1);
+});
+
+test("renderPlaneCandidateMarkdown includes all generated contracts for aggregate candidates", () => {
+  const result = buildPlaneQualitySchedulerHandoff({
+    registry,
+    workItem: workItem(),
+    comments: [comment([
+      "post_worker_quality:",
+      "  status: FOLLOWUP_READY",
+      "  scheduler_may_spawn: true",
+      "controller.audit-followup:",
+      "  state: AUDIT_REQUESTED",
+      "  worker_class: quality-auditor",
+      "controller.audit-followup:",
+      "  state: AUDIT_REQUESTED",
+      "  worker_class: security-auditor",
+    ].join("\n"))],
+    workspaceRoot,
+    projectIdentifier: "COMPA",
+  });
+  const markdown = renderPlaneCandidateMarkdown(result);
+
+  assert.match(markdown, /Generated Lower-Worker Contracts/);
+  assert.match(markdown, /### quality-auditor/);
+  assert.match(markdown, /### security-auditor/);
 });
 
 test("renderPlaneCandidateMarkdown includes the candidate marker and generated contract", () => {

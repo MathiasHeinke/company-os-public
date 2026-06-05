@@ -8,8 +8,9 @@ the current local/public-RC install path.
 
 ## Release Gate Frame
 
-The current `0.9.0-rc.0` public release candidate proves public-upstream
-install/update/onboarding. It does not ship hosted SaaS, multi-tenant account
+The current `1.0.0-alpha.1` line absorbs the `0.9.0-rc.0` public-upstream
+install/update/onboarding proof and adds the managed local AionUI/Hermes/EVE
+operator-shell path. It does not ship hosted SaaS, multi-tenant account
 provisioning or a stable dashboard product.
 
 This supergoal splits the next product surface into gated release bands:
